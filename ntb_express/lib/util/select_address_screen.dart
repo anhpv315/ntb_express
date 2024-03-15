@@ -13,14 +13,14 @@ class SelectAddressScreen extends StatefulWidget {
   final User customer;
   final Address current;
 
-  SelectAddressScreen({this.customer, this.current});
+  SelectAddressScreen({required this.customer, required this.current});
 
   @override
   _SelectAddressScreenState createState() => _SelectAddressScreenState();
 }
 
 class _SelectAddressScreenState extends State<SelectAddressScreen> {
-  Address _current;
+  late Address _current;
 
   @override
   void initState() {
@@ -36,7 +36,7 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
           onPressed: () => Navigator.of(context).pop(_current),
           icon: Icon(Icons.close),
         ),
-        title: Text('${Utils.getLocale(context).selectAnAddress}'),
+        title: Text('${Utils.getLocale(context)?.selectAnAddress}'),
       ),
       body: Container(
         child: FutureBuilder<List<Address>>(
@@ -49,13 +49,13 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
             if (snapshot.hasError) {
               return Center(
                 child: Text(
-                    '${Utils.getLocale(context).errorOccurred}: ${snapshot.error.toString()}'),
+                    '${Utils.getLocale(context)?.errorOccurred}: ${snapshot.error.toString()}'),
               );
             }
 
-            if (!snapshot.hasData || snapshot.data.isEmpty) {
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
               return Center(
-                child: Text('${Utils.getLocale(context).empty}'),
+                child: Text('${Utils.getLocale(context)?.empty}'),
               );
             }
 
@@ -64,29 +64,29 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
             return Scrollbar(
               child: ListView.separated(
                 itemBuilder: (context, index) {
-                  final address = addressList[index];
+                  final address = addressList?[index];
                   return ListTile(
                     onTap: () {
                       if (mounted) {
-                        setState(() => _current = address);
+                        setState(() => _current = address!);
                       }
                       Navigator.of(context).pop(_current);
                     },
-                    title: Text('${address.fullName}'),
+                    title: Text('${address?.fullName}'),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(address.phoneNumber ?? ''),
+                        Text(address?.phoneNumber ?? ''),
                         Text([
-                          address.address,
-                          address.wards,
-                          address.district,
-                          address.province
-                        ].join(', ')?.replaceAll(' ,', '')),
+                          address?.address,
+                          address?.wards,
+                          address?.district,
+                          address?.province
+                        ].join(', ')!.replaceAll(' ,', '')),
                       ],
                     ),
                     trailing: _current != null &&
-                            _current.addressId == address.addressId
+                            _current.addressId == address?.addressId
                         ? Icon(
                             Icons.done,
                             color: Utils.accentColor,
@@ -95,7 +95,7 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
                   );
                 },
                 separatorBuilder: (context, index) => Divider(),
-                itemCount: addressList.length,
+                itemCount: addressList!.length,
               ),
             );
           },
@@ -115,16 +115,16 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
   Future<List<Address>> _getAddressList() async {
     final Completer<List<Address>> c = Completer();
     final url =
-        ApiUrls.instance().getAddressListByUserUrl(widget.customer.username);
+        ApiUrls.instance()?.getAddressListByUserUrl(widget.customer.username);
 
     HttpUtil.get(
-      url,
+      url!,
       headers: {'Content-Type': 'application/json; charset=utf-8'},
       onResponse: (resp) {
         if (resp == null || resp.statusCode != 200) {
           Utils.alert(context,
-              title: Utils.getLocale(context).failed,
-              message: '${Utils.getLocale(context).errorOccurred}: ${resp?.statusCode}');
+              title: Utils.getLocale(context)?.failed,
+              message: '${Utils.getLocale(context)?.errorOccurred}: ${resp?.statusCode}');
 
           if (!c.isCompleted) {
             c.complete([]);
@@ -146,8 +146,8 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
       },
       onTimeout: () {
         Utils.alert(context,
-            title: Utils.getLocale(context).errorOccurred,
-            message: Utils.getLocale(context).requestTimeout);
+            title: Utils.getLocale(context)?.errorOccurred,
+            message: Utils.getLocale(context)?.requestTimeout);
 
         if (!c.isCompleted) {
           c.complete([]);

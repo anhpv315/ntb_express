@@ -21,9 +21,9 @@ class Address {
   String createdDate;
   String updatedId;
   String updatedDate;
-
+  
   Address(
-      {this.addressId,
+      {this.addressId = 0,
       this.userName = '',
       this.fullName = '',
       this.phoneNumber = '',
@@ -42,7 +42,7 @@ class Address {
 
   Map<String, dynamic> toJson() => _$AddressToJson(this);
 
-  static Address clone(Address other) {
+  static Address? clone(Address? other) {
     final String jsonString = json.encode(other);
     final jsonResponse = json.decode(jsonString);
 

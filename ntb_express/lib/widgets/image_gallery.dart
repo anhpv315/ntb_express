@@ -9,13 +9,13 @@ class GalleryPhotoViewWrapper extends StatefulWidget {
     this.backgroundDecoration,
     this.minScale,
     this.maxScale,
-    this.initialIndex,
-    @required this.galleryItems,
+    this.initialIndex = 0,
+    required this.galleryItems,
     this.scrollDirection = Axis.horizontal,
   }) : pageController = PageController(initialPage: initialIndex);
 
-  final LoadingBuilder loadingBuilder;
-  final Decoration backgroundDecoration;
+  final LoadingBuilder? loadingBuilder;
+  final Decoration? backgroundDecoration;
   final dynamic minScale;
   final dynamic maxScale;
   final int initialIndex;
@@ -30,7 +30,7 @@ class GalleryPhotoViewWrapper extends StatefulWidget {
 }
 
 class _GalleryPhotoViewWrapperState extends State<GalleryPhotoViewWrapper> {
-  int currentIndex;
+  late int currentIndex;
 
   @override
   void initState() {
@@ -60,7 +60,7 @@ class _GalleryPhotoViewWrapperState extends State<GalleryPhotoViewWrapper> {
               builder: _buildItem,
               itemCount: widget.galleryItems.length,
               loadingBuilder: widget.loadingBuilder,
-              backgroundDecoration: widget.backgroundDecoration,
+              backgroundDecoration: widget.backgroundDecoration as BoxDecoration,
               pageController: widget.pageController,
               onPageChanged: onPageChanged,
               scrollDirection: widget.scrollDirection,
@@ -85,9 +85,9 @@ class _GalleryPhotoViewWrapperState extends State<GalleryPhotoViewWrapper> {
   PhotoViewGalleryPageOptions _buildItem(BuildContext context, int index) {
     final item = widget.galleryItems[index];
     return PhotoViewGalleryPageOptions(
-      imageProvider: item.isNetworkImage
+      imageProvider: (item.isNetworkImage
           ? NetworkImage(item.fileUrl)
-          : FileImage(item.file),
+          : FileImage(item.file)) as ImageProvider,
       initialScale: PhotoViewComputedScale.contained,
       minScale: PhotoViewComputedScale.contained * (0.5 + index / 10),
       maxScale: PhotoViewComputedScale.covered * 1.1,

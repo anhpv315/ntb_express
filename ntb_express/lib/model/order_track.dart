@@ -12,11 +12,11 @@ class OrderTrack {
   String note;
 
   OrderTrack(
-      {this.trackId,
-      this.actionDate,
-      this.actionId,
-      this.actionType,
-      this.orderId, this.note});
+      {this.trackId = 0,
+      this.actionDate = 0,
+      this.actionId = '',
+      this.actionType = 0,
+      this.orderId = '', this.note = ''});
 
   factory OrderTrack.fromJson(Map<String, dynamic> json) =>
       _$OrderTrackFromJson(json);

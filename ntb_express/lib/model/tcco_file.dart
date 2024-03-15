@@ -17,17 +17,17 @@ class TCCOFile {
   String fleUri;
 
   TCCOFile(
-      {this.atchFleSeq,
-      this.fleTP,
-      this.flePath,
-      this.fleNm,
-      this.newFleNm,
-      this.fleSz,
-      this.descrpt,
-      this.insId,
-      this.insDt,
-      this.uptDt,
-      this.fleUri});
+      {required this.atchFleSeq,
+      required this.fleTP,
+      required this.flePath,
+      required this.fleNm,
+      required this.newFleNm,
+      required this.fleSz,
+      required this.descrpt,
+      required this.insId,
+      required this.insDt,
+      required this.uptDt,
+      required this.fleUri});
 
   factory TCCOFile.fromJson(Map<String, dynamic> json) => _$TCCOFileFromJson(json);
 

@@ -14,35 +14,35 @@ part 'order.g.dart';
 class Order {
   String orderId;
   int addressId;
-  double commission;
+  double? commission;
   num createdDate;
   String createdId;
   String customerId;
-  double extFee;
+  double? extFee;
   String extTrackNo;
   String goodsDescr;
   int goodsType;
-  double intFee;
+  double? intFee;
   String intTrackNo;
-  double payOnBehalf;
+  double? payOnBehalf;
   int needRepack;
-  double repackFee;
+  double? repackFee;
   int orderStatus;
   int packCount;
   String saleId;
-  double size;
-  double feeBySize;
-  double feeByWeight;
-  double totalFee;
-  double weight;
+  double? size;
+  double? feeBySize;
+  double? feeByWeight;
+  double? totalFee;
+  double? weight;
   String note;
   String nextWarehouse;
   int promotionId;
-  List<TCCOFile> tccoFileDTOS;
-  Address addressDTO;
-  User customerDTO;
-  List<OrderTrack> orderTrackDTOS;
-  Promotion promotionDTO;
+  List<TCCOFile?>? tccoFileDTOS;
+  Address? addressDTO;
+  User? customerDTO;
+  List<OrderTrack?>? orderTrackDTOS;
+  Promotion? promotionDTO;
   double totalFeeOriginal;
   double feeBySizeDealer;
   double feeByWeightDealer;
@@ -53,7 +53,7 @@ class Order {
       {this.orderId = '',
       this.addressId = 0,
       this.commission = 0.0,
-      this.createdDate,
+      this.createdDate = 0,
       this.createdId = '',
       this.customerId = '',
       this.extFee = 0.0,
@@ -73,14 +73,14 @@ class Order {
       this.feeByWeight = 0.0,
       this.totalFee = 0.0,
       this.weight = 0.0,
-      this.note,
-      this.nextWarehouse,
-      this.promotionId,
-      this.tccoFileDTOS,
-      this.addressDTO,
-      this.customerDTO,
+      this.note = '',
+      this.nextWarehouse = '',
+      this.promotionId = 0,
+      List<TCCOFile?>? this.tccoFileDTOS,
+      Address? this.addressDTO,
+      User? this.customerDTO,
       this.orderTrackDTOS,
-      this.promotionDTO,
+      Promotion? this.promotionDTO,
       this.totalFeeOriginal = 0,
       this.feeBySizeDealer = 0,
       this.feeByWeightDealer = 0,

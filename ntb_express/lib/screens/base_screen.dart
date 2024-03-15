@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:ntbexpress/screens/register_screen.dart';
 import 'package:ntbexpress/util/contants.dart';
 import 'package:ntbexpress/util/utils.dart';
+import 'package:ntbexpress/widgets/raised_button.dart';
 
 class BaseScreen extends StatefulWidget {
   @override
@@ -18,7 +19,7 @@ class _BaseScreenState extends State<BaseScreen> {
     'https://bestwallpapers.net/wp-content/uploads/2020/02/Top-Nature-Wallpapers-For-Phone-Free-Download.jpg'
   ];
   String _backgroundUrl = '';
-  Timer _timer;
+  late Timer _timer;
 
   @override
   void initState() {

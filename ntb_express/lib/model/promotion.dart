@@ -12,54 +12,54 @@ class Promotion {
   num endDate;
   int goodsType;
   int promotionType;
-  double discountValue;
-  double maxDiscountValue;
+  double? discountValue;
+  double? maxDiscountValue;
   int countOrder;
-  double minSize;
-  double maxSize;
-  double minWeight;
-  double maxWeight;
-  double minFee;
-  double maxFee;
+  double? minSize;
+  double? maxSize;
+  double? minWeight;
+  double? maxWeight;
+  double? minFee;
+  double? maxFee;
   String compareValue;
   int compareType;
   int maxUse;
-  double feeBySizeZ1;
-  double feeByWeightZ1;
-  double feeBySizeZ2;
-  double feeByWeightZ2;
-  double feeBySizeZ3;
-  double feeByWeightZ3;
+  double? feeBySizeZ1;
+  double? feeByWeightZ1;
+  double? feeBySizeZ2;
+  double? feeByWeightZ2;
+  double? feeBySizeZ3;
+  double? feeByWeightZ3;
   String description;
   bool valid;
 
   Promotion(
-      {this.promotionId,
-      this.promotionName,
-      this.startDate,
-      this.endDate,
-      this.goodsType,
-      this.promotionType,
-      this.discountValue,
-      this.maxDiscountValue,
-      this.countOrder,
-      this.minSize,
-      this.maxSize,
-      this.minWeight,
-      this.maxWeight,
-      this.minFee,
-      this.maxFee,
-      this.compareValue,
-      this.compareType,
-      this.maxUse,
-      this.feeBySizeZ1,
-      this.feeByWeightZ1,
-      this.feeBySizeZ2,
-      this.feeByWeightZ2,
-      this.feeBySizeZ3,
-      this.feeByWeightZ3,
-      this.description,
-      this.valid});
+      {this.promotionId = 0,
+      this.promotionName = '',
+      this.startDate = 0,
+      this.endDate = 0,
+      this.goodsType = 0,
+      this.promotionType = 0,
+      double? this.discountValue,
+      this.maxDiscountValue = 0,
+      this.countOrder = 0,
+      this.minSize = 0,
+      this.maxSize = 0,
+      this.minWeight = 0,
+      this.maxWeight = 0,
+      this.minFee = 0,
+      this.maxFee = 0,
+      this.compareValue = '',
+      this.compareType = 0,
+      this.maxUse = 0,
+      this.feeBySizeZ1 = 0,
+      this.feeByWeightZ1 = 0,
+      this.feeBySizeZ2 = 0,
+      double? this.feeByWeightZ2,
+      this.feeBySizeZ3 = 0,
+      this.feeByWeightZ3 = 0,
+      this.description = '',
+      this.valid = true});
 
   factory Promotion.fromJson(Map<String, dynamic> json) =>
       _$PromotionFromJson(json);

@@ -15,8 +15,8 @@ class NotificationDetail {
   String insertTime;
 
 
-  NotificationDetail({this.id, this.orderId, this.title,
-      this.body, this.insertTime});
+  NotificationDetail({required this.id, required this.orderId, required this.title,
+      required this.body, required this.insertTime});
 
   factory NotificationDetail.fromJson(Map<String, dynamic> json) =>
       _$NotificationDetailFromJson(json);

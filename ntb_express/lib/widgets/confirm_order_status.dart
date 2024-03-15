@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:ntbexpress/model/fee_item.dart';
 import 'package:ntbexpress/model/order.dart';
 import 'package:ntbexpress/util/contants.dart';
@@ -13,10 +14,11 @@ import 'package:ntbexpress/util/session_util.dart';
 import 'package:ntbexpress/util/utils.dart';
 import 'package:ntbexpress/widgets/app_provider.dart';
 import 'package:ntbexpress/widgets/currency_swap_input.dart';
+import 'package:ntbexpress/widgets/flat_button.dart';
 import 'package:ntbexpress/widgets/image_picker_widget.dart';
 
 class ConfirmOrderStatusWidget extends StatefulWidget {
-  final Order forOrder;
+  final Order? forOrder;
   final bool cancelOrder;
   final bool output;
   final bool hidePackCount;
@@ -37,9 +39,9 @@ class _ConfirmOrderStatusWidgetState extends State<ConfirmOrderStatusWidget> {
   final _payOnBehalfController = TextEditingController();
   final _intFeeController = TextEditingController();
   int _packCount = 0;
-  String _note;
+  late String _note;
   String _nextWarehouse = '';
-  Order _order;
+  late Order _order;
 
   bool get isChineseStaff =>
       SessionUtil
@@ -51,7 +53,7 @@ class _ConfirmOrderStatusWidgetState extends State<ConfirmOrderStatusWidget> {
   void initState() {
     super.initState();
     if (widget.forOrder != null) {
-      _order = Order.clone(widget.forOrder);
+      _order = Order.clone(widget.forOrder!);
     }
 
     if (feeTable.isEmpty) {
@@ -68,7 +70,7 @@ class _ConfirmOrderStatusWidgetState extends State<ConfirmOrderStatusWidget> {
 
   void _getFeeTable() {
     HttpUtil.get(
-      ApiUrls.instance().getFeeTableUrl(),
+      ApiUrls.instance()!.getFeeTableUrl()!,
       headers: {'Content-Type': 'application/json; charset=utf-8'},
       onResponse: (resp) {
         if (resp != null && resp.statusCode == 200) {
@@ -103,22 +105,22 @@ class _ConfirmOrderStatusWidgetState extends State<ConfirmOrderStatusWidget> {
     return PriceCalculationUtil.calculatePrice(
         repackFee: _order.repackFee ?? 0,
         payOnBehalf: _order.payOnBehalf ?? 0,
-        intFee: _order.intFee,
+        intFee: _order.intFee?? 0,
         extFee: PriceCalculationUtil.calculateExtFee(
             address: _order.addressDTO,
             goodsType: _order.goodsType,
-            size: _order.size,
-            weight: _order.weight));
+            size: _order.size!,
+            weight: _order.weight!));
   }
 
   double _getExtFee() {
     return PriceCalculationUtil.calculateExtFee(
         address: _order.addressDTO,
         goodsType: _order.goodsType,
-        size: _order.size,
-        weight: _order.weight,
-        feeBySize: _order.feeBySize,
-        feeByWeight: _order.feeByWeight);
+        size: _order.size!,
+        weight: _order.weight!,
+        feeBySize: _order.feeBySize!,
+        feeByWeight: _order.feeByWeight!);
   }
 
   @override
@@ -128,7 +130,7 @@ class _ConfirmOrderStatusWidgetState extends State<ConfirmOrderStatusWidget> {
       child: AlertDialog(
         title: Text('${Utils
             .getLocale(context)
-            .confirmation}'),
+            ?.confirmation}'),
         content: Container(
           width: MediaQuery
               .of(context)
@@ -145,7 +147,7 @@ class _ConfirmOrderStatusWidgetState extends State<ConfirmOrderStatusWidget> {
                   children: [
                     Visibility(
                       visible: isChineseStaff &&
-                          widget.forOrder.orderStatus ==
+                          widget.forOrder?.orderStatus ==
                               OrderStatus.newlyCreated,
                       child: Row(
                         children: [
@@ -158,32 +160,32 @@ class _ConfirmOrderStatusWidgetState extends State<ConfirmOrderStatusWidget> {
                                   labelText:
                                   '${Utils
                                       .getLocale(context)
-                                      .weight} (kg)',
+                                      ?.weight} (kg)',
                                   hintText:
                                   '${Utils
                                       .getLocale(context)
-                                      .enter} ${Utils
+                                      ?.enter} ${Utils
                                       .getLocale(context)
-                                      .weight
+                                      ?.weight
                                       .toLowerCase()} (kg)...',
                                   counterText: ''),
                               maxLines: 1,
                               validator: (value) {
                                 if (!isChineseStaff ||
-                                    widget.forOrder.orderStatus !=
+                                    widget.forOrder?.orderStatus !=
                                         OrderStatus.newlyCreated) return null;
 
                                 String tmp = _sizeController.text;
 
                                 if ((Utils.isNullOrEmpty(value) ||
-                                    value.trim() == '0' ||
-                                    value.trim() == '0.0') &&
+                                    value?.trim() == '0' ||
+                                    value?.trim() == '0.0') &&
                                     (Utils.isNullOrEmpty(tmp) ||
                                         tmp.trim() == '0' ||
                                         tmp.trim() == '0.0'))
                                   return Utils
                                       .getLocale(context)
-                                      .required;
+                                      ?.required;
 
                                 return null;
                               },
@@ -199,32 +201,32 @@ class _ConfirmOrderStatusWidgetState extends State<ConfirmOrderStatusWidget> {
                                   labelText:
                                   '${Utils
                                       .getLocale(context)
-                                      .size} (m³)',
+                                      ?.size} (m³)',
                                   hintText:
                                   '${Utils
                                       .getLocale(context)
-                                      .enter} ${Utils
+                                      ?.enter} ${Utils
                                       .getLocale(context)
-                                      .size
+                                      ?.size
                                       .toLowerCase()} (m³)...',
                                   counterText: ''),
                               maxLines: 1,
                               validator: (value) {
                                 if (!isChineseStaff ||
-                                    widget.forOrder.orderStatus !=
+                                    widget.forOrder?.orderStatus !=
                                         OrderStatus.newlyCreated) return null;
 
                                 String tmp = _weightController.text;
 
                                 if ((Utils.isNullOrEmpty(value) ||
-                                    value.trim() == '0' ||
-                                    value.trim() == '0.0') &&
+                                    value?.trim() == '0' ||
+                                    value?.trim() == '0.0') &&
                                     (Utils.isNullOrEmpty(tmp) ||
                                         tmp.trim() == '0' ||
                                         tmp.trim() == '0.0'))
                                   return Utils
                                       .getLocale(context)
-                                      .required;
+                                      ?.required;
 
                                 return null;
                               },
@@ -235,32 +237,32 @@ class _ConfirmOrderStatusWidgetState extends State<ConfirmOrderStatusWidget> {
                     ),
                     Visibility(
                       visible: isChineseStaff &&
-                          widget.forOrder.orderStatus ==
+                          widget.forOrder?.orderStatus ==
                               OrderStatus.newlyCreated,
                       child: ChineseCurrencyInput(
                         controller: _payOnBehalfController,
                         labelText:
                         '${Utils
                             .getLocale(context)
-                            .payOnBehalf} (CNY)',
+                            ?.payOnBehalf} (CNY)',
                         hintText: '${Utils
                             .getLocale(context)
-                            .enter} CNY...',
+                            ?.enter} CNY...',
                       ),
                     ),
                     Visibility(
                       visible: isChineseStaff &&
-                          widget.forOrder.orderStatus ==
+                          widget.forOrder?.orderStatus ==
                               OrderStatus.newlyCreated,
                       child: ChineseCurrencyInput(
                         controller: _intFeeController,
                         labelText:
                         '${Utils
                             .getLocale(context)
-                            .domesticShippingFee} (CNY)',
+                            ?.domesticShippingFee} (CNY)',
                         hintText: '${Utils
                             .getLocale(context)
-                            .enter} CNY...',
+                            ?.enter} CNY...',
                       ),
                     ),
                     Visibility(
@@ -271,28 +273,29 @@ class _ConfirmOrderStatusWidgetState extends State<ConfirmOrderStatusWidget> {
                           labelText:
                           '${Utils
                               .getLocale(context)
-                              .packageQuantity}',
+                              ?.packageQuantity}',
                         ),
                         onChanged: (value) => _packCount = value.parseInt(),
                         validator: (value) {
                           if (widget.cancelOrder || widget.hidePackCount) return null;
 
-                          if (Utils.isNullOrEmpty(value))
+                          if (value == null || value!.isEmpty)
+
                             return Utils
                                 .getLocale(context)
-                                .required;
+                                ?.required;
                           final int numValue = value.parseInt();
                           if (numValue <= 0)
                             return '${Utils
                                 .getLocale(context)
-                                .mustBeGreaterThanZero}!';
+                                ?.mustBeGreaterThanZero}!';
                           int count = widget?.forOrder?.packCount ?? 0;
                           if (numValue > count &&
                               widget.forOrder?.orderStatus !=
                                   OrderStatus.newlyCreated)
                             return '${Utils
                                 .getLocale(context)
-                                .greaterThanCurrentParcels}!';
+                                ?.greaterThanCurrentParcels}!';
 
                           return null;
                         },
@@ -302,20 +305,21 @@ class _ConfirmOrderStatusWidgetState extends State<ConfirmOrderStatusWidget> {
                       decoration: InputDecoration(
                         labelText: '${Utils
                             .getLocale(context)
-                            .note}...',
+                            ?.note}...',
                       ),
                       onChanged: (value) => _note = value,
                       validator: (value) {
                         bool needToValidate = false;
-                        if (widget.forOrder.orderStatus ==
+                        if (widget.forOrder?.orderStatus ==
                             OrderStatus.chineseWarehoused)
                           needToValidate = true;
                         else if (widget.output) needToValidate = true;
                         if (!needToValidate) return null;
-                        if (Utils.isNullOrEmpty(value))
+                        if (value == null || value!.isEmpty)
+
                           return Utils
                               .getLocale(context)
-                              .required;
+                              ?.required;
 
                         return null;
                       },
@@ -329,16 +333,16 @@ class _ConfirmOrderStatusWidgetState extends State<ConfirmOrderStatusWidget> {
                         controller: _filesController,
                         child: Text('${Utils
                             .getLocale(context)
-                            .imageAttach}'),
-                        maxImages: 2,
+                            ?.imageAttach}'),
+                        maxImages: 2, key: null,
                       ),
                     ),
                     Visibility(
                       visible: !widget.cancelOrder &&
                           SessionUtil
                               .instance()
-                              .user
-                              .userType !=
+                              ?.user
+                              ?.userType !=
                               UserType.chineseWarehouseStaff &&
                           widget.output,
                       child: Builder(
@@ -346,8 +350,8 @@ class _ConfirmOrderStatusWidgetState extends State<ConfirmOrderStatusWidget> {
                           bool isChineseStaff =
                               SessionUtil
                                   .instance()
-                                  .user
-                                  .userType ==
+                                  ?.user
+                                  ?.userType ==
                                   UserType.chineseWarehouseStaff;
                           if (isChineseStaff) return SizedBox();
 
@@ -355,20 +359,20 @@ class _ConfirmOrderStatusWidgetState extends State<ConfirmOrderStatusWidget> {
                           bool isHanoiStaff =
                               SessionUtil
                                   .instance()
-                                  .user
-                                  .userType ==
+                                  ?.user
+                                  ?.userType ==
                                   UserType.hanoiWarehouseStaff;
                           bool isUongBiStaff =
                               SessionUtil
                                   .instance()
-                                  .user
-                                  .userType ==
+                                  ?.user
+                                  ?.userType ==
                                   UserType.uongbiWarehouseStaff;
                           bool isSaiGonStaff =
                               SessionUtil
                                   .instance()
-                                  .user
-                                  .userType ==
+                                  ?.user
+                                  ?.userType ==
                                   UserType.saigonWarehouseStaff;
 
                           if (isHanoiStaff)
@@ -395,13 +399,13 @@ class _ConfirmOrderStatusWidgetState extends State<ConfirmOrderStatusWidget> {
                               Text(
                                   '${Utils
                                       .getLocale(context)
-                                      .warehouseArrived}'),
+                                      ?.warehouseArrived}'),
                               SizedBox(width: 5.0),
                               DropdownButton<String>(
                                 value: _nextWarehouse,
                                 onChanged: (value) {
                                   setState(() {
-                                    _nextWarehouse = value;
+                                    _nextWarehouse = value!;
                                   });
                                 },
                                 items: values
@@ -416,7 +420,7 @@ class _ConfirmOrderStatusWidgetState extends State<ConfirmOrderStatusWidget> {
                                           ? 'Sài Gòn'
                                           : '${Utils
                                           .getLocale(context)
-                                          .select}...'),
+                                          ?.select}...'),
                                     ))
                                     .toList(),
                               ),
@@ -439,7 +443,7 @@ class _ConfirmOrderStatusWidgetState extends State<ConfirmOrderStatusWidget> {
             child: Text(
               Utils
                   .getLocale(context)
-                  .cancel,
+                  !.cancel,
               style: TextStyle(
                 color: Colors.red,
               ),
@@ -447,7 +451,7 @@ class _ConfirmOrderStatusWidgetState extends State<ConfirmOrderStatusWidget> {
           ),
           FlatButton(
             onPressed: () async {
-              if (!_formKey.currentState.validate()) {
+              if (!_formKey.currentState!.validate()) {
                 return;
               }
 
@@ -455,11 +459,11 @@ class _ConfirmOrderStatusWidgetState extends State<ConfirmOrderStatusWidget> {
                 Utils.alert(context,
                     title: Utils
                         .getLocale(context)
-                        .required,
+                        ?.required,
                     message:
                     '${Utils
                         .getLocale(context)
-                        .mustSelectAWarehouseArrived}!');
+                        ?.mustSelectAWarehouseArrived}!');
                 return;
               }
 
@@ -468,17 +472,17 @@ class _ConfirmOrderStatusWidgetState extends State<ConfirmOrderStatusWidget> {
               if (files != null) files.removeWhere((f) => f == null);
               // check if does not attach files & is chinese staff
               if (isChineseStaff &&
-                  widget.forOrder.orderStatus == OrderStatus.newlyCreated &&
-                  (widget.forOrder.tccoFileDTOS == null ||
-                      widget.forOrder.tccoFileDTOS.isEmpty) &&
+                  widget.forOrder!.orderStatus == OrderStatus.newlyCreated &&
+                  (widget.forOrder!.tccoFileDTOS == null ||
+                      widget.forOrder!.tccoFileDTOS!.isEmpty) &&
                   (files == null || files.isEmpty)) {
                 Utils.alert(context,
                     title: Utils
                         .getLocale(context)
-                        .required,
+                        ?.required,
                     message: Utils
                         .getLocale(context)
-                        .imagesRequired);
+                        ?.imagesRequired);
                 return;
               }
 
@@ -501,26 +505,26 @@ class _ConfirmOrderStatusWidgetState extends State<ConfirmOrderStatusWidget> {
   Future<bool> updateOrder() async {
     var c = Completer<bool>();
     _getFormData();
-    if (_order.weight != widget.forOrder.weight ||
-        _order.size != widget.forOrder.size ||
-        _order.payOnBehalf != widget.forOrder.payOnBehalf ||
-        _order.intFee != widget.forOrder.intFee) {
+    if (_order.weight != widget.forOrder?.weight ||
+        _order.size != widget.forOrder?.size ||
+        _order.payOnBehalf != widget.forOrder?.payOnBehalf ||
+        _order.intFee != widget.forOrder?.intFee) {
       // get new price
       _order.extFee = _getExtFee();
       _order.totalFee = _getTotalFee();
       _order.totalFeeOriginal = _getTotalFeeOriginal();
 
-      widget.forOrder.weight = _order.weight;
-      widget.forOrder.size = _order.size;
-      widget.forOrder.payOnBehalf = _order.payOnBehalf;
-      widget.forOrder.intFee = _order.intFee;
-      widget.forOrder.extFee = _order.extFee;
-      widget.forOrder.totalFee = _order.totalFee;
-      widget.forOrder.totalFeeOriginal = _order.totalFeeOriginal;
+      widget.forOrder?.weight = _order.weight;
+      widget.forOrder?.size = _order.size;
+      widget.forOrder?.payOnBehalf = _order.payOnBehalf;
+      widget.forOrder?.intFee = _order.intFee;
+      widget.forOrder?.extFee = _order.extFee;
+      widget.forOrder?.totalFee = _order.totalFee;
+      widget.forOrder?.totalFeeOriginal = _order.totalFeeOriginal;
 
       HttpUtil.postOrder(
-        ApiUrls.instance().getOrdersUrl(),
-        order: widget.forOrder,
+        ApiUrls.instance()!.getOrdersUrl()!,
+        order: widget.forOrder!,
         onDone: (resp) {
           var json =
           resp == null ? null : jsonDecode(utf8.decode(resp.bodyBytes));
@@ -533,7 +537,7 @@ class _ConfirmOrderStatusWidgetState extends State<ConfirmOrderStatusWidget> {
             Order savedOrder = Order.fromJson(json);
             AppProvider
                 .of(context)
-                .state
+                ?.state
                 .orderBloc
                 .updateOrder(savedOrder);
           }
@@ -546,5 +550,39 @@ class _ConfirmOrderStatusWidgetState extends State<ConfirmOrderStatusWidget> {
     }
 
     return c.future;
+  }
+}
+
+class ChineseCurrencyInput extends StatelessWidget {
+  final TextEditingController controller;
+  final String labelText;
+  final String hintText;
+
+  const ChineseCurrencyInput({
+    Key? key,
+    required this.controller,
+    required this.labelText,
+    required this.hintText,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+        hintText: hintText,
+      ),
+      keyboardType: TextInputType.numberWithOptions(decimal: true),
+      inputFormatters: [
+        FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+      ],
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please enter a valid amount';
+        }
+        return null;
+      },
+    );
   }
 }

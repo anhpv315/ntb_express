@@ -10,18 +10,20 @@ import 'package:ntbexpress/util/http_util.dart';
 import 'package:ntbexpress/util/utils.dart';
 import 'package:ntbexpress/util/extensions.dart';
 
+import '../widgets/raised_button.dart';
+
 class SelectPromotionScreen extends StatefulWidget {
   final Order order;
   final Promotion current;
 
-  SelectPromotionScreen({this.order, this.current});
+  SelectPromotionScreen({required this.order, required this.current});
 
   @override
   _SelectPromotionScreenState createState() => _SelectPromotionScreenState();
 }
 
 class _SelectPromotionScreenState extends State<SelectPromotionScreen> {
-  Promotion _current;
+  late Promotion _current;
   final List<Promotion> _promotionList = [];
   bool _loaded = false;
 
@@ -44,14 +46,14 @@ class _SelectPromotionScreenState extends State<SelectPromotionScreen> {
           icon: Icon(Icons.close),
         ),
         title: Text(
-            '${Utils.getLocale(context).select} ${Utils.getLocale(context).promotion}'),
+            '${Utils.getLocale(context)?.select} ${Utils.getLocale(context)?.promotion}'),
       ),
-          body: Container(
-      child: !_loaded
-      ? Center(child: CircularProgressIndicator())
-        : _promotionList.isEmpty
+      body: Container(
+        child: !_loaded
+            ? Center(child: CircularProgressIndicator())
+            : _promotionList.isEmpty
                 ? Center(
-                    child: Text('${Utils.getLocale(context).empty}'),
+                    child: Text('${Utils.getLocale(context)?.empty}'),
                   )
                 : ListView.separated(
                     itemBuilder: (context, index) {
@@ -77,11 +79,14 @@ class _SelectPromotionScreenState extends State<SelectPromotionScreen> {
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const SizedBox(height: 4.0,),
+                              const SizedBox(
+                                height: 4.0,
+                              ),
                               RichText(
                                 text: TextSpan(
                                   style: Theme.of(context).textTheme.bodyText2,
-                                  text: '${Utils.getLocale(context).applyFor} ',
+                                  text:
+                                      '${Utils.getLocale(context)?.applyFor} ',
                                   children: [
                                     TextSpan(
                                       text: Utils.getGoodsTypeString(
@@ -94,7 +99,7 @@ class _SelectPromotionScreenState extends State<SelectPromotionScreen> {
                               Text(promotion.description),
                               //Text(promotion.description ?? ''),
                               Text(
-                                  '${Utils.getLocale(context).expiryDate}: ${Utils.getDateString(promotion.startDate, 'dd.MM.yyyy')} - ${Utils.getDateString(promotion.endDate, 'dd.MM.yyyy')}'),
+                                  '${Utils.getLocale(context)?.expiryDate}: ${Utils.getDateString(promotion.startDate, 'dd.MM.yyyy')} - ${Utils.getDateString(promotion.endDate, 'dd.MM.yyyy')}'),
                             ],
                           ),
                           trailing: _current != null &&
@@ -121,8 +126,8 @@ class _SelectPromotionScreenState extends State<SelectPromotionScreen> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(_current == null
-                  ? '${Utils.getLocale(context).noPromotionSelected}'
-                  : '${Utils.getLocale(context).onePromotionSelected}. ${_current.promotionName}'),
+                  ? '${Utils.getLocale(context)?.noPromotionSelected}'
+                  : '${Utils.getLocale(context)?.onePromotionSelected}. ${_current.promotionName}'),
             ),
             SizedBox(
               width: double.infinity,
@@ -146,26 +151,24 @@ class _SelectPromotionScreenState extends State<SelectPromotionScreen> {
 
   Widget _getTag(Promotion promotion) {
     var nf = NumberFormat.currency(locale: 'vi_VN');
-    String tagText = '';
+    String? tagText = '';
     final String discount = promotion?.discountValue?.toString() ?? '';
     if (promotion.promotionType == PromotionType.percent) {
       tagText =
-          '${Utils.getLocale(context).discount.replaceFirst('%value%', '${promotion?.discountValue?.isInt ?? false ? discount.substring(0, discount.indexOf('.')) : discount}')}% (${Utils.getLocale(context).max} ${nf.format(promotion?.maxDiscountValue ?? 0)})';
+          '${Utils.getLocale(context)?.discount.replaceFirst('%value%', '${promotion?.discountValue?.isInt ?? false ? discount.substring(0, discount.indexOf('.')) : discount}')}% (${Utils.getLocale(context)?.max} ${nf.format(promotion?.maxDiscountValue ?? 0)})';
     } else if (promotion.promotionType == PromotionType.specificValue) {
-      tagText = Utils.getLocale(context)
-          .discount
-          .replaceFirst('%value%', '${nf.format(promotion.discountValue ?? 0)}');
+      tagText = Utils.getLocale(context)?.discount.replaceFirst(
+          '%value%', '${nf.format(promotion.discountValue ?? 0)}');
     } else if (promotion.promotionType == PromotionType.samePrice) {
-      tagText = Utils.getLocale(context)
-          .discount
-          .replaceFirst('%value%', '${nf.format(promotion.discountValue ?? 0)}');
+      tagText = Utils.getLocale(context)?.discount.replaceFirst(
+          '%value%', '${nf.format(promotion.discountValue ?? 0)}');
     }
 
     return Container(
       padding: const EdgeInsets.all(2.0),
       color: Colors.orange,
       child: Text(
-        tagText,
+        tagText == null ? '' : tagText,
         style: TextStyle(color: Colors.white, fontSize: 12.0),
       ),
     );
@@ -178,17 +181,17 @@ class _SelectPromotionScreenState extends State<SelectPromotionScreen> {
       return c.future;
     }
 
-    final url = ApiUrls.instance().getPromotionListByOrderUrl(widget.order);
+    final url = ApiUrls.instance()?.getPromotionListByOrderUrl(widget.order);
 
     HttpUtil.get(
-      url,
+      url!,
       headers: {'Content-Type': 'application/json; charset=utf-8'},
       onResponse: (resp) {
         if (resp == null || resp.statusCode != 200) {
           Utils.alert(context,
-              title: Utils.getLocale(context).failed,
+              title: Utils.getLocale(context)?.failed,
               message:
-                  '${Utils.getLocale(context).errorOccurred} ${resp?.statusCode}');
+                  '${Utils.getLocale(context)?.errorOccurred} ${resp?.statusCode}');
 
           if (!c.isCompleted) {
             c.complete([]);
@@ -210,8 +213,8 @@ class _SelectPromotionScreenState extends State<SelectPromotionScreen> {
       },
       onTimeout: () {
         Utils.alert(context,
-            title: Utils.getLocale(context).errorOccurred,
-            message: Utils.getLocale(context).requestTimeout);
+            title: Utils.getLocale(context)?.errorOccurred,
+            message: Utils.getLocale(context)?.requestTimeout);
 
         _loaded = true;
         if (!c.isCompleted) {

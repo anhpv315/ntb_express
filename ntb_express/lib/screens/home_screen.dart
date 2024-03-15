@@ -60,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool get isSaleStaff =>
       SessionUtil.instance()?.user?.userType == UserType.saleStaff;
 
-  User get _user => SessionUtil.instance()?.user;
+  User? get _user => SessionUtil.instance()?.user;
 
   bool get isWarehouseStaff => [
         UserType.chineseWarehouseStaff,
@@ -89,7 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final hasRequested = !prefs.containsKey(PrefsKey.requestPushPermissions)
         ? false
         : prefs.getBool(PrefsKey.requestPushPermissions);
-    if (hasRequested) return;
+    if (hasRequested!) return;
     Utils.alert(
       context,
       title: Utils.getLocale(context).required,
@@ -119,7 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<void> _getStatisticList({String url}) async {
+  Future<void> _getStatisticList({String? url}) async {
     HttpUtil.get(
       Utils.isNullOrEmpty(url) ? _statisticUrl : url,
       headers: {'Content-Type': 'application/json; charset=utf-8'},

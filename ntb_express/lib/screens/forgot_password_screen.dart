@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:ntbexpress/util/contants.dart';
 import 'package:ntbexpress/util/utils.dart';
+import 'package:ntbexpress/widgets/raised_button.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   @override
@@ -16,7 +17,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _usernameFocusNode = FocusNode();
   final _passwordRetrievalFormKey = GlobalKey<FormState>();
   bool _hasError = false;
-  String _message;
+  late String _message;
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +68,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     cursorColor: Utils.accentColor,
                     textInputAction: TextInputAction.done,
                     validator: (value) {
-                      if (Utils.isNullOrEmpty(value))
+                      if (value == null || value!.isEmpty)
+
                         return Utils.getLocale(context).required;
 
                       return null;
@@ -100,7 +102,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     );
   }
 
-  InputDecoration _decoration({String hintText, IconData prefixIcon}) {
+  InputDecoration _decoration({String? hintText, IconData? prefixIcon}) {
     return InputDecoration(
       hintText: hintText ?? '',
       hintStyle: TextStyle(
@@ -137,7 +139,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   void _btnPasswordRetrievalClicked() {
-    if (!_passwordRetrievalFormKey.currentState.validate()) {
+    if (!_passwordRetrievalFormKey.currentState!.validate()) {
       return;
     }
 
@@ -147,7 +149,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
       http.Response resp;
       try {
-        resp = await http.get(ApiUrls.instance().getForgotPasswordUrl(username),
+        resp = await http.get(ApiUrls.instance().getForgotPasswordUrl(username!) as Uri,
             headers: {
               'Content-Type': 'application/json; charset=utf-8'
             }).timeout(const Duration(seconds: timeout), onTimeout: () {
@@ -155,8 +157,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           setState(() {
             _hasError = false;
             _message = Utils.getLocale(context).requestTimeout;
+
           });
-          return null;
+          return http.Response('Error', 408); // Request Timeout response status code
+
         });
 
         dynamic json = resp == null
@@ -185,7 +189,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         _popLoading();
         setState(() {
           _hasError = true;
-          _message = '${Utils.getLocale(context).errorOccurred} ${resp?.statusCode}\n$e';
+          _message = '${Utils.getLocale(context).errorOccurred} \n$e';
         });
       }
     });

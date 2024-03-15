@@ -21,7 +21,7 @@ import 'package:random_string/random_string.dart';
 
 class CustomerFormScreen extends StatefulWidget {
   final bool isUpdate;
-  final User currentUser;
+  final User? currentUser;
 
   CustomerFormScreen({this.isUpdate = false, this.currentUser});
 
@@ -45,11 +45,11 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
   final _refUserFocusNode = FocusNode();
   final picker = ImagePicker();
   bool _hasChanged = false;
-  File _image;
+  late File _image;
   bool _active = true;
   bool _showPassword = true;
-  User _user;
-  User _immutableUser;
+  late User _user;
+  late User _immutableUser;
   final List<Address> _addressList = [];
   final _maskFormatter = MaskTextInputFormatter(
       mask: '##-##-####', filter: {'#': RegExp(r'[0-9]')});
@@ -62,7 +62,7 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
   User get currentUser => SessionUtil.instance().user;
 
   Future _getImage() async {
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null && mounted) {
       _hasChanged = true;
       setState(() => _image = File(pickedFile.path));
@@ -114,7 +114,7 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
     _fullNameController.text = _user.fullName;
     _phoneNumberController.text = _user.phoneNumber;
     _dobController.text =
-        _user.dob == null ? '' : Utils.getDateString(_user.dob, _datePattern);
+        _user.dob == null ? '' : Utils.getDateString(_user.dob!, _datePattern);
     _emailController.text = _user.email;
     _refUserController.text = _user.refId;
     _customerCodeController.text = _user.customerId;
@@ -182,14 +182,14 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                             backgroundColor: Theme.of(context).disabledColor,
                             child: CircleAvatar(
                               radius: 40.0,
-                              backgroundImage: _image != null
-                                  ? FileImage(_image)
+                              backgroundImage: (_image != null
+                                  ? FileImage(_image!)
                                   : (widget.isUpdate &&
                                           _user.avatarImgDTO != null)
                                       ? NetworkImage(
-                                          '${ApiUrls.instance().baseUrl}/${_user.avatarImgDTO.flePath}?t=${DateTime.now().millisecondsSinceEpoch}')
+                                          '${ApiUrls.instance().baseUrl}/${_user.avatarImgDTO?.flePath}?t=${DateTime.now().millisecondsSinceEpoch}')
                                       : AssetImage(
-                                          'assets/images/default-avatar.png'),
+                                          'assets/images/default-avatar.png')) as ImageProvider,
                             ),
                           ),
                         ),
@@ -212,7 +212,8 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                             .requestFocus(_phoneNumberFocusNode);
                       },
                       validator: (value) {
-                        if (Utils.isNullOrEmpty(value))
+                        if (value == null || value!.isEmpty)
+
                           return Utils.getLocale(context).required;
 
                         return null;
@@ -241,7 +242,8 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                                   .requestFocus(_dobFocusNode);*/
                             },
                             validator: (value) {
-                              if (Utils.isNullOrEmpty(value))
+                              if (value == null || value!.isEmpty)
+
                                 return Utils.getLocale(context).required;
                               if (!Utils.isPhoneNumberValid(value))
                                 return '${Utils.getLocale(context).phoneNumber} ${Utils.getLocale(context).wrongFormat}';
@@ -305,7 +307,7 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                       maxLength: 50,
                       validator: (value) {
                         if (widget.isUpdate) return null;
-                        if (Utils.isNullOrEmpty(value))
+                        if (value == null || value!.isEmpty)
                           return '${Utils.getLocale(context).required}';
                         if (RegExp(r'[^a-zA-Z_0-9]+').hasMatch(value))
                           return '${Utils.getLocale(context).customerCode} ${Utils.getLocale(context).wrongFormat}';
@@ -330,7 +332,8 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                         FocusScope.of(context).requestFocus(_refUserFocusNode);
                       },
                       validator: (value) {
-                        if (Utils.isNullOrEmpty(value))
+                        if (value == null || value!.isEmpty)
+
                           return '${Utils.getLocale(context).required}';
                         if (!Utils.isEmailValid(value))
                           return '${Utils.getLocale(context).email} ${Utils.getLocale(context).wrongFormat}';
@@ -384,7 +387,7 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                             validator: (value) {
                               if (widget.isUpdate) return null;
 
-                              if (Utils.isNullOrEmpty(value))
+                              if (value == null || value!.isEmpty)
                                 return Utils.getLocale(context).required;
                               if (value.length < 8)
                                 return '${Utils.getLocale(context).passwordLengthRequired}';
@@ -464,7 +467,7 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                             width: 25.0,
                             child: Checkbox(
                               onChanged: (value) {
-                                setState(() => _active = value);
+                                setState(() => _active = value!);
                               },
                               value: _active,
                             ),
@@ -486,20 +489,20 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
   }
 
   Future<void> _selectDate(BuildContext context,
-      {ValueChanged<DateTime> onPicked}) async {
-    final DateTime picked = await showDatePicker(
+      {ValueChanged<DateTime>? onPicked}) async {
+    final DateTime? picked = await showDatePicker(
         context: context,
         initialDate: DateTime(1970),
         firstDate: DateTime(1930),
         lastDate: DateTime(2020));
 
     if (onPicked != null) {
-      onPicked(picked);
+      onPicked(picked!);
     }
   }
 
-  void _saveData({ValueChanged<User> done}) {
-    if (!_formKey.currentState.validate()) {
+  void _saveData({ValueChanged<User>? done}) {
+    if (!_formKey.currentState!.validate()) {
       return;
     }
 
@@ -522,7 +525,7 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
     _user.userType = UserType.customer;
     _user.isCreate = widget.isUpdate ? 0 : 1; // 1: create new, other: update
     if (Utils.isNullOrEmpty(_user.email)) {
-      _user.email = null; // avoid exception from DB for Unique constraint
+      _user.email = ''; // avoid exception from DB for Unique constraint
     }
     if (widget.isUpdate && _image != null) {
       // update avatar
@@ -542,7 +545,7 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
       HttpUtil.postUser(
         ApiUrls.instance().getUsersUrl(),
         user: _user,
-        avatar: _image == null ? null : FileHolder(file: _image),
+        avatar: _image == null ? null : FileHolder(file: _image, fileUrl: '', key: ''),
         onDone: (resp) async {
           if (resp == null || resp.statusCode != 200) {
             _popLoading();
@@ -563,7 +566,7 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
           }
 
           dynamic json = jsonDecode(utf8.decode(resp.bodyBytes));
-          User savedUser = json == null ? null : User.fromJson(json);
+          User? savedUser = json == null ? null : User.fromJson(json);
           if (savedUser != null) {
             // save addresses
             for (var address in _addressList) {
@@ -594,7 +597,7 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                   : '${Utils.getLocale(context).createUserSuccessMessage}',
               onAccept: () {
                 if (done != null) {
-                  done(savedUser);
+                  done(savedUser!);
                 }
               },
             );
@@ -603,7 +606,7 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
         onTimeout: () {
           _popLoading();
           if (done != null) {
-            done(null);
+            done({} as User);
           }
         },
       );
@@ -653,16 +656,19 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
   void _copyToClipboard() {
     final currentText = _passwordController.text?.trim() ?? '';
     if (Utils.isNullOrEmpty(currentText)) {
-      _scaffoldKey.currentState.showSnackBar(SnackBar(
-        content: Text('${Utils.getLocale(context).nothingToCopy}'),
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${Utils.getLocale(context).nothingToCopy}')));
+
+      // _scaffoldKey.currentState?.showSnackBar(SnackBar(
+      //   content: Text('${Utils.getLocale(context).nothingToCopy}'),
+      // ));
       return;
     }
 
     Clipboard.setData(ClipboardData(text: currentText)).then((value) {
-      _scaffoldKey.currentState.showSnackBar(SnackBar(
-        content: Text('${Utils.getLocale(context).passwordCopied}'),
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${Utils.getLocale(context).passwordCopied}')));
+      // _scaffoldKey.currentState?.showSnackBar(SnackBar(
+      //   content: Text('${Utils.getLocale(context).passwordCopied}'),
+      // ));
     });
   }
 
@@ -704,43 +710,43 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
             _user.phoneNumber.length > 4 ? _user.phoneNumber.length - 4 : 0);
     _customerCodeController.text =
         Utils.changeAlias('${name.toLowerCase()}$phone');
-    _user.customerId = _customerCodeController.text?.trim();
+    _user.customerId = _customerCodeController.text!.trim();
   }
 
   // Listeners
   void _fullNameListener() {
-    _user.fullName = _fullNameController.text?.trim();
+    _user.fullName = _fullNameController.text!.trim();
     _makeCustomerId();
 
     _updateUI();
   }
 
   void _phoneNumberListener() {
-    _user.phoneNumber = _phoneNumberController.text?.trim();
+    _user.phoneNumber = _phoneNumberController.text!.trim();
     _makeCustomerId();
 
     _updateUI();
   }
 
   void _emailListener() {
-    _user.email = _emailController.text?.trim();
+    _user.email = _emailController.text!.trim();
     _updateUI();
   }
 
   void _customerIdListener() {
     if (widget.isUpdate) return;
 
-    _user.customerId = _customerCodeController.text?.trim();
+    _user.customerId = _customerCodeController.text!.trim();
     _updateUI();
   }
 
   void _passwordListener() {
-    _user.password = _passwordController.text?.trim();
+    _user.password = _passwordController.text!.trim();
     _updateUI();
   }
 
   void _refUserListener() {
-    _user.refId = _refUserController.text?.trim();
+    _user.refId = _refUserController.text!.trim();
     _updateUI();
   }
 
@@ -758,7 +764,7 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                       address.wards,
                       address.district,
                       address.province
-                    ].join(', ')?.replaceAll(' ,', '')),
+                    ].join(', ')!.replaceAll(' ,', '')),
                   ],
                 ),
                 trailing: IconButton(

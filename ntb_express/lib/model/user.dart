@@ -17,19 +17,20 @@ class User {
   int status;
   String langKey;
   String createdId;
-  num createdDate;
+  num? createdDate;
   String updatedId;
-  num updatedDate;
+  num? updatedDate;
   String address;
   String phoneNumber;
   String customerId;
   String managerId;
-  double commission;
-  num dob;
-  TCCOFile avatarImgDTO;
+  double? commission;
+  num? dob;
+  TCCOFile? avatarImgDTO;
   String refId;
   String resetToken;
-  int isCreate;
+  int? isCreate;
+
 
   User(
       {this.username = '',
@@ -53,13 +54,14 @@ class User {
       this.avatarImgDTO,
       this.refId = '',
       this.resetToken = '',
-      this.isCreate});
+      this.isCreate = 0});
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 
   Map<String, dynamic> toJson() => _$UserToJson(this);
 
-  static User clone(User other) {
+  static User clone(User? other) {
+
     final String jsonString = json.encode(other);
     final jsonResponse = json.decode(jsonString);
 

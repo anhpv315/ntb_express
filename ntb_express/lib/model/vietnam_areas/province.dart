@@ -10,7 +10,7 @@ class Province implements Location {
   String location;
   String type;
 
-  Province({this.id, this.name, this.location, this.type});
+  Province({required this.id, required this.name, this.location='', this.type=''});
 
   factory Province.fromJson(Map<String, dynamic> json) =>
       _$ProvinceFromJson(json);

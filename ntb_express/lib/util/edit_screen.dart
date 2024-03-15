@@ -8,13 +8,13 @@ class EditScreen extends StatefulWidget {
   final String title;
   final String hintText;
   final int length;
-  final ValidationCallback onValidate;
+  final ValidationCallback? onValidate;
 
   EditScreen(
-      {this.currentValue,
-      @required this.title,
-      @required this.hintText,
-      @required this.length,
+      {this.currentValue = '',
+      required this.title,
+      required this.hintText,
+      required this.length,
       this.onValidate});
 
   @override
@@ -65,11 +65,11 @@ class _EditScreenState extends State<EditScreen> {
 
               Utils.confirm(
                 context,
-                title: '${Utils.getLocale(context).saveChanges}',
-                message: Utils.getLocale(context).saveChangesMessage,
+                title: '${Utils.getLocale(context)?.saveChanges}',
+                message: Utils.getLocale(context)!.saveChangesMessage,
                 onAccept: () {
                   if (widget.onValidate != null) {
-                    if (widget.onValidate(_txtController.text)) {
+                    if (widget.onValidate!(_txtController.text)) {
                       Navigator.of(context).pop(_txtController.text);
                     }
                   } else {
@@ -87,7 +87,7 @@ class _EditScreenState extends State<EditScreen> {
             IconButton(
               onPressed: !_isDataChanged ? null : () {
                 if (widget.onValidate != null) {
-                  if (widget.onValidate(_txtController.text)) {
+                  if (widget.onValidate!(_txtController.text)) {
                     Navigator.of(context).pop(_txtController.text);
                   }
                 } else {
@@ -121,7 +121,7 @@ class _EditScreenState extends State<EditScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 8.0),
-                child: Text('${widget.length ?? 100} ${Utils.getLocale(context).charactersOnly}'),
+                child: Text('${widget.length ?? 100} ${Utils.getLocale(context)?.charactersOnly}'),
               ),
             ],
           ),

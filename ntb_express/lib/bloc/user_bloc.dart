@@ -14,8 +14,8 @@ class UserBloc {
   int _currentPage = 0;
   final int _pageSize = 20;
 
-  BehaviorSubject<User> _currentUserSubject;
-  BehaviorSubject<List<User>> _customersSubject;
+  late BehaviorSubject<User> _currentUserSubject;
+  late BehaviorSubject<List<User>> _customersSubject;
 
   UserBloc() {
     _currentUserSubject = BehaviorSubject<User>.seeded(_currentUser);
@@ -37,13 +37,13 @@ class UserBloc {
     _customersSubject.sink.add(_customers);
   }
 
-  void fetch({int page = 0, bool reset = false, VoidCallback done}) {
+  void fetch({int page = 0, bool reset = false, required VoidCallback done}) {
     if (reset) page = 0;
     _currentPage = page;
 
-    if (SessionUtil.instance().isLoggedIn()) {
+    if (SessionUtil.instance()!.isLoggedIn()) {
       final url =
-          '${ApiUrls.instance().getUsersUrl()}?page=$page&size=$_pageSize';
+          '${ApiUrls.instance()?.getUsersUrl()}?page=$page&size=$_pageSize';
       HttpUtil.get(
         url,
         headers: {'Content-Type': 'application/json; charset=utf-8'},
@@ -93,7 +93,7 @@ class UserBloc {
         : (_customers.length / _pageSize).ceil() - 1; // start page = 0
   }
 
-  void loadMore({VoidCallback done}) {
+  void loadMore({required VoidCallback done}) {
     fetch(page: _currentPage + 1, done: done);
   }
 
@@ -102,7 +102,7 @@ class UserBloc {
         ? 0
         : b.createdDate == null || a.createdDate == null
             ? 0
-            : b.createdDate - a.createdDate);
+            : b.createdDate!.toInt() - a.createdDate!.toInt());
   }
 
   void _addAll(List<User> customerList) {

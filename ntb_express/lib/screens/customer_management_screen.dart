@@ -83,7 +83,7 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen> {
               }
 
               if (snapshot.hasData) {
-                if (snapshot.data == null || snapshot.data.isEmpty) {
+                if (snapshot.data == null || snapshot.data!.isEmpty) {
                   if (!_loaded) {
                     Future.delayed(const Duration(milliseconds: 500), () async {
                       userBloc.fetch(
@@ -112,7 +112,7 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen> {
                   );
                 }
 
-                return _content(snapshot.data);
+                return _content(snapshot.data!);
               }
 
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -140,7 +140,7 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen> {
   }
 
   Future<void> _onRefresh() async {
-    AppProvider.of(context).state.userBloc.fetch(reset: true);
+    AppProvider.of(context).state.userBloc.fetch(reset: true, done: () {  });
   }
 
   Widget _content(List<User> customers) {
@@ -155,7 +155,7 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen> {
               (context, index) {
                 final cus = customers[index];
                 return Slidable(
-                  actionPane: SlidableScrollActionPane(),
+                  startActionPane: ActionPane(motion:  const DrawerMotion(), children: [],),
                   child: ListTile(
                     onTap: () async {
                       User updatedUser = await Navigator.of(context).push(
@@ -165,8 +165,8 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen> {
 
                       if (updatedUser != null) {
                         if (updatedUser.avatarImgDTO != null) {
-                          updatedUser.avatarImgDTO.flePath =
-                              updatedUser.avatarImgDTO.flePath +
+                          updatedUser.avatarImgDTO?.flePath =
+                              updatedUser.avatarImgDTO!.flePath +
                                   '?t=${DateTime.now().millisecondsSinceEpoch}';
                         }
                         AppProvider.of(context)
@@ -180,10 +180,10 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen> {
                       backgroundColor: Colors.grey[100],
                       child: CircleAvatar(
                         radius: 20.0,
-                        backgroundImage: cus.avatarImgDTO != null
+                        backgroundImage: (cus.avatarImgDTO != null
                             ? NetworkImage(
-                                '${ApiUrls.instance().baseUrl}/${cus.avatarImgDTO.flePath}')
-                            : AssetImage('assets/images/default-avatar.png'),
+                                '${ApiUrls.instance().baseUrl}/${cus.avatarImgDTO!.flePath}')
+                            : AssetImage('assets/images/default-avatar.png')) as ImageProvider,
                       ),
                     ),
                     title: Text(
@@ -197,9 +197,11 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen> {
                       ],
                     ),
                   ),
-                  secondaryActions: [
-                    IconSlideAction(
-                      onTap: () {
+                  endActionPane:
+
+                  ActionPane(motion:  const DrawerMotion(), children: [
+                    SlidableAction(
+                      onPressed: (context) {
                         Utils.confirm(
                           context,
                           title: Utils.getLocale(context).confirmation,
@@ -209,11 +211,13 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen> {
                         );
                       },
                       icon: Icons.delete,
-                      color: Colors.red,
+                      backgroundColor: Colors.red,
                       foregroundColor: Colors.white,
-                      caption: Utils.getLocale(context).delete,
+                      label: Utils.getLocale(context).delete,
                     ),
-                  ],
+                  ],),
+
+
                 );
               },
               childCount: customers.length,

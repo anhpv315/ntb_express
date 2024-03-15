@@ -67,7 +67,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _cameraRoll() async {
     Navigator.of(context).pop(); // hide bottom sheet
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null && mounted) {
       _hasChanges = true;
       final file = await compute(_computeFile, File(pickedFile.path));
@@ -77,7 +77,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _takePhoto() async {
     Navigator.of(context).pop(); // hide bottom sheet
-    final pickedFile = await picker.getImage(source: ImageSource.camera);
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
     if (pickedFile != null && mounted) {
       _hasChanges = true;
       final file = await compute(_computeFile, File(pickedFile.path));
@@ -240,7 +240,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }*/
 
   /*Future _getImage() async {
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null && mounted) {
       _hasChanges = true;
       setState(() => _image = File(pickedFile.path));
@@ -260,7 +260,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: '${Utils.getLocale(context).edit} $email',
         hintText: '${Utils.getLocale(context).enter} $email...',
         length: 50, onValidate: (value) {
-      if (Utils.isNullOrEmpty(value)) {
+      if (value == null || value!.isEmpty)
+ {
         Utils.alert(context,
             title: '$errorOccurred!',
             message: '${Utils.getLocale(context).mustEnter} $email!');
@@ -295,7 +296,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: '${Utils.getLocale(context).edit} $phoneNumber',
         hintText: '${Utils.getLocale(context).enter} $phoneNumber...',
         length: 12, onValidate: (value) {
-      if (Utils.isNullOrEmpty(value)) {
+      if (value == null || value!.isEmpty)
+ {
         Utils.alert(context,
             title: '$errorOccurred!',
             message: '${Utils.getLocale(context).mustEnter} $phoneNumber!');
@@ -330,7 +332,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: '${Utils.getLocale(context).edit} $dob',
         hintText: '${Utils.getLocale(context).enter} $dob...',
         length: 10, onValidate: (value) {
-      if (Utils.isNullOrEmpty(value)) {
+      if (value == null || value!.isEmpty)
+ {
         Utils.alert(context,
             title: '$errorOccurred!',
             message: '${Utils.getLocale(context).mustEnter} $dob!');

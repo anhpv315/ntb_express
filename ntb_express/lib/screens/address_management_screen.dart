@@ -11,9 +11,9 @@ import 'package:ntbexpress/util/session_util.dart';
 import 'package:ntbexpress/util/utils.dart';
 
 class AddressManagementScreen extends StatefulWidget {
-  final User forUser;
+  final User? forUser;
 
-  AddressManagementScreen({this.forUser});
+  AddressManagementScreen({User? this.forUser});
 
   @override
   _AddressManagementScreenState createState() =>
@@ -21,7 +21,7 @@ class AddressManagementScreen extends StatefulWidget {
 }
 
 class _AddressManagementScreenState extends State<AddressManagementScreen> {
-  User currentUser;
+  User? currentUser;
 
   @override
   void initState() {
@@ -58,7 +58,7 @@ class _AddressManagementScreenState extends State<AddressManagementScreen> {
                   );
                 }
 
-                if (!snapshot.hasData || snapshot.data.isEmpty) {
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return Column(
                     children: [
                       Container(
@@ -104,12 +104,12 @@ class _AddressManagementScreenState extends State<AddressManagementScreen> {
                       child: Scrollbar(
                         child: ListView.separated(
                           itemBuilder: (context, index) {
-                            final address = addressList[index];
+                            final address = addressList?[index];
                             var addrs = [
-                              address.address,
-                              address.wards,
-                              address.district,
-                              address.province
+                              address?.address,
+                              address?.wards,
+                              address?.district,
+                              address?.province
                             ];
                             return AddressItem(
                                 onTap: () async {
@@ -125,15 +125,15 @@ class _AddressManagementScreenState extends State<AddressManagementScreen> {
                                     setState(() {}); // reload
                                   }
                                 },
-                                name: address.fullName,
+                                name: address!.fullName,
                                 phoneNumber: address.phoneNumber,
-                                address: addrs.join(', ')?.replaceAll(' ,', ''));
+                                address: addrs.join(', ')!.replaceAll(' ,', ''));
                           },
                           separatorBuilder: (context, index) => Divider(
                             height: 0.5,
                             thickness: 0.5,
                           ),
-                          itemCount: addressList.length,
+                          itemCount: addressList!.length,
                         ),
                       ),
                     ),
@@ -167,7 +167,7 @@ class _AddressManagementScreenState extends State<AddressManagementScreen> {
   Future<List<Address>> _getAddressList() async {
     final Completer<List<Address>> c = Completer();
     final url =
-        ApiUrls.instance().getAddressListByUserUrl(currentUser.username);
+        ApiUrls.instance().getAddressListByUserUrl(currentUser!.username);
 
     HttpUtil.get(
       url,
@@ -217,13 +217,13 @@ class AddressItem extends StatelessWidget {
   final String phoneNumber;
   final String email;
   final String address;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   AddressItem(
-      {@required this.name,
-      @required this.phoneNumber,
-      this.email,
-      @required this.address,
+      {required this.name,
+      required this.phoneNumber,
+      this.email = '',
+      required this.address,
       this.onTap});
 
   @override

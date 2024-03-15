@@ -130,7 +130,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             .requestFocus(_phoneNumberFocusNode);
                       },
                       validator: (value) {
-                        if (Utils.isNullOrEmpty(value))
+                        if (value == null || value!.isEmpty)
+
                           return Utils.getLocale(context).required;
 
                         return null;
@@ -154,7 +155,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             .requestFocus(_emailFocusNode);
                       },
                       validator: (value) {
-                        if (Utils.isNullOrEmpty(value))
+                        if (value == null || value!.isEmpty)
+
                           return Utils.getLocale(context).required;
                         if (!Utils.isPhoneNumberValid(value))
                           return '${Utils.getLocale(context).phoneNumber} ${Utils.getLocale(context).wrongFormat}';
@@ -175,7 +177,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         maxLength: 50,
                         validator: (value) {
-                          if (Utils.isNullOrEmpty(value))
+                          if (value == null || value!.isEmpty)
+
                             return '${Utils.getLocale(context).required}';
                           if (RegExp(r'[^a-zA-Z_0-9]+').hasMatch(value))
                             return '${Utils.getLocale(context).customerCode} ${Utils.getLocale(context).wrongFormat}';
@@ -200,7 +203,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         _emailFocusNode.unfocus();
                       },
                       validator: (value) {
-                        if (Utils.isNullOrEmpty(value))
+                        if (value == null || value!.isEmpty)
+
                           return '${Utils.getLocale(context).required}';
                         if (!Utils.isEmailValid(value))
                           return '${Utils.getLocale(context).email} ${Utils.getLocale(context).wrongFormat}';

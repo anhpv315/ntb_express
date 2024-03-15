@@ -3,17 +3,17 @@ import 'package:ntbexpress/util/utils.dart';
 
 class InfoItem extends StatelessWidget {
   final String firstText;
-  final String secondText;
+  final String? secondText;
   final bool alignTop;
   final bool breakLine;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final bool useWidget;
-  final Widget firstChild;
-  final Widget secondChild;
-  final Widget bottomChild;
+  final Widget? firstChild;
+  final Widget? secondChild;
+  final Widget? bottomChild;
 
   InfoItem(
-      {this.firstText,
+      {required this.firstText,
       this.secondText,
       this.alignTop = false,
       this.breakLine = false,
@@ -41,14 +41,14 @@ class InfoItem extends StatelessWidget {
                     ? CrossAxisAlignment.start
                     : CrossAxisAlignment.center,
                 children: [
-                  useWidget ? firstChild : Text(firstText ?? ''),
+                  (useWidget && (firstChild != null)) ? firstChild! : Text(firstText ?? ''),
                   breakLine
                       ? const SizedBox()
                       : Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              useWidget ? secondChild : Text(secondText ?? ''),
+                              (useWidget && (secondChild != null)) ? secondChild! : Text(secondText ?? ''),
                             ],
                           ),
                         ),

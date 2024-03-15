@@ -14,8 +14,8 @@ class OrderBloc {
   OrderFilter _filter = OrderFilter();
   int _currentPage = 0;
 
-  BehaviorSubject<List<Order>> _ordersSubject;
-  BehaviorSubject<OrderFilter> _filterSubject;
+  late BehaviorSubject<List<Order>> _ordersSubject;
+  late BehaviorSubject<OrderFilter> _filterSubject;
 
   OrderBloc() {
     _ordersSubject = BehaviorSubject<List<Order>>.seeded(_orders);
@@ -59,7 +59,7 @@ class OrderBloc {
   }
 
   // Update filter
-  void updateFilter(OrderFilter filter, {VoidCallback done}) {
+  void updateFilter(OrderFilter filter, {required VoidCallback done}) {
     if (filter == null) return;
     _filter.statusList = filter.statusList;
     _filter.customerId = filter.customerId;
@@ -74,13 +74,13 @@ class OrderBloc {
     fetch(reset: true, done: done);
   }
 
-  void fetch({int page = 0, bool reset = false, VoidCallback done}) {
+  void fetch({int page = 0, bool reset = false, required VoidCallback done}) {
     if (reset) page = 0;
     _currentPage = page;
 
-    if (SessionUtil.instance().isLoggedIn()) {
+    if (SessionUtil.instance()!.isLoggedIn()) {
       final url =
-          '${ApiUrls.instance().getOrdersUrl()}?page=$page&size=$_pageSize&' +
+          '${ApiUrls.instance()!.getOrdersUrl()}?page=$page&size=$_pageSize&' +
               _filter.toQueryString();
       HttpUtil.get(
         url,
@@ -125,7 +125,7 @@ class OrderBloc {
   }
 
   void _sort() {
-    _orders.sort((a, b) => b.createdDate - a.createdDate);
+    _orders.sort((a, b) => (b.createdDate - a.createdDate).toInt());
   }
 
   void _addAll(List<Order> orderList) {
@@ -147,7 +147,7 @@ class OrderBloc {
         : (_orders.length / _pageSize).ceil() - 1; // start page = 0
   }
 
-  void loadMore({VoidCallback done}) {
+  void loadMore({required VoidCallback done}) {
     fetch(page: _currentPage + 1, done: done);
   }
 
@@ -181,15 +181,15 @@ class OrderFilter {
   String licensePlates;
 
   OrderFilter(
-      {this.statusList,
-      this.customerId,
-      this.internalTrackNo,
-      this.externalTrackNo,
-      this.fromDate,
-      this.toDate,
-      this.packCount,
-      this.goodsDescr,
-      this.licensePlates}) {
+      {this.statusList = const [],
+      this.customerId = '',
+      this.internalTrackNo ='',
+      this.externalTrackNo = '',
+      this.fromDate = '',
+      this.toDate = '',
+      this.packCount = 0,
+      this.goodsDescr = '',
+      this.licensePlates = ''}) {
     if (statusList == null) {
       statusList = []..addAll(OrderStatus.values);
     }

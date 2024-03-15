@@ -37,7 +37,7 @@ Order _$OrderFromJson(Map<String, dynamic> json) {
     tccoFileDTOS: (json['tccoFileDTOS'] as List)
         ?.map((e) =>
             e == null ? null : TCCOFile.fromJson(e as Map<String, dynamic>))
-        ?.toList(),
+        !.toList(),
     addressDTO: json['addressDTO'] == null
         ? null
         : Address.fromJson(json['addressDTO'] as Map<String, dynamic>),

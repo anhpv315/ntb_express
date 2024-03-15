@@ -12,12 +12,12 @@ class DeviceInfo {
   String locale;
 
   DeviceInfo(
-      {this.id,
-      this.username,
-      this.deviceId,
-      this.fcmToken,
-      this.platform,
-      this.locale});
+      {this.id = 0,
+      required this.username,
+      required this.deviceId,
+      required this.fcmToken,
+      required this.platform,
+      required this.locale});
 
   factory DeviceInfo.fromJson(Map<String, dynamic> json) =>
       _$DeviceInfoFromJson(json);

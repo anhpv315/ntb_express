@@ -31,7 +31,7 @@ User _$UserFromJson(Map<String, dynamic> json) {
         : TCCOFile.fromJson(json['avatarImgDTO'] as Map<String, dynamic>),
     refId: json['refId'] as String,
     resetToken: json['resetToken'] as String,
-    isCreate: json['isCreate'] as num,
+    isCreate: json['isCreate'] as int,
   );
 }
 

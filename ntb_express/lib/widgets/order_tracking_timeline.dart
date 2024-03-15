@@ -10,7 +10,7 @@ class OrderTrackingTimeline extends StatelessWidget {
   final double indicatorWidth;
 
   OrderTrackingTimeline(
-      {this.tracks,
+      {required this.tracks,
       this.indicatorLineWidth = 1.0,
       this.indicatorPadding = 10.0,
       this.indicatorWidth = 10.0});
@@ -24,8 +24,8 @@ class OrderTrackingTimeline extends StatelessWidget {
         list.add(TimelineTile(
           isFirst: isFirst,
           isLast: isLast,
-          topLineStyle: LineStyle(
-            width: indicatorLineWidth,
+          beforeLineStyle: LineStyle(
+            thickness: indicatorLineWidth,
             color: Colors.black12,
           ),
           indicatorStyle: IndicatorStyle(
@@ -34,7 +34,7 @@ class OrderTrackingTimeline extends StatelessWidget {
             color: isFirst ? Colors.green : Colors.black12,
             padding: EdgeInsets.only(left: indicatorPadding),
           ),
-          rightChild: Container(
+          startChild: Container(
             margin: EdgeInsets.only(left: indicatorPadding),
             width: double.infinity,
             decoration: BoxDecoration(
@@ -71,7 +71,7 @@ class OrderTrackingTimeline extends StatelessWidget {
                     Visibility(
                       visible: !Utils.isNullOrEmpty(track.note),
                       child: Text(
-                        '${Utils.getLocale(context).note}: ${track.note}',
+                        '${Utils.getLocale(context)?.note}: ${track.note}',
                         style: TextStyle(
                           fontSize: 10.0,
                           color: Theme.of(context).disabledColor,

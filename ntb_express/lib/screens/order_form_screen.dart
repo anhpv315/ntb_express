@@ -701,7 +701,8 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                 validator: (value) {
                                   if (isChineseWarehouseStaff) return null;
 
-                                  if (Utils.isNullOrEmpty(value))
+                                  if (value == null || value!.isEmpty)
+
                                     return Utils.getLocale(context).required;
 
                                   return null;
@@ -729,7 +730,8 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                       maxLines: 1,
                                       maxLength: 50,
                                       validator: (value) {
-                                        /*if (Utils.isNullOrEmpty(value))
+                                        /*if (value == null || value!.isEmpty)
+
                                           return Utils.getLocale(context)
                                               .required;*/
 
@@ -784,7 +786,8 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                     counterText: ''),
                                 maxLines: 1,
                                 validator: (value) {
-                                  if (Utils.isNullOrEmpty(value))
+                                  if (value == null || value!.isEmpty)
+
                                     return Utils.getLocale(context).required;
 
                                   return null;
@@ -907,7 +910,8 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                         maxLines: 1,
                                         validator: (value) {
                                           if (!isAllowEditAgentFee) return null;
-                                          if (Utils.isNullOrEmpty(value)) {
+                                          if (value == null || value!.isEmpty)
+ {
                                             return Utils.getLocale(context)
                                                 .required;
                                           } else if (double.parse(value) <
@@ -946,7 +950,8 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                         maxLines: 1,
                                         validator: (value) {
                                           if (!isAllowEditAgentFee) return null;
-                                          if (Utils.isNullOrEmpty(value)) {
+                                          if (value == null || value!.isEmpty)
+ {
                                             return Utils.getLocale(context)
                                                 .required;
                                           } else if (double.parse(value) <

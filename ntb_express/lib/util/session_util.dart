@@ -4,21 +4,21 @@ import 'package:ntbexpress/util/utils.dart';
 class SessionUtil {
   SessionUtil._();
 
-  static SessionUtil _instance;
+  static SessionUtil? _instance;
 
-  static SessionUtil instance() {
+  static SessionUtil? instance() {
     if (_instance != null) return _instance;
 
     _instance = SessionUtil._();
     return _instance;
   }
 
-  User user;
-  String fcmToken;
-  String authToken;
-  String deviceId;
-  double exchangeRate = 3400;
-  int canPop = 0;
+  User? user;
+  String? fcmToken;
+  String? authToken;
+  String? deviceId;
+  double? exchangeRate = 3400;
+  int? canPop = 0;
 
   void reset() {
     _instance = SessionUtil._();

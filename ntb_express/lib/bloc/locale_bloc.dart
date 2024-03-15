@@ -3,9 +3,9 @@ import 'package:rxdart/rxdart.dart';
 
 class LocaleBloc {
   Locale initialLocale = const Locale('en');
-  BehaviorSubject<Locale> _localeSubject;
+  late BehaviorSubject<Locale> _localeSubject;
 
-  LocaleBloc({this.initialLocale}) {
+  LocaleBloc({required this.initialLocale}) {
     _localeSubject = BehaviorSubject<Locale>.seeded(this.initialLocale);
   }
 

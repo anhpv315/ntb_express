@@ -12,7 +12,7 @@ class District implements Location {
   @JsonKey(name: 'tinh_id')
   int provinceId;
 
-  District({this.id, this.name, this.location, this.type, this.provinceId});
+  District({required this.id, required this.name, required this.location, required this.type, required this.provinceId});
 
   factory District.fromJson(Map<String, dynamic> json) =>
       _$DistrictFromJson(json);

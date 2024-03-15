@@ -1,6 +1,6 @@
 abstract class Location {
-  int id;
-  String name;
-  String location;
-  String type;
+  late int id;
+  late String name;
+  late String location;
+  late String type;
 }

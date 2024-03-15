@@ -16,16 +16,16 @@ class FeeItem {
   double maxSize;
 
   FeeItem(
-      {this.feeId,
-      this.feeGroup,
-      this.goodsType,
-      this.locationGroup,
-      this.feeByWeight,
-      this.minWeight,
-      this.maxWeight,
-      this.feeBySize,
-      this.minSize,
-      this.maxSize});
+      {required this.feeId,
+      required this.feeGroup,
+      required this.goodsType,
+      required this.locationGroup,
+       this.feeByWeight = 0,
+       this.minWeight = 0,
+       this.maxWeight = 0,
+       this.feeBySize = 0,
+       this.minSize = 0,
+       this.maxSize = 0});
 
   factory FeeItem.fromJson(Map<String, dynamic> json) =>
       _$FeeItemFromJson(json);

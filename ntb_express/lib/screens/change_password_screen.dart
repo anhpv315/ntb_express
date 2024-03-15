@@ -6,6 +6,8 @@ import 'package:ntbexpress/util/contants.dart';
 import 'package:ntbexpress/util/http_util.dart';
 import 'package:ntbexpress/util/utils.dart';
 
+import '../widgets/raised_button.dart';
+
 class ChangePasswordScreen extends StatefulWidget {
   final User forUser;
 
@@ -85,8 +87,8 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                             : Icons.visibility),
                       ),
                     ),
-                    validator: (value) {
-                      if (Utils.isNullOrEmpty(value))
+                    validator: (String? value) {
+                      if (value == null || value!.isEmpty)
                         return Utils.getLocale(context).required;
                       if (value.length < 8)
                         return '${Utils.getLocale(context).passwordLengthRequired}';
@@ -116,7 +118,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       ),
                     ),
                     validator: (value) {
-                      if (Utils.isNullOrEmpty(value))
+                      if (value == null || value!.isEmpty)
                         return Utils.getLocale(context).required;
                       if (value.length < 8)
                         return '${Utils.getLocale(context).passwordLengthRequired}';
@@ -150,7 +152,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       ),
                     ),
                     validator: (value) {
-                      if (Utils.isNullOrEmpty(value))
+                      if (value == null || value!.isEmpty)
                         return Utils.getLocale(context).required;
                       if (value.length < 8)
                         return '${Utils.getLocale(context).passwordLengthRequired}';
@@ -186,7 +188,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   }
 
   void _btnChangeClicked() {
-    if (!_formKey.currentState.validate()) {
+    if (!_formKey.currentState!.validate()) {
       return;
     }
 

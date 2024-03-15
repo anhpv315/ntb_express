@@ -18,7 +18,7 @@ class SelectUserScreen extends StatefulWidget {
 }
 
 class _SelectUserScreenState extends State<SelectUserScreen> {
-  User _current;
+  late User _current;
   final List<User> _userList = [];
   final List<User> _immutableUserList = [];
 
@@ -43,7 +43,7 @@ class _SelectUserScreenState extends State<SelectUserScreen> {
     final c = Completer<List<User>>();
 
     HttpUtil.get(
-      ApiUrls.instance().getUsersUrl(),
+      ApiUrls.instance()!.getUsersUrl()!,
       headers: {'Content-Type': 'application/json; charset=utf-8'},
       onResponse: (resp) {
         if (resp != null &&
@@ -74,14 +74,15 @@ class _SelectUserScreenState extends State<SelectUserScreen> {
             onPressed: () => Navigator.of(context).pop(),
             icon: Icon(Icons.close),
           ),
-          title: Text('${Utils.getLocale(context).select}'),
+          title: Text('${Utils.getLocale(context)?.select}'),
         ),
         body: Container(
           child: Column(
             children: [
               TextField(
                 onChanged: (value) {
-                  if (Utils.isNullOrEmpty(value)) {
+                  if (value == null || value!.isEmpty)
+ {
                     if (_userList.length != _immutableUserList.length) {
                       if (mounted) {
                         setState(() {
@@ -115,7 +116,7 @@ class _SelectUserScreenState extends State<SelectUserScreen> {
                   }
                 },
                 decoration: InputDecoration(
-                    hintText: '${Utils.getLocale(context).search}...',
+                    hintText: '${Utils.getLocale(context)?.search}...',
                     contentPadding:
                         const EdgeInsets.symmetric(horizontal: 10.0)),
               ),

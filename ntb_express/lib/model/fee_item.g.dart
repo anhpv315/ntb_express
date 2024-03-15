@@ -12,12 +12,12 @@ FeeItem _$FeeItemFromJson(Map<String, dynamic> json) {
     feeGroup: json['feeGroup'] as int,
     goodsType: json['goodsType'] as int,
     locationGroup: json['locationGroup'] as int,
-    feeByWeight: (json['feeByWeight'] as num)?.toDouble(),
-    minWeight: (json['minWeight'] as num)?.toDouble(),
-    maxWeight: (json['maxWeight'] as num)?.toDouble(),
-    feeBySize: (json['feeBySize'] as num)?.toDouble(),
-    minSize: (json['minSize'] as num)?.toDouble(),
-    maxSize: (json['maxSize'] as num)?.toDouble(),
+    feeByWeight: (json['feeByWeight'] as num)!.toDouble(),
+    minWeight: (json['minWeight'] as num)!.toDouble(),
+    maxWeight: (json['maxWeight'] as num)!.toDouble(),
+    feeBySize: (json['feeBySize'] as num)!.toDouble(),
+    minSize: (json['minSize'] as num)!.toDouble(),
+    maxSize: (json['maxSize'] as num)!.toDouble(),
   );
 }
 

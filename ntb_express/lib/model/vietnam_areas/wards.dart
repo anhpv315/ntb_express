@@ -12,7 +12,7 @@ class Wards implements Location {
   @JsonKey(name: 'huyen_id')
   int districtId;
 
-  Wards({this.id, this.name, this.location, this.type, this.districtId});
+  Wards({this.id = 0, this.name = '', this.location = '', this.type = '', this.districtId = 0});
 
   factory Wards.fromJson(Map<String, dynamic> json) => _$WardsFromJson(json);
 

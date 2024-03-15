@@ -18,8 +18,8 @@ class PriceCalculationUtil {
 
   /// Calculate international shipping fee
   static double calculateExtFee(
-      {Address address,
-      int goodsType,
+      {Address? address,
+      int? goodsType,
       double weight = 0,
       double size = 0,
       double feeByWeight = 0,
@@ -30,14 +30,14 @@ class PriceCalculationUtil {
 
     // check fixed fee
     if (feeBySize > 0 || feeByWeight > 0) {
-      return weight * feeByWeight + size * feeBySize;
+      return weight * feeByWeight! + size * feeBySize;
     }
 
     final locationGroup = getLocationGroupByProvince(address.province);
     if (locationGroup == 0) return 0;
 
     if (goodsType != GoodsType.normal) {
-      FeeItem fee = _getFeeItem(goodsType, locationGroup);
+      FeeItem? fee = _getFeeItem(goodsType!, locationGroup);
       if (fee == null) return 0;
 
       double price = weight * fee.feeByWeight + size * fee.feeBySize;
@@ -66,8 +66,8 @@ class PriceCalculationUtil {
   }
 
   static Map<String, double> getAgentFee(
-      {Address address,
-        int goodsType,
+      {Address? address,
+        int? goodsType,
         double weight = 0,
         double size = 0,
         double feeByWeight = 0,
@@ -91,7 +91,7 @@ class PriceCalculationUtil {
     if (locationGroup == 0) return result;
 
     if (goodsType != GoodsType.normal) {
-      FeeItem fee = _getFeeItem(goodsType, locationGroup);
+      FeeItem? fee = _getFeeItem(goodsType!, locationGroup);
       if (fee == null) return result;
       result["weight"] = fee.feeByWeight;
       result["size"] = fee.feeBySize;
@@ -123,13 +123,13 @@ class PriceCalculationUtil {
         (promotion.countOrder == -1 || promotion.countOrder > 0)) {
       double discountPrice = 0;
       if (promotion.promotionType == PromotionType.percent) {
-        discountPrice = (price * promotion.discountValue) / 100; // 100%
-        if (discountPrice > promotion.maxDiscountValue) {
-          discountPrice = promotion.maxDiscountValue;
+        discountPrice = (price * promotion.discountValue!) / 100; // 100%
+        if (discountPrice > promotion.maxDiscountValue!) {
+          discountPrice = promotion.maxDiscountValue!;
         }
       } else if (promotion.promotionType == PromotionType.specificValue ||
           promotion.promotionType == PromotionType.samePrice) {
-        discountPrice = promotion.discountValue;
+        discountPrice = promotion.discountValue!;
       }
 
       price = price - discountPrice;
@@ -139,10 +139,10 @@ class PriceCalculationUtil {
     return price;
   }
 
-  static FeeItem _getFeeItem(int goodsType, int locationGroup) {
+  static FeeItem? _getFeeItem(int goodsType, int locationGroup) {
     return feeTable.firstWhere(
         (e) => e.locationGroup == locationGroup && e.goodsType == goodsType,
-        orElse: () => null);
+        orElse: () => FeeItem(feeId: 0, feeGroup: 0, goodsType: 0, locationGroup: locationGroup));
   }
 
   static List<FeeItem> _getFeeItems(int locationGroup) {
@@ -155,8 +155,8 @@ class PriceCalculationUtil {
   static int getLocationGroupByProvince(String provinceName) {
     return provinces
             .firstWhere(
-                (p) => p.name.toLowerCase() == provinceName.toLowerCase(),
-                orElse: () => null)
+                (p) => p.name?.toLowerCase() == provinceName.toLowerCase(),
+                orElse: () => ProvinceGroup('', '', 0))
             ?.group ??
         0;
   }

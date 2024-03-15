@@ -164,7 +164,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               .requestFocus(_passwordFocusNode);
                         },
                         validator: (value) {
-                          if (Utils.isNullOrEmpty(value))
+                          if (value == null || value!.isEmpty)
+
                             return Utils.getLocale(context).required;
 
                           return null;
@@ -186,7 +187,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         cursorColor: Utils.accentColor,
                         textInputAction: TextInputAction.done,
                         validator: (value) {
-                          if (Utils.isNullOrEmpty(value))
+                          if (value == null || value!.isEmpty)
+
                             return Utils.getLocale(context).required;
 
                           return null;
