@@ -26,9 +26,12 @@ import 'package:ntbexpress/widgets/app_provider.dart';
 import 'package:ntbexpress/widgets/currency_swap_input.dart';
 import 'package:ntbexpress/widgets/image_picker_widget.dart';
 
+import '../widgets/confirm_order_status.dart';
+import '../widgets/raised_button.dart';
+
 class OrderFormScreen extends StatefulWidget {
-  final Order order;
-  final bool update;
+  final Order? order;
+  final bool? update;
 
   OrderFormScreen({this.order, this.update = false});
 
@@ -69,10 +72,10 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
   final List<FileHolder> _removeImages = [];
   double _totalFee = 0;
   double _totalFeeOrigin = 0;
-  Order _order;
-  User _customer;
-  Address _address;
-  Promotion _promotion;
+  late Order _order;
+  late User _customer;
+  late Address? _address;
+  late Promotion? _promotion;
   int _goodsType = GoodsType.normal;
   int _status = OrderStatus.newlyCreated;
   bool _boxedWood = false;
@@ -82,13 +85,13 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
   double _agentTotalFee = 0;
 
   bool get isChineseWarehouseStaff =>
-      SessionUtil.instance().user.userType == UserType.chineseWarehouseStaff;
+      SessionUtil.instance()?.user?.userType == UserType.chineseWarehouseStaff;
 
   bool get isSaleStaff =>
-      SessionUtil.instance().user.userType == UserType.saleStaff;
+      SessionUtil.instance()?.user?.userType == UserType.saleStaff;
 
   bool get isNotCustomer =>
-      SessionUtil.instance().user.userType != UserType.customer;
+      SessionUtil.instance()?.user?.userType != UserType.customer;
 
   String get _getTotalFeeText =>
       NumberFormat.currency(locale: 'vi_VN', symbol: 'đ').format(_totalFee);
@@ -97,17 +100,17 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
       NumberFormat.currency(locale: 'vi_VN', symbol: 'đ')
           .format(_agentTotalFee);
 
-  User get currentUser => SessionUtil.instance().user;
+  User? get currentUser => SessionUtil.instance()?.user;
 
-  bool get canEditAddress => !widget.update
+  bool get canEditAddress => !widget.update!
       ? true
-      : currentUser.username == _order?.customerId ||
-          (currentUser.username == _order?.saleId);
+      : currentUser?.username == _order?.customerId ||
+          (currentUser?.username == _order?.saleId);
 
-  bool get canEditCustomer => !widget.update
+  bool get canEditCustomer => !widget.update!
       ? true
-      : currentUser.username == _order?.customerId ||
-          (currentUser.username == _order?.saleId);
+      : currentUser?.username == _order?.customerId ||
+          (currentUser?.username == _order?.saleId);
 
   TextStyle get textStyle => TextStyle(
       color: !isChineseWarehouseStaff && isNotCustomer
@@ -121,12 +124,12 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
       !Utils.isNullOrEmpty(_sizeController.text) &&
       (_order != null &&
           ![OrderStatus.delivery, OrderStatus.delivered, OrderStatus.completed]
-              .contains(_order.orderStatus) &&
+              .contains( _order!.orderStatus) &&
           !isSaleStaff);
 
   bool get isAllowEditAgentFee =>
-      currentUser.userType == UserType.admin ||
-      currentUser.userType == UserType.customer ||
+      currentUser?.userType == UserType.admin ||
+      currentUser?.userType == UserType.customer ||
       isSaleStaff;
 
   @override
@@ -134,58 +137,58 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
     super.initState();
     _getFeeTable();
     if (widget.order != null) {
-      _order = Order.clone(widget.order);
-      _status = _order.orderStatus;
-      _goodsType = _order.goodsType;
-      _customer = _order.customerDTO;
-      _address = _order.addressDTO;
-      _goodsTypeDescrController.text = _order.goodsDescr;
-      _intTrackNoController.text = _order.intTrackNo;
-      _packCountController.text = _order.packCount?.toString();
-      _weightController.text = _order.weight?.toString();
-      _sizeController.text = _order.size?.toString();
-      _boxedWood = _order.needRepack == 1;
-      _payOnBehalfController.text = _order.payOnBehalf?.toString();
-      _repackFeeController.text = _order.repackFee?.toString();
-      _intFeeController.text = _order.intFee?.toString();
-      _extFeeController.text = _order.extFee?.toString();
-      _noteController.text = _order.note;
+      _order = Order.clone(widget.order!);
+      _status =  _order!.orderStatus;
+      _goodsType =  _order!.goodsType;
+      _customer =  _order!.customerDTO!;
+      _address =  _order!.addressDTO!;
+      _goodsTypeDescrController.text =  _order!.goodsDescr;
+      _intTrackNoController.text =  _order!.intTrackNo!;
+      _packCountController.text =  _order!.packCount!.toString();
+      _weightController.text =  _order!.weight!.toString();
+      _sizeController.text =  _order!.size!.toString();
+      _boxedWood =  _order!.needRepack == 1;
+      _payOnBehalfController.text =  _order!.payOnBehalf!.toString();
+      _repackFeeController.text =  _order!.repackFee!.toString();
+      _intFeeController.text =  _order!.intFee!.toString();
+      _extFeeController.text =  _order!.extFee!.toString();
+      _noteController.text =  _order!.note;
       _parseImages();
-      _promotion = _order.promotionDTO == null
+      _promotion = ( _order!.promotionDTO == null
           ? null
-          : Promotion.fromJson(_order.promotionDTO.toJson());
-      _totalFee = _order.totalFeeDaiLong ?? 0;
+          : Promotion.fromJson( _order!.promotionDTO!.toJson()))!;
+      _totalFee =  _order!.totalFeeDaiLong ?? 0;
       _feeBySizeController.text =
-          _order.feeBySize == null ? '0' : _order.feeBySize.toString();
+           _order!.feeBySize == null ? '0' :  _order!.feeBySize.toString();
       _feeByWeightController.text =
-          _order.feeByWeight == null ? '0' : _order.feeByWeight.toString();
-      if (_order.feeBySize != null && _order.feeBySize > 0 ||
-          _order.feeByWeight != null && _order.feeByWeight > 0) {
+           _order!.feeByWeight == null ? '0' :  _order!.feeByWeight.toString();
+      if ( _order!.feeBySize != null &&  _order!.feeBySize! > 0 ||
+           _order!.feeByWeight != null &&  _order!.feeByWeight! > 0) {
         _priceType = PriceType.fixed;
       }
 
       Map<String, double> fees = PriceCalculationUtil.getAgentFee(
-          address: _order.addressDTO,
-          goodsType: _order.goodsType,
-          weight: _order.weight,
-          size: _order.size,
-          feeBySize: _order.feeBySize,
-          feeByWeight: _order.feeByWeight);
+          address:  _order!.addressDTO,
+          goodsType:  _order!.goodsType,
+          weight:  _order!.weight == null? 0:  _order!.weight!,
+          size:  _order!.size == null? 0:   _order!.size!,
+          feeBySize:  _order!.feeBySize == null? 0:  _order!.feeBySize!,
+          feeByWeight:  _order!.feeByWeight == null? 0 :  _order!.feeByWeight!);
 
-      _minAgentWeightFee = fees["weight"];
-      _minAgentSizeFee = fees["size"];
+      _minAgentWeightFee = fees["weight"]!;
+      _minAgentSizeFee = fees["size"]!;
 
-      _feeByWeightDealerController.text = _order.feeByWeightDealer == null
+      _feeByWeightDealerController.text =  _order!.feeByWeightDealer == null
           ? '0'
-          : _order.feeByWeightDealer.toString();
-      _feeBySizeDealerController.text = _order.feeBySizeDealer == null
+          :  _order!.feeByWeightDealer.toString();
+      _feeBySizeDealerController.text =  _order!.feeBySizeDealer == null
           ? '0'
-          : _order.feeBySizeDealer.toString();
-      _agentTotalFee = _order.totalFee ?? 0;
+          :  _order!.feeBySizeDealer.toString();
+      _agentTotalFee =  _order!.totalFee ?? 0;
       //Future.delayed(const Duration(milliseconds: 500), _updateTotalFee);
     }
 
-    if (currentUser.userType == UserType.customer) {
+    if (currentUser?.userType == UserType.customer) {
       _customer = User.clone(currentUser);
     }
 
@@ -235,18 +238,18 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
   }
 
   Future<void> _parseImages() async {
-    if (_order.tccoFileDTOS != null) {
-      for (var f in _order.tccoFileDTOS) {
+    if ( _order!.tccoFileDTOS != null) {
+      for (var f in  _order!.tccoFileDTOS!) {
         if (f == null) continue;
-        final url = '${ApiUrls.instance().baseUrl}/${f.flePath}';
+        final url = '${ApiUrls.instance()?.baseUrl}/${f.flePath}';
         if (!(await Utils.isUrlValid(url))) continue;
 
-        if (widget.update) {
+        if ( widget.update !=null && widget.update!) {
           _filesController.add(FileHolder(
               key: f.atchFleSeq, isNetworkImage: true, fileUrl: url));
         } else {
           File file = await HttpUtil.download(url);
-          _filesController.add(FileHolder(file: file));
+          _filesController.add(FileHolder(file: file, key: '', fileUrl: ''));
         }
       }
     }
@@ -259,34 +262,34 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
       _updateAgentTotalFee();
 
       _totalFee = PriceCalculationUtil.calculatePrice(
-          repackFee: _order.repackFee,
-          payOnBehalf: _order.payOnBehalf,
-          intFee: _order.intFee,
-          extFee: _order.extFee);
+          repackFee:  _order!.repackFee!,
+          payOnBehalf:  _order!.payOnBehalf!,
+          intFee:  _order!.intFee!,
+          extFee:  _order!.extFee!);
 
       _totalFeeOrigin = PriceCalculationUtil.calculatePrice(
-          repackFee: _order.repackFee,
-          payOnBehalf: _order.payOnBehalf,
-          intFee: _order.intFee,
+          repackFee:  _order!.repackFee!,
+          payOnBehalf:  _order!.payOnBehalf!,
+          intFee:  _order!.intFee!,
           extFee: PriceCalculationUtil.calculateExtFee(
               address: _address,
-              goodsType: _order.goodsType,
-              size: _order.size,
-              weight: _order.weight));
+              goodsType:  _order!.goodsType,
+              size:  _order!.size!,
+              weight:  _order!.weight!));
     });
   }
 
   void _updateAgentTotalFee() {
     _agentTotalFee = PriceCalculationUtil.calculatePrice(
-        repackFee: _order.repackFee,
-        payOnBehalf: _order.payOnBehalf,
-        intFee: _order.intFee,
-        extFee: _order.weight * _order.feeByWeightDealer +
-            _order.size * _order.feeBySizeDealer);
+        repackFee:  _order!.repackFee!,
+        payOnBehalf:  _order!.payOnBehalf!,
+        intFee:  _order!.intFee!,
+        extFee:  _order!.weight! *  _order!.feeByWeightDealer! +
+             _order!.size! *  _order!.feeBySizeDealer);
   }
 
   void _updateAgentFee() {
-    _formKey.currentState.validate();
+    _formKey.currentState?.validate();
     _getFormData();
     _updateAgentTotalFee();
     setState(() {});
@@ -296,25 +299,25 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
     //_promotion = null; // reset promotion when the price has changed, user need reselect promotion!!!
     _getFormData();
     double price = PriceCalculationUtil.calculateExtFee(
-        address: _order.addressDTO,
-        goodsType: _order.goodsType,
-        size: _order.size,
-        weight: _order.weight,
-        feeBySize: _order.feeBySize,
-        feeByWeight: _order.feeByWeight);
+        address:  _order!.addressDTO,
+        goodsType:  _order!.goodsType,
+        size:  _order!.size!,
+        weight:  _order!.weight!,
+        feeBySize:  _order!.feeBySize!,
+        feeByWeight:  _order!.feeByWeight!);
 
-    _extFeeController.text = price?.toString() ?? 0;
+    _extFeeController.text = price == null? '0': price!.toString();
 
     Map<String, double> fees = PriceCalculationUtil.getAgentFee(
-        address: _order.addressDTO,
-        goodsType: _order.goodsType,
-        weight: _order.weight,
-        size: _order.size,
-        feeBySize: _order.feeBySize,
-        feeByWeight: _order.feeByWeight);
+        address:  _order!.addressDTO,
+        goodsType:  _order!.goodsType,
+        weight:  _order!.weight!,
+        size:  _order!.size!,
+        feeBySize:  _order!.feeBySize!,
+        feeByWeight:  _order!.feeByWeight!);
 
-    _minAgentWeightFee = fees["weight"];
-    _minAgentSizeFee = fees["size"];
+    _minAgentWeightFee = fees["weight"]!;
+    _minAgentSizeFee = fees["size"]!;
     _feeByWeightDealerController.text = _minAgentWeightFee.toString();
     _feeBySizeDealerController.text = _minAgentSizeFee.toString();
 
@@ -323,7 +326,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
 
   void _getFeeTable() {
     HttpUtil.get(
-      ApiUrls.instance().getFeeTableUrl(),
+      ApiUrls.instance()!.getFeeTableUrl()!,
       headers: {'Content-Type': 'application/json; charset=utf-8'},
       onResponse: (resp) {
         if (resp != null && resp.statusCode == 200) {
@@ -343,45 +346,45 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
     if (_order == null) {
       _order = Order();
     }
-    _order.addressDTO = _address;
-    _order.addressId = _address?.addressId;
-    _order.customerId = _customer?.username;
-    _order.customerDTO = _customer;
-    _order.goodsType = _goodsType;
-    _order.orderStatus = _status;
-    _order.goodsDescr = _goodsTypeDescrController.text.trim();
-    _order.intTrackNo = _intTrackNoController.text.trim();
-    _order.packCount = _packCountController.text.trim().parseInt();
-    _order.weight = _weightController.text.trim().parseDouble();
-    _order.size = _sizeController.text.trim().parseDouble();
-    _order.needRepack = _boxedWood ? 1 : 0;
-    _order.repackFee = _repackFeeController.text.trim().parseDouble();
-    _order.payOnBehalf = _payOnBehalfController.text.trim().parseDouble();
-    _order.intFee = _intFeeController.text.trim().parseDouble();
-    _order.extFee = _extFeeController.text.trim().parseDouble();
-    _order.note = _noteController.text.trim();
+     _order!.addressDTO = _address;
+     _order!.addressId = _address!.addressId;
+     _order!.customerId = _customer!.username;
+     _order!.customerDTO = _customer;
+     _order!.goodsType = _goodsType;
+     _order!.orderStatus = _status;
+     _order!.goodsDescr = _goodsTypeDescrController.text.trim();
+     _order!.intTrackNo = _intTrackNoController.text.trim();
+     _order!.packCount = _packCountController.text.trim().parseInt();
+     _order!.weight = _weightController.text.trim().parseDouble();
+     _order!.size = _sizeController.text.trim().parseDouble();
+     _order!.needRepack = _boxedWood ? 1 : 0;
+     _order!.repackFee = _repackFeeController.text.trim().parseDouble();
+     _order!.payOnBehalf = _payOnBehalfController.text.trim().parseDouble();
+     _order!.intFee = _intFeeController.text.trim().parseDouble();
+     _order!.extFee = _extFeeController.text.trim().parseDouble();
+     _order!.note = _noteController.text.trim();
     if (_removeImages.isNotEmpty) {
-      if (_order.tccoFileDTOS == null) {
-        _order.tccoFileDTOS = [];
+      if ( _order!.tccoFileDTOS == null) {
+         _order!.tccoFileDTOS = [];
       }
 
       _removeImages.forEach((e) {
-        _order.tccoFileDTOS.removeWhere((f) => e.key == f.atchFleSeq);
+         _order!.tccoFileDTOS?.removeWhere((f) => e.key == f?.atchFleSeq);
       });
     }
-    _order.promotionId = _promotion?.promotionId;
-    _order.promotionDTO = _promotion;
-    _order.feeBySize =
+     _order!.promotionId = _promotion!.promotionId;
+     _order!.promotionDTO = _promotion;
+     _order!.feeBySize =
         _feeBySizeController?.text?.toString()?.parseDouble() ?? 0;
-    _order.feeByWeight =
+     _order!.feeByWeight =
         _feeByWeightController?.text?.toString()?.parseDouble() ?? 0;
-    _order.totalFee = _agentTotalFee;
-    _order.totalFeeOriginal = _totalFeeOrigin;
-    _order.feeByWeightDealer =
+     _order!.totalFee = _agentTotalFee;
+     _order!.totalFeeOriginal = _totalFeeOrigin;
+     _order!.feeByWeightDealer =
         _feeByWeightDealerController.text.trim().parseDouble();
-    _order.feeBySizeDealer =
+     _order!.feeBySizeDealer =
         _feeBySizeDealerController.text.trim().parseDouble();
-    _order.totalFeeDaiLong = _totalFee;
+     _order!.totalFeeDaiLong = _totalFee;
   }
 
   @override
@@ -395,7 +398,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
             icon: Icon(Icons.close),
           ),
           title: Text(
-              '${widget.update ? Utils.getLocale(context).edit : Utils.getLocale(context).add} ${Utils.getLocale(context).order.toLowerCase()}'),
+              '${widget.update! ? Utils.getLocale(context)?.edit : Utils.getLocale(context)?.add} ${Utils.getLocale(context)?.order.toLowerCase()}'),
           actions: [
             IconButton(
               onPressed: _saveOrder,
@@ -423,7 +426,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                           child: Column(
                             children: [
                               Visibility(
-                                visible: SessionUtil.instance().user.userType !=
+                                visible: SessionUtil.instance()?.user?.userType !=
                                         UserType.customer &&
                                     !isChineseWarehouseStaff,
                                 child: ListTile(
@@ -436,7 +439,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                                   MaterialPageRoute(
                                                       builder: (context) =>
                                                           SelectUserScreen(
-                                                              currentUser,
+                                                              currentUser!,
                                                               _customer)));
 
                                           _address = null;
@@ -457,7 +460,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                   contentPadding:
                                       const EdgeInsets.only(left: 0.0),
                                   title: Text(
-                                      '${Utils.getLocale(context).customer}'),
+                                      '${Utils.getLocale(context)?.customer}'),
                                   subtitle: _customer != null
                                       ? ListTile(
                                           title: Text('${_customer.fullName}'),
@@ -471,7 +474,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                           ),
                                         )
                                       : Text(
-                                          '${Utils.getLocale(context).notSelectedYet}'),
+                                          '${Utils.getLocale(context)?.notSelectedYet}'),
                                   trailing: !canEditCustomer
                                       ? null
                                       : Icon(Icons.chevron_right),
@@ -487,9 +490,9 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                           if (_customer == null) {
                                             Utils.alert(context,
                                                 title: Utils.getLocale(context)
-                                                    .required,
+                                                    ?.required,
                                                 message:
-                                                    '${Utils.getLocale(context).mustChooseCustomer}!');
+                                                    '${Utils.getLocale(context)?.mustChooseCustomer}!');
                                             return;
                                           }
 
@@ -498,7 +501,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                                   builder: (context) =>
                                                       SelectAddressScreen(
                                                         customer: _customer,
-                                                        current: _address,
+                                                        current: _address!,
                                                       )));
                                           _updateTotalFee();
                                           setState(() {});
@@ -506,29 +509,29 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                   contentPadding:
                                       const EdgeInsets.only(left: 0.0),
                                   title: Text(
-                                      '${Utils.getLocale(context).deliveryAddress}'),
+                                      '${Utils.getLocale(context)?.deliveryAddress}'),
                                   subtitle: _address != null
                                       ? ListTile(
                                           enabled: isNotCustomer,
-                                          title: Text('${_address.fullName}'),
+                                          title: Text('${_address?.fullName}'),
                                           subtitle: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Text(_address.phoneNumber ?? ''),
+                                              Text(_address?.phoneNumber ?? ''),
                                               Text([
-                                                _address.address,
-                                                _address.wards,
-                                                _address.district,
-                                                _address.province
+                                                _address?.address,
+                                                _address?.wards,
+                                                _address?.district,
+                                                _address?.province
                                               ]
                                                   .join(', ')
-                                                  ?.replaceAll(' ,', '')),
+                                                  !.replaceAll(' ,', '')),
                                             ],
                                           ),
                                         )
                                       : Text(
-                                          '${Utils.getLocale(context).notSelectedYet}'),
+                                          '${Utils.getLocale(context)!.notSelectedYet}'),
                                   trailing: canEditAddress
                                       ? Icon(Icons.chevron_right)
                                       : null,
@@ -543,14 +546,14 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                     children: [
                                       Row(
                                         children: [
-                                          Text(Utils.getLocale(context)
+                                          Text(Utils.getLocale(context)!
                                               .priceType),
                                           SizedBox(
                                             width: 10.0,
                                           ),
                                           DropdownButton<PriceType>(
                                             disabledHint: Text(
-                                                Utils.getLocale(context).fixed),
+                                                Utils.getLocale(context)!.fixed),
                                             value: _priceType,
                                             items: _dropDownPriceType(),
                                             onChanged: _promotion != null
@@ -577,9 +580,9 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                                       labelText:
                                                           Utils.getLocale(
                                                                   context)
-                                                              .priceOnKilogram,
+                                                              ?.priceOnKilogram,
                                                       hintText:
-                                                          '${Utils.getLocale(context).priceOnKilogram}...'),
+                                                          '${Utils.getLocale(context)!.priceOnKilogram}...'),
                                                   onChanged: (value) {
                                                     _updateExtFee();
                                                   },
@@ -591,7 +594,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                                         value))
                                                       return Utils.getLocale(
                                                               context)
-                                                          .required;
+                                                          ?.required;
 
                                                     return null;
                                                   },
@@ -609,9 +612,9 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                                       labelText: Utils
                                                               .getLocale(
                                                                   context)
-                                                          .priceOnCubicMeter,
+                                                          ?.priceOnCubicMeter,
                                                       hintText:
-                                                          '${Utils.getLocale(context).priceOnCubicMeter}...'),
+                                                          '${Utils.getLocale(context)!.priceOnCubicMeter}...'),
                                                   onChanged: (value) {
                                                     _updateExtFee();
                                                   },
@@ -623,7 +626,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                                         value))
                                                       return Utils.getLocale(
                                                               context)
-                                                          .required;
+                                                          ?.required;
 
                                                     return null;
                                                   },
@@ -640,7 +643,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                               Row(
                                 children: [
                                   Text(
-                                    '${Utils.getLocale(context).type}',
+                                    '${Utils.getLocale(context)!.type}',
                                     style: TextStyle(
                                       color: isNotCustomer
                                           ? Colors.black
@@ -666,7 +669,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                 visible: false, //widget.update,
                                 child: Row(
                                   children: [
-                                    Text('${Utils.getLocale(context).status}'),
+                                    Text('${Utils.getLocale(context)!.status}'),
                                     SizedBox(
                                       width: 10.0,
                                     ),
@@ -692,9 +695,9 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                 },
                                 decoration: InputDecoration(
                                     labelText:
-                                        '${Utils.getLocale(context).description}',
+                                        '${Utils.getLocale(context)!.description}',
                                     hintText:
-                                        '${Utils.getLocale(context).enter} ${Utils.getLocale(context).description.toLowerCase()}...',
+                                        '${Utils.getLocale(context)!.enter} ${Utils.getLocale(context)!.description.toLowerCase()}...',
                                     counterText: ''),
                                 maxLines: 1,
                                 maxLength: 250,
@@ -703,7 +706,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
 
                                   if (value == null || value!.isEmpty)
 
-                                    return Utils.getLocale(context).required;
+                                    return Utils.getLocale(context)!.required;
 
                                   return null;
                                 },
@@ -723,16 +726,16 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                       },
                                       decoration: InputDecoration(
                                           labelText:
-                                              '${Utils.getLocale(context).chineseWaybillCode}',
+                                              '${Utils.getLocale(context)!.chineseWaybillCode}',
                                           hintText:
-                                              '${Utils.getLocale(context).enter}/${Utils.getLocale(context).scan}...',
+                                              '${Utils.getLocale(context)!.enter}/${Utils.getLocale(context)!.scan}...',
                                           counterText: ''),
                                       maxLines: 1,
                                       maxLength: 50,
                                       validator: (value) {
                                         /*if (value == null || value!.isEmpty)
 
-                                          return Utils.getLocale(context)
+                                          return Utils.getLocale(context)!
                                               .required;*/
 
                                         return null;
@@ -745,7 +748,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                         : () {
                                             FlutterBarcodeScanner.scanBarcode(
                                               '#ff6666',
-                                              '${Utils.getLocale(context).cancel}',
+                                              '${Utils.getLocale(context)!.cancel}',
                                               true,
                                               ScanMode.DEFAULT,
                                             ).then((value) {
@@ -780,15 +783,15 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                 },
                                 decoration: InputDecoration(
                                     labelText:
-                                        '${Utils.getLocale(context).packageQuantity}',
+                                        '${Utils.getLocale(context)!.packageQuantity}',
                                     hintText:
-                                        '${Utils.getLocale(context).enter} ${Utils.getLocale(context).packageQuantity.toLowerCase()}...',
+                                        '${Utils.getLocale(context)!.enter} ${Utils.getLocale(context)!.packageQuantity.toLowerCase()}...',
                                     counterText: ''),
                                 maxLines: 1,
                                 validator: (value) {
                                   if (value == null || value!.isEmpty)
 
-                                    return Utils.getLocale(context).required;
+                                    return Utils.getLocale(context)!.required;
 
                                   return null;
                                 },
@@ -813,9 +816,9 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                       },
                                       decoration: InputDecoration(
                                           labelText:
-                                              '${Utils.getLocale(context).weight} (kg)',
+                                              '${Utils.getLocale(context)!.weight} (kg)',
                                           hintText:
-                                              '${Utils.getLocale(context).enter} ${Utils.getLocale(context).weight.toLowerCase()} (kg)...',
+                                              '${Utils.getLocale(context)!.enter} ${Utils.getLocale(context)!.weight.toLowerCase()} (kg)...',
                                           counterText: ''),
                                       maxLines: 1,
                                       validator: (value) {
@@ -830,7 +833,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                             (Utils.isNullOrEmpty(tmp) ||
                                                 tmp == '0' ||
                                                 tmp == '0.0'))
-                                          return Utils.getLocale(context)
+                                          return Utils.getLocale(context)!
                                               .required;
 
                                         return null;
@@ -856,9 +859,9 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                       },
                                       decoration: InputDecoration(
                                           labelText:
-                                              '${Utils.getLocale(context).size} (m³)',
+                                              '${Utils.getLocale(context)!.size} (m³)',
                                           hintText:
-                                              '${Utils.getLocale(context).enter} ${Utils.getLocale(context).size.toLowerCase()} (m³)...',
+                                              '${Utils.getLocale(context)!.enter} ${Utils.getLocale(context)!.size.toLowerCase()} (m³)...',
                                           counterText: ''),
                                       maxLines: 1,
                                       validator: (value) {
@@ -873,7 +876,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                             (Utils.isNullOrEmpty(tmp) ||
                                                 tmp == '0' ||
                                                 tmp == '0.0'))
-                                          return Utils.getLocale(context)
+                                          return Utils.getLocale(context)!
                                               .required;
 
                                         return null;
@@ -903,21 +906,21 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                         },
                                         decoration: InputDecoration(
                                             labelText:
-                                                '${Utils.getLocale(context).feeByWeightDealer} (VND)',
+                                                '${Utils.getLocale(context)!.feeByWeightDealer} (VND)',
                                             hintText:
-                                                '${Utils.getLocale(context).enter} ${Utils.getLocale(context).feeByWeightDealer.toLowerCase()}...',
+                                                '${Utils.getLocale(context)!.enter} ${Utils.getLocale(context)!.feeByWeightDealer.toLowerCase()}...',
                                             counterText: ''),
                                         maxLines: 1,
                                         validator: (value) {
                                           if (!isAllowEditAgentFee) return null;
                                           if (value == null || value!.isEmpty)
  {
-                                            return Utils.getLocale(context)
+                                            return Utils.getLocale(context)!
                                                 .required;
                                           } else if (double.parse(value) <
                                               _minAgentWeightFee) {
                                             return Utils.getLocale(context)
-                                                    .required +
+                                                    !.required! +
                                                 " >= " +
                                                 _minAgentWeightFee.toString();
                                           }
@@ -943,20 +946,20 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                         },
                                         decoration: InputDecoration(
                                             labelText:
-                                                '${Utils.getLocale(context).feeBySizeDealer} (VND)',
+                                                '${Utils.getLocale(context)!.feeBySizeDealer} (VND)',
                                             hintText:
-                                                '${Utils.getLocale(context).enter} ${Utils.getLocale(context).feeBySizeDealer.toLowerCase()}...',
+                                                '${Utils.getLocale(context)!.enter} ${Utils.getLocale(context)!.feeBySizeDealer.toLowerCase()}...',
                                             counterText: ''),
                                         maxLines: 1,
                                         validator: (value) {
                                           if (!isAllowEditAgentFee) return null;
                                           if (value == null || value!.isEmpty)
  {
-                                            return Utils.getLocale(context)
+                                            return Utils.getLocale(context)!
                                                 .required;
                                           } else if (double.parse(value) <
                                               _minAgentSizeFee) {
-                                            return Utils.getLocale(context)
+                                            return Utils.getLocale(context)!
                                                     .required +
                                                 " >= " +
                                                 _minAgentSizeFee.toString();
@@ -978,12 +981,12 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                       width: 25.0,
                                       child: Checkbox(
                                         value: _boxedWood,
-                                        onChanged: widget.update &&
+                                        onChanged: widget.update! &&
                                                 OrderStatus.chineseWarehoused ==
-                                                    _order.orderStatus
+                                                     _order!.orderStatus
                                             ? null
                                             : (value) => setState(() {
-                                                  _boxedWood = value;
+                                                  _boxedWood = value!;
                                                   if (!_boxedWood) {
                                                     _repackFeeController
                                                         .clear();
@@ -993,7 +996,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                     ),
                                     SizedBox(width: 5.0),
                                     Text(
-                                        '${Utils.getLocale(context).packedByWoodenBox}'),
+                                        '${Utils.getLocale(context)!.packedByWoodenBox}'),
                                   ],
                                 ),
                               ),
@@ -1003,20 +1006,20 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                 child: ChineseCurrencyInput(
                                   controller: _repackFeeController,
                                   labelText:
-                                      '${Utils.getLocale(context).packingFee} (CNY)',
+                                      '${Utils.getLocale(context)!.packingFee} (CNY)',
                                   hintText:
-                                      '${Utils.getLocale(context).enter} CNY...',
+                                      '${Utils.getLocale(context)!.enter} CNY...',
                                 ),
                                 /*CurrencySwapInput(
                                   controller: _repackFeeController,
                                   title:
-                                      '${Utils.getLocale(context).packingFee} (VND/CNY)',
+                                      '${Utils.getLocale(context)!.packingFee} (VND/CNY)',
                                   firstLabelText: 'VND',
                                   firstHintText:
-                                      '${Utils.getLocale(context).enter} VND...',
+                                      '${Utils.getLocale(context)!.enter} VND...',
                                   secondLabelText: 'CNY',
                                   secondHintText:
-                                      '${Utils.getLocale(context).enter} CNY...',
+                                      '${Utils.getLocale(context)!.enter} CNY...',
                                 ),*/
                               ),
                               SizedBox(
@@ -1027,20 +1030,20 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                 enabled: isNotCustomer,
                                 controller: _payOnBehalfController,
                                 labelText:
-                                    '${Utils.getLocale(context).payOnBehalf} (CNY)',
+                                    '${Utils.getLocale(context)!.payOnBehalf} (CNY)',
                                 hintText:
-                                    '${Utils.getLocale(context).enter} CNY...',
+                                    '${Utils.getLocale(context)!.enter} CNY...',
                               ),
                               /*CurrencySwapInput(
                                 controller: _payOnBehalfController,
                                 title:
-                                    '${Utils.getLocale(context).payOnBehalf} (VND/CNY)',
+                                    '${Utils.getLocale(context)!.payOnBehalf} (VND/CNY)',
                                 firstLabelText: 'VND',
                                 firstHintText:
-                                    '${Utils.getLocale(context).enter} VND...',
+                                    '${Utils.getLocale(context)!.enter} VND...',
                                 secondLabelText: 'CNY',
                                 secondHintText:
-                                    '${Utils.getLocale(context).enter} CNY...',
+                                    '${Utils.getLocale(context)!.enter} CNY...',
                               ),*/
                               const SizedBox(height: 20.0),
                               ChineseCurrencyInput(
@@ -1048,20 +1051,20 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                 enabled: isNotCustomer,
                                 controller: _intFeeController,
                                 labelText:
-                                    '${Utils.getLocale(context).domesticShippingFee} (CNY)',
+                                    '${Utils.getLocale(context)!.domesticShippingFee} (CNY)',
                                 hintText:
-                                    '${Utils.getLocale(context).enter} CNY...',
+                                    '${Utils.getLocale(context)!.enter} CNY...',
                               ),
                               /*CurrencySwapInput(
                                 controller: _intFeeController,
                                 title:
-                                    '${Utils.getLocale(context).domesticShippingFee} (VND/CNY)',
+                                    '${Utils.getLocale(context)!.domesticShippingFee} (VND/CNY)',
                                 firstLabelText: 'VND',
                                 firstHintText:
-                                    '${Utils.getLocale(context).enter} VND...',
+                                    '${Utils.getLocale(context)!.enter} VND...',
                                 secondLabelText: 'CNY',
                                 secondHintText:
-                                    '${Utils.getLocale(context).enter} CNY...',
+                                    '${Utils.getLocale(context)!.enter} CNY...',
                               ),*/
                               const SizedBox(height: 20.0),
                               Visibility(
@@ -1074,9 +1077,9 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                   focusNode: _extFeeFocusNode,
                                   decoration: InputDecoration(
                                       labelText:
-                                          '${Utils.getLocale(context).internationalShippingFee} (VND)',
+                                          '${Utils.getLocale(context)!.internationalShippingFee} (VND)',
                                       hintText:
-                                          '${Utils.getLocale(context).enter} ${Utils.getLocale(context).internationalShippingFee.toLowerCase()}...',
+                                          '${Utils.getLocale(context)!.enter} ${Utils.getLocale(context)!.internationalShippingFee.toLowerCase()}...',
                                       counterText: ''),
                                   maxLines: 1,
                                 ),
@@ -1084,13 +1087,13 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                               /*CurrencySwapInput(
                                 controller: _extFeeController,
                                 title:
-                                    '${Utils.getLocale(context).internationalShippingFee} (VND/CNY)',
+                                    '${Utils.getLocale(context)!.internationalShippingFee} (VND/CNY)',
                                 firstLabelText: 'VND',
                                 firstHintText:
-                                    '${Utils.getLocale(context).enter} VND...',
+                                    '${Utils.getLocale(context)!.enter} VND...',
                                 secondLabelText: 'CNY',
                                 secondHintText:
-                                    '${Utils.getLocale(context).enter} CNY...',
+                                    '${Utils.getLocale(context)!.enter} CNY...',
                               ),*/
                               SizedBox(height: 10.0),
                               TextFormField(
@@ -1099,9 +1102,9 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                 focusNode: _noteFocusNode,
                                 decoration: InputDecoration(
                                     labelText:
-                                        '${Utils.getLocale(context).note}',
+                                        '${Utils.getLocale(context)!.note}',
                                     hintText:
-                                        '${Utils.getLocale(context).enter} ${Utils.getLocale(context).note.toLowerCase()}...',
+                                        '${Utils.getLocale(context)!.enter} ${Utils.getLocale(context)!.note.toLowerCase()}...',
                                     counterText: ''),
                                 maxLines: 1,
                               ),
@@ -1115,9 +1118,9 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                     contentPadding:
                                         const EdgeInsets.only(left: 0.0),
                                     title: Text(
-                                        '${Utils.getLocale(context).imageAttach}'),
+                                        '${Utils.getLocale(context)!.imageAttach}'),
                                     subtitle: Text(
-                                        '${Utils.getLocale(context).imageAttachNote}'),
+                                        '${Utils.getLocale(context)!.imageAttachNote}'),
                                   ),
                                   onAdd: (img) {
                                     final index = _uploadImages
@@ -1163,15 +1166,15 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                           _getFormData();
                                           if (_order == null ||
                                               Utils.isNullOrEmpty(
-                                                  _order.customerId) ||
+                                                   _order!.customerId) ||
                                               _address == null ||
                                               Utils.isNullOrEmpty(
-                                                  _address.province)) {
+                                                  _address?.province)) {
                                             Utils.alert(context,
-                                                title: Utils.getLocale(context)
+                                                title: Utils.getLocale(context)!
                                                     .required,
                                                 message:
-                                                    '${Utils.getLocale(context).cannotChoosePromotionMessage}!');
+                                                    '${Utils.getLocale(context)?.cannotChoosePromotionMessage}!');
                                             return;
                                           }
 
@@ -1181,7 +1184,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                                       builder: (context) =>
                                                           SelectPromotionScreen(
                                                             order: _order,
-                                                            current: _promotion,
+                                                            current: _promotion!,
                                                           ))) ??
                                               _promotion;
 
@@ -1191,22 +1194,22 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                               int locationGroup =
                                                   PriceCalculationUtil
                                                       .getLocationGroupByProvince(
-                                                          _address.province);
+                                                          _address!.province);
                                               if (locationGroup == 1) {
                                                 _feeByWeightController.text =
-                                                    '${_promotion.feeByWeightZ1}';
+                                                    '${_promotion?.feeByWeightZ1}';
                                                 _feeBySizeController.text =
-                                                    '${_promotion.feeBySizeZ1}';
+                                                    '${_promotion?.feeBySizeZ1}';
                                               } else if (locationGroup == 2) {
                                                 _feeByWeightController.text =
-                                                    '${_promotion.feeByWeightZ2}';
+                                                    '${_promotion?.feeByWeightZ2}';
                                                 _feeBySizeController.text =
-                                                    '${_promotion.feeBySizeZ2}';
+                                                    '${_promotion?.feeBySizeZ2}';
                                               } else if (locationGroup == 3) {
                                                 _feeByWeightController.text =
-                                                    '${_promotion.feeByWeightZ3}';
+                                                    '${_promotion?.feeByWeightZ3}';
                                                 _feeBySizeController.text =
-                                                    '${_promotion.feeBySizeZ3}';
+                                                    '${_promotion?.feeBySizeZ3}';
                                               }
                                             });
                                           }
@@ -1222,7 +1225,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                         children: [
                                           Expanded(
                                             child: Text(
-                                              '${Utils.getLocale(context).promotion}',
+                                              '${Utils.getLocale(context)!.promotion}',
                                               style: TextStyle(
                                                 fontSize: 12.0,
                                               ),
@@ -1237,7 +1240,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                       ),
                                       _promotion != null
                                           ? Text(
-                                              '${_promotion.promotionName}',
+                                              '${_promotion?.promotionName}',
                                               style: TextStyle(
                                                 color: Theme.of(context)
                                                     .disabledColor,
@@ -1245,7 +1248,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                               ),
                                             )
                                           : Text(
-                                              '${Utils.getLocale(context).notSelectedYet}',
+                                              '${Utils.getLocale(context)!.notSelectedYet}',
                                               style: TextStyle(
                                                 color: Theme.of(context)
                                                     .disabledColor,
@@ -1266,12 +1269,12 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                               child: RichText(
                                 text: TextSpan(
                                   text:
-                                      '${Utils.getLocale(context).totalAmount}: ',
+                                      '${Utils.getLocale(context)!.totalAmount}: ',
                                   style: TextStyle(
                                     color: Theme.of(context)
                                         .textTheme
                                         .bodyText1
-                                        .color,
+                                        ?.color,
                                     fontSize: 16.0,
                                   ),
                                   children: [
@@ -1328,14 +1331,14 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                               color: Utils.accentColor,
                               onPressed: _saveOrder,
                               child: Text(
-                                '${Utils.getLocale(context).save}'
+                                '${Utils.getLocale(context)!.save}'
                                 /*isChineseWarehouseStaff &&
                                         _order?.orderStatus !=
                                             OrderStatus.chineseWarehoused
                                     ? _boxedWood
-                                        ? '${Utils.getLocale(context).saveAndWaitConfirmPacking}'
-                                        : '${Utils.getLocale(context).saveAndWarehoused}'
-                                    : '${Utils.getLocale(context).save}'*/
+                                        ? '${Utils.getLocale(context)!.saveAndWaitConfirmPacking}'
+                                        : '${Utils.getLocale(context)!.saveAndWarehoused}'
+                                    : '${Utils.getLocale(context)!.save}'*/
                                 ,
                                 style: TextStyle(color: Colors.white),
                               ),
@@ -1412,8 +1415,8 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
     ];
   }
 
-  void _onGoodsTypeChanged(int value) {
-    setState(() => _goodsType = value);
+  void _onGoodsTypeChanged(int? value) {
+    setState(() => _goodsType = value == null? 0: value);
     _updateExtFee();
   }
 
@@ -1465,21 +1468,21 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
     return [
       DropdownMenuItem(
         value: PriceType.normal,
-        child: Text('${Utils.getLocale(context).company}'),
+        child: Text('${Utils.getLocale(context)!.company}'),
       ),
       DropdownMenuItem(
         value: PriceType.fixed,
-        child: Text('${Utils.getLocale(context).fixed}'),
+        child: Text('${Utils.getLocale(context)!.fixed}'),
       ),
     ];
   }
 
-  void _onOrderStatusChanged(int value) {
-    setState(() => _status = value);
+  void _onOrderStatusChanged(int? value) {
+    setState(() => _status = value == null? 0: value);
   }
 
-  void _onPriceTypeChanged(PriceType value) {
-    setState(() => _priceType = value);
+  void _onPriceTypeChanged(PriceType? value) {
+    setState(() => _priceType = value!);
 
     if (value == PriceType.normal) {
       _feeBySizeController.clear();
@@ -1489,35 +1492,35 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
   }
 
   Future<void> _saveOrder() async {
-    if (_address == null || _address.addressId == null) {
+    if (_address == null || _address?.addressId == null) {
       Utils.alert(context,
-          title: Utils.getLocale(context).required,
-          message: '${Utils.getLocale(context).mustChooseAddress}!');
+          title: Utils.getLocale(context)!.required,
+          message: '${Utils.getLocale(context)!.mustChooseAddress}!');
       return;
     }
 
-    if (!_formKey.currentState.validate()) {
+    if (!_formKey.currentState!.validate()) {
       return;
     }
 
     // check attachment is empty
     if (isChineseWarehouseStaff &&
-        ((!widget.update ||
+        ((!widget.update! ||
                 widget.order?.orderStatus == OrderStatus.newlyCreated) ||
-            (widget.update &&
-                (widget.order.tccoFileDTOS == null ||
-                    widget.order.tccoFileDTOS.isEmpty)))) {
+            (widget.update! &&
+                (widget.order!.tccoFileDTOS == null ||
+                    widget.order!.tccoFileDTOS!.isEmpty)))) {
       if (_uploadImages == null || _uploadImages.isEmpty) {
         Utils.alert(context,
-            title: Utils.getLocale(context).required,
-            message: '${Utils.getLocale(context).imagesRequired}!');
+            title: Utils.getLocale(context)!.required,
+            message: '${Utils.getLocale(context)!.imagesRequired}!');
         return;
       }
     }
 
     _getFormData();
     Utils.showLoading(context,
-        textContent: Utils.getLocale(context).waitForLogin);
+        textContent: Utils.getLocale(context)!.waitForLogin);
     Future.delayed(Duration(milliseconds: 500), () async {
       /*if (_uploadImages.isNotEmpty) {
         // resize images if so big
@@ -1529,15 +1532,15 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
       }*/
 
       HttpUtil.postOrder(
-        ApiUrls.instance().getOrdersUrl(),
+        ApiUrls.instance()!.getOrdersUrl()!,
         order: _order,
         files: _uploadImages,
         onTimeout: () {
           // pop loading
           Navigator.of(context, rootNavigator: true).pop();
           Utils.alert(context,
-              title: Utils.getLocale(context).errorOccurred,
-              message: Utils.getLocale(context).requestTimeout);
+              title: Utils.getLocale(context)!.errorOccurred,
+              message: Utils.getLocale(context)!.requestTimeout);
         },
         onDone: (resp) async {
           var json =
@@ -1546,27 +1549,27 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
             // pop loading
             Navigator.of(context, rootNavigator: true).pop();
             Utils.alert(context,
-                title: Utils.getLocale(context).failed,
+                title: Utils.getLocale(context)!.failed,
                 message:
-                    '${Utils.getLocale(context).errorOccurred}!\n${json['message']}');
+                    '${Utils.getLocale(context)!.errorOccurred}!\n${json['message']}');
             return;
           }
 
           if (json != null) {
             Order savedOrder = Order.fromJson(json);
-            AppProvider.of(context).state.orderBloc.updateOrder(savedOrder);
+            AppProvider.of(context)?.state.orderBloc.updateOrder(savedOrder);
           }
 
           // now do not needed
           /*if (widget.update &&
               isChineseWarehouseStaff &&
               !_boxedWood &&
-              _order.orderStatus == OrderStatus.newlyCreated) {
+               _order!.orderStatus == OrderStatus.newlyCreated) {
             bool success = await HttpUtil.updateOrderTrackingStatus(
-                _order.orderId, ActionType.chineseWarehouse);
+                 _order!.orderId, ActionType.chineseWarehouse);
             if (success) {
-              Order updatedOrder = await HttpUtil.getOrder(_order.orderId);
-              AppProvider.of(context).state.orderBloc.updateOrder(updatedOrder);
+              Order updatedOrder = await HttpUtil.getOrder( _order!.orderId);
+              AppProvider.of(context)!.state.orderBloc.updateOrder(updatedOrder);
 
               // remove order from block if needed
               Utils.removeOrderFromBloc(context, updatedOrder);
@@ -1576,11 +1579,11 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
           // pop loading
           Navigator.of(context, rootNavigator: true).pop();
           Utils.alert(context,
-              title: '${Utils.getLocale(context).success}',
-              message: widget.update
-                  ? '${Utils.getLocale(context).updateOrderSuccessMessage}'
-                  : '${Utils.getLocale(context).createOrderSuccessMessage}',
-              onAccept: widget.update
+              title: '${Utils.getLocale(context)!.success}',
+              message: widget.update!
+                  ? '${Utils.getLocale(context)!.updateOrderSuccessMessage}'
+                  : '${Utils.getLocale(context)!.createOrderSuccessMessage}',
+              onAccept: widget.update!
                   ? () => Utils.popToFirstScreen(context)
                   : () {
                       _reset();

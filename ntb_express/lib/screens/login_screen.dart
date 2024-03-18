@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:device_info/device_info.dart';
+import 'package:android_id/android_id.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -17,6 +18,8 @@ import 'package:ntbexpress/util/utils.dart';
 import 'package:ntbexpress/widgets/app_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../widgets/raised_button.dart';
+
 class ReceivedNotification {
   final int id;
   final String title;
@@ -24,10 +27,10 @@ class ReceivedNotification {
   final String payload;
 
   ReceivedNotification({
-    @required this.id,
-    @required this.title,
-    @required this.body,
-    @required this.payload,
+    required this.id,
+    required this.title,
+    required this.body,
+    required this.payload,
   });
 }
 
@@ -54,7 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     super.initState();
     _getDeviceId()
-        .then((deviceId) => SessionUtil.instance().deviceId = deviceId);
+        .then((deviceId) => SessionUtil.instance()!.deviceId = deviceId);
   }
 
   Future<void> _getPreferencesData() async {
@@ -62,16 +65,16 @@ class _LoginScreenState extends State<LoginScreen> {
     await prefs.setBool(PrefsKey.logged, false);
     _rememberMe = prefs.getBool(PrefsKey.remember) ?? false;
     _usernameController.text =
-        _rememberMe ? prefs.getString(PrefsKey.username) : '';
+        (_rememberMe ? prefs.getString(PrefsKey.username) : '')!;
     _passwordController.text =
-        _rememberMe ? prefs.getString(PrefsKey.password) : '';
+        (_rememberMe ? prefs.getString(PrefsKey.password) : '')!;
     _locale = prefs.getString(PrefsKey.languageCode) ??
         await Utils.getCurrentLocale();
 
     if (_locale.contains('-'))
       _locale = _locale.split('-')[0];
     else if (_locale.contains('_')) _locale = _locale.split('_')[0];
-    AppProvider.of(context).state.localeBloc.setLocale(Locale(_locale));
+    AppProvider.of(context)!.state.localeBloc.setLocale(Locale(_locale));
     setState(() {});
   }
 
@@ -88,11 +91,11 @@ class _LoginScreenState extends State<LoginScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_appLocaleIsChanged) {
-      AppProvider.of(context).state.localeBloc.setLocale(Locale(_locale));
+      AppProvider.of(context)!.state.localeBloc.setLocale(Locale(_locale));
       _appLocaleIsChanged = true;
     }
 
-    Locale locale = AppProvider.of(context)?.state?.localeBloc?.currentLocale;
+    Locale? locale = AppProvider.of(context)!.state?.localeBloc?.currentLocale;
     if (locale != null && locale.languageCode != _locale) {
       if (mounted) {
         setState(() => _locale = locale.languageCode);
@@ -150,7 +153,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         controller: _usernameController,
                         focusNode: _usernameFocusNode,
                         decoration: _decoration(
-                          hintText: Utils.getLocale(context).username,
+                          hintText: Utils.getLocale(context)!.username,
                           prefixIcon: Icons.account_circle,
                         ),
                         style: _white(),
@@ -165,8 +168,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                         validator: (value) {
                           if (value == null || value!.isEmpty)
-
-                            return Utils.getLocale(context).required;
+                            return Utils.getLocale(context)!.required;
 
                           return null;
                         },
@@ -177,7 +179,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         controller: _passwordController,
                         focusNode: _passwordFocusNode,
                         decoration: _decoration(
-                          hintText: Utils.getLocale(context).password,
+                          hintText: Utils.getLocale(context)!.password,
                           prefixIcon: Icons.lock_outline,
                         ),
                         style: _white(),
@@ -188,8 +190,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         textInputAction: TextInputAction.done,
                         validator: (value) {
                           if (value == null || value!.isEmpty)
-
-                            return Utils.getLocale(context).required;
+                            return Utils.getLocale(context)!.required;
 
                           return null;
                         },
@@ -207,7 +208,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               child: Checkbox(
                                 onChanged: (checked) {
-                                  setState(() => _rememberMe = checked);
+                                  setState(() => _rememberMe = checked!);
                                 },
                                 value: _rememberMe,
                                 activeColor: Utils.accentColor,
@@ -222,7 +223,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 setState(() => _rememberMe = !_rememberMe);
                               },
                               child: Text(
-                                Utils.getLocale(context).rememberMe,
+                                Utils.getLocale(context)!.rememberMe,
                                 style: _white(),
                               ),
                             ),
@@ -241,8 +242,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           textColor: Colors.white,
                           child: Text(
                             _loading
-                                ? '${Utils.getLocale(context).waitForLogin}'
-                                : Utils.getLocale(context).login,
+                                ? '${Utils.getLocale(context)!.waitForLogin}'
+                                : Utils.getLocale(context)!.login,
                             style: TextStyle(
                               fontSize: 20.0,
                             ),
@@ -260,7 +261,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     builder: (context) => RegisterScreen()));
                               },
                               child: Text(
-                                Utils.getLocale(context).register,
+                                Utils.getLocale(context)!.register,
                                 style: _blue(),
                               ),
                             ),
@@ -273,7 +274,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 child: InkWell(
                                   onTap: _forgotPasswordClicked,
                                   child: Text(
-                                    '${Utils.getLocale(context).forgotPassword}?',
+                                    '${Utils.getLocale(context)!.forgotPassword}?',
                                     style: _blue(),
                                   ),
                                 ),
@@ -301,7 +302,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                             Icon(Icons.language),
                                             SizedBox(width: 10.0),
                                             Text(
-                                                '${Utils.getLocale(context).language}'),
+                                                '${Utils.getLocale(context)!.language}'),
                                           ],
                                         ),
                                         content: SingleChildScrollView(
@@ -314,7 +315,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   Navigator.of(context).pop();
                                                 },
                                                 title: Text(
-                                                    '${Utils.getLocale(context).vietnamese}'),
+                                                    '${Utils.getLocale(context)!.vietnamese}'),
                                                 trailing: _locale != 'vi'
                                                     ? null
                                                     : Icon(Icons.done,
@@ -327,7 +328,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   Navigator.of(context).pop();
                                                 },
                                                 title: Text(
-                                                    '${Utils.getLocale(context).english}'),
+                                                    '${Utils.getLocale(context)!.english}'),
                                                 trailing: _locale != 'en'
                                                     ? null
                                                     : Icon(Icons.done,
@@ -340,7 +341,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                   Navigator.of(context).pop();
                                                 },
                                                 title: Text(
-                                                    '${Utils.getLocale(context).chinese}'),
+                                                    '${Utils.getLocale(context)!.chinese}'),
                                                 trailing: _locale != 'zh'
                                                     ? null
                                                     : Icon(Icons.done,
@@ -354,16 +355,16 @@ class _LoginScreenState extends State<LoginScreen> {
                                     );
                                   },
                                   /*child: Text(
-                                  '${Utils.getLocale(context).changeLanguage}',
+                                  '${Utils.getLocale(context)!.changeLanguage}',
                                   style: TextStyle(color: Colors.white),
                                 ),*/
                                 ),
                                 Text(
                                   _locale == 'vi'
-                                      ? Utils.getLocale(context).vietnamese
+                                      ? Utils.getLocale(context)!.vietnamese
                                       : _locale == 'en'
-                                          ? Utils.getLocale(context).english
-                                          : Utils.getLocale(context).chinese,
+                                          ? Utils.getLocale(context)!.english
+                                          : Utils.getLocale(context)!.chinese,
                                   style: TextStyle(
                                     color: Colors.black54,
                                   ),
@@ -383,7 +384,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       PriceCalculationScreen()));
                             },
                             child: Text(
-                              Utils.getLocale(context)
+                              Utils.getLocale(context)!
                                   .tryToCalculatePrice
                                   .toUpperCase(),
                               style: TextStyle(
@@ -413,14 +414,14 @@ class _LoginScreenState extends State<LoginScreen> {
   void _localeChanged(String code) {
     setState(() {
       _locale = code;
-      AppProvider.of(context).state.localeBloc.setLocale(Locale(code));
+      AppProvider.of(context)!.state.localeBloc.setLocale(Locale(code));
       SharedPreferences.getInstance()
           .then((prefs) => prefs.setString(PrefsKey.languageCode, _locale));
     });
-    HttpUtil.updateLocale(SessionUtil.instance().deviceId, code);
+    HttpUtil.updateLocale(SessionUtil.instance()!.deviceId!, code);
   }
 
-  InputDecoration _decoration({String hintText, IconData prefixIcon}) {
+  InputDecoration _decoration({String? hintText, IconData? prefixIcon}) {
     return InputDecoration(
       hintText: hintText ?? '',
       hintStyle: TextStyle(
@@ -452,15 +453,15 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Future<void> _btnLoginClicked() async {
-    if (_loginFormKey.currentState.validate()) {
+  Future<void>? _btnLoginClicked() async {
+    if (_loginFormKey.currentState!.validate()) {
       _setLoading(true);
       Future.delayed(Duration(milliseconds: 500), () async {
         http.Response resp;
         try {
           // send HTTP request to login
           resp = await http
-              .post(ApiUrls.instance().getLoginUrl(),
+              .post(ApiUrls.instance()?.getLoginUrl() as Uri,
                   headers: {'Content-Type': 'application/json'},
                   body: jsonEncode({
                     'username': _usernameController.text?.trim(),
@@ -468,82 +469,84 @@ class _LoginScreenState extends State<LoginScreen> {
                   }))
               .timeout(const Duration(seconds: timeout), onTimeout: () {
             _onRequestTimeout();
-            return null;
+            return Future.delayed(const Duration(seconds: 3));
           });
-        } catch (e) {
-          _setLoading(false);
-        }
-        if (resp == null) return;
-        if (resp.statusCode == 200) {
-          var body = jsonDecode(resp.body);
-          final jwtToken = body['jwttoken'];
-          if (!Utils.isNullOrEmpty(jwtToken)) {
-            // save authorization token
-            SessionUtil.instance().authToken = jwtToken;
+          if (resp == null) return;
+          if (resp.statusCode == 200) {
+            var body = jsonDecode(resp.body);
+            final jwtToken = body['jwttoken'];
+            if (!Utils.isNullOrEmpty(jwtToken)) {
+              // save authorization token
+              SessionUtil.instance()!.authToken = jwtToken;
 
-            // set FCM token
-            SessionUtil.instance().fcmToken =
-                await FirebaseMessaging().getToken();
+              // set FCM token
+              SessionUtil.instance()!.fcmToken =
+                  await FirebaseMessaging.instance.getToken();
 
-            // Get user information
-            HttpUtil.get(ApiUrls.instance().getUserInfoUrl(),
-                headers: {'Content-Type': 'application/json'},
-                onResponse: (resp) {
-              if (resp == null || resp.statusCode != 200) {
-                _setLoading(false);
-                Utils.alert(context,
-                    title: Utils.getLocale(context).errorOccurred,
-                    message:
-                        '${Utils.getLocale(context).cannotGetUserInfoMessage}');
-                return;
-              }
-              var json = jsonDecode(utf8.decode(resp.bodyBytes));
-              if (json == null) {
-                Utils.alert(context,
-                    title: Utils.getLocale(context).errorOccurred,
-                    message:
-                        '${Utils.getLocale(context).usernameOrPasswordNotMatchMessage}');
-                return;
-              }
-              // save user info
-              SessionUtil.instance().user = User.fromJson(json);
-              // parse avatar
-              var imageData = json['avatarImgDTO'];
-              if (imageData != null) {
-                String filePath = imageData['flePath']?.toString() ?? '';
-                filePath = filePath.replaceAll('\\', '/');
-                SessionUtil.instance().user.avatarImg =
-                    '${ApiUrls.instance().baseUrl}/$filePath';
-              }
-              _saveDataToPreferences();
-              _deviceRegister();
-              //_setLoading(false); => now do not needed
-              // Navigate to home screen
-              /*Navigator.of(context).pushReplacement(
+              // Get user information
+              HttpUtil.get(ApiUrls.instance()!.getUserInfoUrl()!,
+                  headers: {'Content-Type': 'application/json'},
+                  onResponse: (resp) {
+                if (resp == null || resp.statusCode != 200) {
+                  _setLoading(false);
+                  Utils.alert(context,
+                      title: Utils.getLocale(context)!.errorOccurred,
+                      message:
+                          '${Utils.getLocale(context)!.cannotGetUserInfoMessage}');
+                  return;
+                }
+                var json = jsonDecode(utf8.decode(resp.bodyBytes));
+                if (json == null) {
+                  Utils.alert(context,
+                      title: Utils.getLocale(context)!.errorOccurred,
+                      message:
+                          '${Utils.getLocale(context)!.usernameOrPasswordNotMatchMessage}');
+                  return;
+                }
+                // save user info
+                SessionUtil.instance()?.user = User.fromJson(json);
+                // parse avatar
+                var imageData = json['avatarImgDTO'];
+                if (imageData != null) {
+                  String filePath = imageData['flePath']?.toString() ?? '';
+                  filePath = filePath.replaceAll('\\', '/');
+                  SessionUtil.instance()?.user?.avatarImg =
+                      '${ApiUrls.instance()?.baseUrl}/$filePath';
+                }
+                _saveDataToPreferences();
+                _deviceRegister();
+                //_setLoading(false); => now do not needed
+                // Navigate to home screen
+                /*Navigator.of(context).pushReplacement(
                 MaterialPageRoute(builder: (context) => HomeScreen()));*/
-              Navigator.of(context).pushReplacementNamed(AppRouter.homeScreen);
-              if (SessionUtil.instance().user?.avatarImgDTO != null &&
-                  !Utils.isNullOrEmpty(
-                      SessionUtil.instance().user.avatarImgDTO.flePath)) {
-                SessionUtil.instance().user.avatarImgDTO.flePath +=
-                    '?t=${DateTime.now().millisecondsSinceEpoch}';
-              }
-              AppProvider.of(context)
-                  .state
-                  .userBloc
-                  .setCurrentUser(SessionUtil.instance().user);
-            }, onTimeout: _onRequestTimeout);
+                Navigator.of(context)
+                    .pushReplacementNamed(AppRouter.homeScreen);
+                if (SessionUtil.instance()?.user?.avatarImgDTO != null &&
+                    !Utils.isNullOrEmpty(
+                        SessionUtil.instance()?.user?.avatarImgDTO?.flePath)) {
+                  SessionUtil.instance()?.user?.avatarImgDTO?.flePath +=
+                      '?t=${DateTime.now().millisecondsSinceEpoch}';
+                }
+                AppProvider.of(context)
+                    ?.state
+                    .userBloc
+                    .setCurrentUser(SessionUtil.instance()!.user!);
+              }, onTimeout: _onRequestTimeout);
+            } else {
+              _setLoading(false);
+              Utils.alert(context,
+                  title: Utils.getLocale(context)!.errorOccurred,
+                  message: '${body['message']}');
+            }
           } else {
             _setLoading(false);
             Utils.alert(context,
-                title: Utils.getLocale(context).errorOccurred,
-                message: '${body['message']}');
+                title: Utils.getLocale(context)!.errorOccurred,
+                message:
+                    '${Utils.getLocale(context)!.wrongCredentialsMessage}');
           }
-        } else {
+        } catch (e) {
           _setLoading(false);
-          Utils.alert(context,
-              title: Utils.getLocale(context).errorOccurred,
-              message: '${Utils.getLocale(context).wrongCredentialsMessage}');
         }
       });
     } else {
@@ -554,8 +557,8 @@ class _LoginScreenState extends State<LoginScreen> {
   void _onRequestTimeout() {
     _setLoading(false);
     Utils.alert(context,
-        title: Utils.getLocale(context).errorOccurred,
-        message: '${Utils.getLocale(context).requestTimeout}!');
+        title: Utils.getLocale(context)!.errorOccurred,
+        message: '${Utils.getLocale(context)!.requestTimeout}!');
   }
 
   void _forgotPasswordClicked() {
@@ -577,30 +580,34 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _saveDataToPreferences() async {
     var prefs = await SharedPreferences.getInstance();
-    prefs.setString(
-        PrefsKey.username, _rememberMe ? _usernameController.text?.trim() : '');
-    prefs.setString(
-        PrefsKey.password, _rememberMe ? _passwordController.text?.trim() : '');
+    prefs.setString(PrefsKey.username,
+        _rememberMe ? _usernameController.text!.trim()! : '');
+    prefs.setString(PrefsKey.password,
+        _rememberMe ? _passwordController.text!.trim()! : '');
     prefs.setBool(PrefsKey.remember, _rememberMe);
     prefs.setString(PrefsKey.languageCode, _locale);
-    prefs.setBool(PrefsKey.logged, SessionUtil.instance().isLoggedIn());
+    prefs.setBool(PrefsKey.logged, SessionUtil.instance()!.isLoggedIn());
   }
 
   Future<void> _deviceRegister() async {
     final String platform = Platform.isAndroid ? 'android' : 'ios';
     final session = SessionUtil.instance();
-    if (Utils.isNullOrEmpty(session.deviceId)) {
-      session.deviceId = await _getDeviceId();
+    if (Utils.isNullOrEmpty(session?.deviceId)) {
+      session?.deviceId = await _getDeviceId();
     }
     DeviceInfo deviceInfo = DeviceInfo(
-      username: session.user.username,
-      deviceId: session.deviceId,
-      fcmToken: session.fcmToken,
+      username: session!.user!.username!,
+      deviceId: session!.deviceId!,
+      fcmToken: session!.fcmToken!,
       platform: platform,
-      locale: _locale == 'vi' ? 'vi_VN' : _locale == 'en' ? 'en_US' : 'zh_CN',
+      locale: _locale == 'vi'
+          ? 'vi_VN'
+          : _locale == 'en'
+              ? 'en_US'
+              : 'zh_CN',
     );
     HttpUtil.post(
-      ApiUrls.instance().getDeviceRegisterUrl(),
+      ApiUrls.instance()!.getDeviceRegisterUrl()!,
       headers: {'Content-Type': 'application/json; charset=utf-8'},
       body: deviceInfo.toJson(),
       onResponse: (resp) {
@@ -619,10 +626,11 @@ class _LoginScreenState extends State<LoginScreen> {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     if (Platform.isIOS) {
       IosDeviceInfo iosDeviceInfo = await deviceInfo.iosInfo;
-      return iosDeviceInfo.identifierForVendor; // unique ID on iOS
+      return iosDeviceInfo.identifierForVendor!; // unique ID on iOS
     } else {
-      AndroidDeviceInfo androidDeviceInfo = await deviceInfo.androidInfo;
-      return androidDeviceInfo.androidId; // unique ID on Android
+      const _androidIdPlugin = AndroidId();
+      String androidId = await _androidIdPlugin.getId().toString();
+      return androidId!;
     }
   }
 }

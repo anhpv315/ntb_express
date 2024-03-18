@@ -36,7 +36,7 @@
 //   final _firstFocusNode = FocusNode();
 //   final _secondFocusNode = FocusNode();
 //
-//   double get _exchangeRate => SessionUtil.instance().exchangeRate;
+//   double get _exchangeRate => SessionUtil.instance()!.exchangeRate;
 //
 //   @override
 //   void initState() {
@@ -188,7 +188,7 @@
 //   final _secondController = TextEditingController();
 //   final _secondFocusNode = FocusNode();
 //
-//   double get _exchangeRate => SessionUtil.instance().exchangeRate;
+//   double get _exchangeRate => SessionUtil.instance()!.exchangeRate;
 //
 //   @override
 //   void initState() {

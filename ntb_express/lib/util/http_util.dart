@@ -228,11 +228,11 @@ class HttpUtil {
     if (files != null && files.isNotEmpty) {
       files.forEach((f) {
         if (f != null && f.file != null) {
-          final fileName = _getFileName(f.file);
+          final fileName = _getFileName(f.file!);
           final extension = _getExtension(fileName);
 
           request.files.add(http.MultipartFile.fromBytes(
-              'orderImages', f.file.readAsBytesSync(),
+              'orderImages', f.file!.readAsBytesSync(),
               filename: fileName,
               contentType: hparser.MediaType('image', extension)));
         }
@@ -269,11 +269,11 @@ class HttpUtil {
       contentType: hparser.MediaType.parse('application/json; charset=utf-8'),
     ));
     if (avatar != null) {
-      final fileName = _getFileName(avatar.file);
+      final fileName = _getFileName(avatar.file!);
       final extension = _getExtension(fileName);
 
       request.files.add(http.MultipartFile.fromBytes(
-          'avatarImg', avatar.file.readAsBytesSync(),
+          'avatarImg', avatar.file!.readAsBytesSync(),
           filename: fileName,
           contentType: hparser.MediaType('image', extension)));
     }
@@ -355,7 +355,7 @@ class HttpUtil {
             resp != null &&
             resp.statusCode == 200) {
           await appendFiles(ApiUrls.instance()!.getOrderAppendFilesUrl()!,
-              orderId, confirmStatus.files!);
+              orderId, confirmStatus.files);
           c.complete(resp != null && resp.statusCode == 200);
         } else {
           c.complete(resp != null && resp.statusCode == 200);
@@ -373,7 +373,7 @@ class HttpUtil {
   }
 
   static Future<void>? appendFiles(
-      String url, String orderId, List<File> files) async {
+      String url, String orderId, List<File?>? files) async {
     if (Utils.isNullOrEmpty(url) ||
         Utils.isNullOrEmpty(orderId) ||
         files == null ||

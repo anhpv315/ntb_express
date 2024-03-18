@@ -11,7 +11,7 @@ class User {
   String password;
   @JsonKey(name: 'fullname')
   String fullName;
-  String email;
+  String? email;
   String avatarImg;
   int userType;
   int status;

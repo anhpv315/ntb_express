@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:app_settings/app_settings.dart';
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badges;
 
 /// home screen => display order list
 import 'package:flutter/material.dart';
@@ -39,6 +39,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+  final _scaffoldMesKey = GlobalKey<ScaffoldMessengerState>();
   final _notificationProvider = NotificationProvider();
   bool _initialized = false;
   bool _loaded = false;
@@ -46,7 +47,8 @@ class _HomeScreenState extends State<HomeScreen> {
   final _scrollController = ScrollController();
   var _tapPosition;
   final List<dynamic> _statisticList = [];
-  final String _statisticUrl = ApiUrls.instance().baseUrl + '/getStatistics/-1';
+  final String _statisticUrl =
+      ApiUrls.instance()!.baseUrl! + '/getStatistics/-1';
 
   bool get isCustomer =>
       SessionUtil.instance()?.user?.userType == UserType.customer;
@@ -79,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void dispose() {
     //_scrollController.removeListener(_scrollListener);
     // clear session
-    SessionUtil.instance().reset();
+    SessionUtil.instance()!.reset();
     super.dispose();
   }
 
@@ -92,8 +94,8 @@ class _HomeScreenState extends State<HomeScreen> {
     if (hasRequested!) return;
     Utils.alert(
       context,
-      title: Utils.getLocale(context).required,
-      message: Utils.getLocale(context).requestPushPermissionsMessage,
+      title: Utils.getLocale(context)!.required,
+      message: Utils.getLocale(context)!.requestPushPermissionsMessage,
       onAccept: () async {
         await AppSettings.openAppSettings();
         prefs.setBool(PrefsKey.requestPushPermissions, true);
@@ -110,7 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
         _showLoading = true;
       });
       Future.delayed(Duration(seconds: 1), () async {
-        AppProvider.of(context).state.orderBloc?.loadMore(done: () {
+        AppProvider.of(context)!.state.orderBloc?.loadMore(done: () {
           setState(() {
             _showLoading = false;
           });
@@ -121,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _getStatisticList({String? url}) async {
     HttpUtil.get(
-      Utils.isNullOrEmpty(url) ? _statisticUrl : url,
+      Utils.isNullOrEmpty(url) ? _statisticUrl : url!,
       headers: {'Content-Type': 'application/json; charset=utf-8'},
       onResponse: (resp) {
         if (resp == null ||
@@ -160,13 +162,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final orderBloc = AppProvider.of(context).state.orderBloc;
-    final _notificationBloc = AppProvider.of(context).state.notificationBloc;
+    final orderBloc = AppProvider.of(context)!.state.orderBloc;
+    final _notificationBloc = AppProvider.of(context)!.state.notificationBloc;
     if (!_initialized) {
       // get notification count
       _notificationProvider
           .getUnreadCount()
-          .then((count) => _notificationBloc.setUnreadCount(count));
+          .then((count) => _notificationBloc.setUnreadCount(count!));
       _requestPushPermissions();
       _getStatisticList().then((value) {
         setState(() {}); // reset state for statistic list
@@ -195,7 +197,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Text(snapshot.error.toString()),
                   );
                 } else if (snapshot.hasData) {
-                  if (snapshot.data == null || snapshot.data.isEmpty) {
+                  if (snapshot.data == null || snapshot.data!.isEmpty) {
                     if (!_loaded) {
                       Future.delayed(const Duration(milliseconds: 500),
                           () async {
@@ -216,7 +218,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     } else {
                       result = Center(
                         child: Text(
-                          '${Utils.getLocale(context).empty}',
+                          '${Utils.getLocale(context)!.empty}',
                           style: TextStyle(
                             color: Theme.of(context).disabledColor,
                           ),
@@ -224,7 +226,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                     }
                   } else {
-                    result = _content(snapshot.data);
+                    result = _content(snapshot.data!);
                   }
                 } else if (snapshot.connectionState ==
                     ConnectionState.waiting) {
@@ -254,37 +256,41 @@ class _HomeScreenState extends State<HomeScreen> {
                             }
                           },
                         )),
-                        title: Text('${Utils.getLocale(context).order}'),
+                        title: Text('${Utils.getLocale(context)!.order}'),
                         actions: [
                           GestureDetector(
                             onTap: () {
                               Navigator.of(context).push(MaterialPageRoute(
                                   builder: (context) => ProfileScreen(
                                         currentUser:
-                                            SessionUtil.instance().user,
+                                            SessionUtil.instance()!.user!,
                                       )));
                             },
                             child: Center(
                               child: Row(
                                 children: [
                                   StreamBuilder<User>(
-                                    stream: AppProvider.of(context)
+                                    stream: AppProvider.of(context)!
                                         .state
                                         .userBloc
                                         .currentUser,
                                     builder: (context, snapshot) {
                                       return CircleAvatar(
                                         radius: 18.0,
-                                        backgroundImage: (snapshot.hasData &&
-                                                snapshot.data != null &&
-                                                snapshot.data.avatarImgDTO !=
-                                                    null &&
-                                                !Utils.isNullOrEmpty(snapshot
-                                                    .data.avatarImgDTO.flePath))
-                                            ? NetworkImage(
-                                                '${ApiUrls.instance().baseUrl}/${snapshot.data.avatarImgDTO.flePath}')
-                                            : AssetImage(
-                                                'assets/images/default-avatar.png'),
+                                        backgroundImage: ((snapshot.hasData &&
+                                                    snapshot.data != null &&
+                                                    snapshot.data!.avatarImgDTO !=
+                                                        null &&
+                                                    !Utils
+                                                        .isNullOrEmpty(snapshot
+                                                            .data
+                                                            ?.avatarImgDTO
+                                                            ?.flePath))
+                                                ? NetworkImage(
+                                                    '${ApiUrls.instance()?.baseUrl}/${snapshot.data!.avatarImgDTO?.flePath}')
+                                                : AssetImage(
+                                                    'assets/images/default-avatar.png'))
+                                            as ImageProvider,
                                       );
                                     },
                                   ),
@@ -295,17 +301,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                             !Utils.isNullOrEmpty(
                                                 _user.avatarImgDTO.flePath))
                                         ? NetworkImage(
-                                            '${ApiUrls.instance().baseUrl}/${SessionUtil.instance().user.avatarImgDTO.flePath}')
+                                            '${ApiUrls.instance()?.baseUrl}/${SessionUtil.instance()?.user?.avatarImgDTO.flePath}')
                                         : AssetImage(
                                             'assets/images/default-avatar.png'),
                                   ),*/
                                   const SizedBox(width: 5.0),
                                   Text(Utils.isNullOrEmpty(
-                                          SessionUtil.instance()
-                                              .user
+                                          SessionUtil.instance()!
+                                              .user!
                                               .customerId)
-                                      ? SessionUtil.instance().user.username
-                                      : SessionUtil.instance().user.customerId),
+                                      ? SessionUtil.instance()!.user!.username!
+                                      : SessionUtil.instance()!
+                                          .user!
+                                          .customerId!),
                                 ],
                               ),
                             ),
@@ -322,7 +330,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               }),
           floatingActionButton: Visibility(
-            visible: _user.userType != UserType.customer && !isWarehouseStaff,
+            visible: _user?.userType != UserType.customer && !isWarehouseStaff,
             child: FloatingActionButton(
               onPressed: () {
                 Utils.updatePop(1);
@@ -338,7 +346,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _onRefresh() async {
-    AppProvider.of(context).state.orderBloc.fetch(reset: true);
+    AppProvider.of(context)!.state.orderBloc.fetch(reset: true);
   }
 
   Color _getColor(int orderStatus) {
@@ -356,7 +364,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String _getTotalFeeText(double totalFee) =>
       NumberFormat.currency(locale: 'vi_VN', symbol: 'đ').format(totalFee);
 
-  User get currentUser => SessionUtil.instance()?.user;
+  User? get currentUser => SessionUtil.instance()?.user;
 
   TextStyle _statisticStyle(int orderStatus) {
     return TextStyle(
@@ -366,8 +374,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   bool _isVisibleWeightSize(Order ord) {
-    return (ord.weight != null && ord.weight > 0) ||
-        (ord.size != null && ord.size > 0);
+    return (ord.weight != null && ord.weight! > 0) ||
+        (ord.size != null && ord.size! > 0);
   }
 
   Color _getCardColorByStatus(int orderStatus) {
@@ -459,7 +467,7 @@ class _HomeScreenState extends State<HomeScreen> {
             slivers: [
               SliverToBoxAdapter(
                 child: ExpansionTile(
-                  title: Text(Utils.getLocale(context).statistics),
+                  title: Text(Utils.getLocale(context)!.statistics),
                   maintainState: true,
                   children: [
                     _statisticList.isEmpty
@@ -516,7 +524,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           Row(
                                             children: [
                                               Text(
-                                                Utils.getLocale(context)
+                                                Utils.getLocale(context)!
                                                     .totalCount,
                                                 style: _statisticStyle(
                                                     orderStatus),
@@ -541,7 +549,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           Row(
                                             children: [
                                               Text(
-                                                Utils.getLocale(context)
+                                                Utils.getLocale(context)!
                                                     .totalSize,
                                                 style: _statisticStyle(
                                                     orderStatus),
@@ -570,7 +578,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           Row(
                                             children: [
                                               Text(
-                                                Utils.getLocale(context)
+                                                Utils.getLocale(context)!
                                                     .totalWeight,
                                                 style: _statisticStyle(
                                                     orderStatus),
@@ -596,7 +604,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           Row(
                                             children: [
                                               Text(
-                                                Utils.getLocale(context)
+                                                Utils.getLocale(context)!
                                                     .totalFee,
                                                 style: _statisticStyle(
                                                     orderStatus),
@@ -637,92 +645,103 @@ class _HomeScreenState extends State<HomeScreen> {
                     return Container(
                       margin: const EdgeInsets.symmetric(vertical: 4.0),
                       child: Slidable(
-                        actionPane: SlidableScrollActionPane(),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: _getColor(ord.orderStatus),
+                          startActionPane: ActionPane(
+                            motion: const ScrollMotion(),
+                            extentRatio: 0.25,
+                            children: [
+                              SlidableAction(
+                                label: 'Archive',
+                                backgroundColor: Colors.blue,
+                                icon: Icons.archive,
+                                onPressed: (context) {},
+                              ),
+                            ],
                           ),
-                          child: InkWell(
-                            onTapDown: _storePosition,
-                            onTap: () {
-                              Utils.updatePop(1);
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) =>
-                                      OrderDetailScreen(ord)));
-                            },
-                            onLongPress: isWarehouseStaff
-                                ? null
-                                : () => _makeCopyContext(ord),
-                            child: Stack(
-                              children: [
-                                ListTile(
-                                  title: Text(
-                                    '${isCustomer ? Utils.getDisplayOrderId(ord.orderId) : ord.customerDTO?.fullName}',
-                                    style: TextStyle(
-                                        color: Colors.black87,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  subtitle: Padding(
-                                    padding: const EdgeInsets.only(top: 5.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        HideOnCondition(
-                                          hideOn: (ord.customerDTO == null ||
-                                                  Utils.isNullOrEmpty(ord
-                                                      .customerDTO
-                                                      .customerId)) ||
-                                              isCustomer,
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                '${Utils.getLocale(context).customerCode} ',
-                                                style: _small(),
-                                              ),
-                                              Expanded(
-                                                child: Align(
-                                                  alignment:
-                                                      Alignment.centerRight,
-                                                  child: Text(
-                                                    '${ord?.customerDTO?.customerId}',
-                                                    style: _small(),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: _getColor(ord.orderStatus),
+                            ),
+                            child: InkWell(
+                              onTapDown: _storePosition,
+                              onTap: () {
+                                Utils.updatePop(1);
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) =>
+                                        OrderDetailScreen(ord)));
+                              },
+                              onLongPress: isWarehouseStaff
+                                  ? null
+                                  : () => _makeCopyContext(ord),
+                              child: Stack(
+                                children: [
+                                  ListTile(
+                                    title: Text(
+                                      '${isCustomer ? Utils.getDisplayOrderId(ord.orderId!) : ord.customerDTO?.fullName}',
+                                      style: TextStyle(
+                                          color: Colors.black87,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    subtitle: Padding(
+                                      padding: const EdgeInsets.only(top: 5.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          HideOnCondition(
+                                            hideOn: (ord.customerDTO == null ||
+                                                    Utils.isNullOrEmpty(ord
+                                                        .customerDTO
+                                                        ?.customerId)) ||
+                                                isCustomer,
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  '${Utils.getLocale(context)!.customerCode} ',
+                                                  style: _small(),
+                                                ),
+                                                Expanded(
+                                                  child: Align(
+                                                    alignment:
+                                                        Alignment.centerRight,
+                                                    child: Text(
+                                                      '${ord?.customerDTO?.customerId}',
+                                                      style: _small(),
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                        HideOnCondition(
-                                          hideOn: Utils.isNullOrEmpty(
-                                              ord.intTrackNo),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                '${Utils.getLocale(context).chineseWaybillCode} ',
-                                                style: _small(),
-                                              ),
-                                              Expanded(
-                                                child: Align(
-                                                  alignment:
-                                                      Alignment.centerRight,
-                                                  child: Text(
-                                                    '${ord.intTrackNo}',
-                                                    style: _small(),
+                                          HideOnCondition(
+                                            hideOn: Utils.isNullOrEmpty(
+                                                ord.intTrackNo),
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  '${Utils.getLocale(context)!.chineseWaybillCode} ',
+                                                  style: _small(),
+                                                ),
+                                                Expanded(
+                                                  child: Align(
+                                                    alignment:
+                                                        Alignment.centerRight,
+                                                    child: Text(
+                                                      '${ord.intTrackNo}',
+                                                      style: _small(),
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                        /*HideOnCondition(
+                                          /*HideOnCondition(
                                           hideOn: Utils.isNullOrEmpty(
                                                   ord.orderId) ||
                                               isCustomer,
                                           child: Row(
                                             children: [
                                               Text(
-                                                '${Utils.getLocale(context).internationalWaybillCode} ',
+                                                '${Utils.getLocale(context)!.internationalWaybillCode} ',
                                                 style: _small(),
                                               ),
                                               Expanded(
@@ -747,213 +766,214 @@ class _HomeScreenState extends State<HomeScreen> {
                                             ],
                                           ),
                                         ),*/
-                                        HideOnCondition(
-                                          hideOn: Utils.isNullOrEmpty(
-                                              ord.goodsDescr),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                '${Utils.getLocale(context).description} ',
-                                                style: _small(),
-                                              ),
-                                              Expanded(
-                                                child: Align(
-                                                  alignment:
-                                                      Alignment.centerRight,
-                                                  child: RichText(
-                                                    text: TextSpan(
-                                                      text:
-                                                          '${ord.goodsDescr ?? ""}',
-                                                      style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              color:
-                                                                  Colors.orange)
-                                                          .merge(_small()),
-                                                    ),
-                                                  ),
+                                          HideOnCondition(
+                                            hideOn: Utils.isNullOrEmpty(
+                                                ord.goodsDescr),
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  '${Utils.getLocale(context)!.description} ',
+                                                  style: _small(),
                                                 ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        HideOnCondition(
-                                          hideOn: Utils.isNullOrEmpty(
-                                              ord.licensePlates),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                '${Utils.getLocale(context).licensePlates} ',
-                                                style: _small(),
-                                              ),
-                                              Expanded(
-                                                child: Align(
-                                                  alignment:
-                                                      Alignment.centerRight,
-                                                  child: RichText(
-                                                    text: TextSpan(
-                                                      text:
-                                                          '${ord.licensePlates ?? ""}',
-                                                      style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              color: Colors
-                                                                  .black87)
-                                                          .merge(_small()),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        HideOnCondition(
-                                          hideOn: ord.orderStatus == null,
-                                          child: Wrap(
-                                            children: [
-                                              _buildStatusTag(ord.orderStatus),
-                                              Text(
-                                                  '${ord.packCount != null ? ' - ' : ''}${ord.packCount} ${Utils.getLocale(context).packs}',
-                                                  style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          color: Theme.of(
-                                                                  context)
-                                                              .disabledColor)
-                                                      .merge(_small())),
-                                            ],
-                                          ),
-                                        ),
-                                        Visibility(
-                                          visible: _isVisibleWeightSize(ord),
-                                          child: Column(
-                                            children: [
-                                              SizedBox(height: 3.0),
-                                              Text(
-                                                  '${ord.size != null && ord.size > 0 ? '${ord.size}m³' : ''}${(ord.size != null && ord.weight != null && ord.size > 0 && ord.weight > 0) ? ' - ' : ''}${ord.weight != null && ord.weight > 0 ? '${ord.weight}kg' : ''}'),
-                                            ],
-                                          ),
-                                        ),
-                                        Visibility(
-                                          visible: !isChineseWarehouseStaff,
-                                          child: Divider(),
-                                        ),
-                                        Row(
-                                          children: [
-                                            HideOnCondition(
-                                              hideOn: ord.createdDate == null,
-                                              child: Padding(
-                                                padding: EdgeInsets.only(
-                                                    top: isChineseWarehouseStaff
-                                                        ? 2.0
-                                                        : 0),
-                                                child: Text(
-                                                  '${Utils.getDateString(ord.createdDate, commonDateFormat)}',
-                                                  style: TextStyle(
-                                                    fontSize: 10.0,
-                                                    color: Theme.of(context)
-                                                        .disabledColor,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Expanded(
-                                              child: Visibility(
-                                                visible:
-                                                    !isChineseWarehouseStaff,
-                                                child: Align(
-                                                  alignment:
-                                                      Alignment.centerRight,
-                                                  child: RichText(
-                                                    text: TextSpan(
+                                                Expanded(
+                                                  child: Align(
+                                                    alignment:
+                                                        Alignment.centerRight,
+                                                    child: RichText(
+                                                      text: TextSpan(
                                                         text:
-                                                            '${Utils.getLocale(context).intoMoney}: ',
+                                                            '${ord.goodsDescr ?? ""}',
                                                         style: TextStyle(
-                                                          color: Theme.of(
-                                                                  context)
-                                                              .disabledColor,
-                                                        ).merge(_small()),
-                                                        children: [
-                                                          TextSpan(
-                                                            text: ord.promotionDTO ==
-                                                                    null
-                                                                ? ''
-                                                                : (ord.totalFeeOriginal ==
-                                                                            null ||
-                                                                        ord.totalFeeOriginal <=
-                                                                            0 ||
-                                                                        ord.totalFee >=
-                                                                            ord
-                                                                                .totalFeeOriginal)
-                                                                    ? ''
-                                                                    : NumberFormat.currency(
-                                                                            locale:
-                                                                                'vi_VN',
-                                                                            symbol:
-                                                                                'đ')
-                                                                        .format(
-                                                                            ord.totalFeeOriginal),
-                                                            style: TextStyle(
-                                                              color: Theme.of(
-                                                                      context)
-                                                                  .disabledColor,
-                                                              decoration:
-                                                                  TextDecoration
-                                                                      .lineThrough,
-                                                            ),
-                                                          ),
-                                                          TextSpan(
-                                                              text: (ord.promotionDTO != null &&
-                                                                          ord.totalFeeOriginal !=
-                                                                              null &&
-                                                                          ord.totalFeeOriginal >
-                                                                              0 &&
-                                                                          ord.totalFee <
-                                                                              ord.totalFeeOriginal
-                                                                      ? ' '
-                                                                      : '') +
-                                                                  '${_getTotalFeeText(ord.totalFee ?? 0)}',
-                                                              style: TextStyle(
-                                                                color:
-                                                                    Colors.red,
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
-                                                              )),
-                                                        ]),
+                                                                color: Colors
+                                                                    .orange)
+                                                            .merge(_small()),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          HideOnCondition(
+                                            hideOn: Utils.isNullOrEmpty(
+                                                ord.licensePlates),
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  '${Utils.getLocale(context)!.licensePlates} ',
+                                                  style: _small(),
+                                                ),
+                                                Expanded(
+                                                  child: Align(
+                                                    alignment:
+                                                        Alignment.centerRight,
+                                                    child: RichText(
+                                                      text: TextSpan(
+                                                        text:
+                                                            '${ord.licensePlates ?? ""}',
+                                                        style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                color: Colors
+                                                                    .black87)
+                                                            .merge(_small()),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          HideOnCondition(
+                                            hideOn: ord.orderStatus == null,
+                                            child: Wrap(
+                                              children: [
+                                                _buildStatusTag(
+                                                    ord.orderStatus),
+                                                Text(
+                                                    '${ord.packCount != null ? ' - ' : ''}${ord.packCount} ${Utils.getLocale(context)!.packs}',
+                                                    style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .disabledColor)
+                                                        .merge(_small())),
+                                              ],
+                                            ),
+                                          ),
+                                          Visibility(
+                                            visible: _isVisibleWeightSize(ord),
+                                            child: Column(
+                                              children: [
+                                                SizedBox(height: 3.0),
+                                                Text(
+                                                    '${ord.size != null && ord.size! > 0 ? '${ord.size}m³' : ''}${(ord.size != null && ord.weight != null && ord.size! > 0 && ord.weight! > 0) ? ' - ' : ''}${ord.weight != null && ord.weight! > 0 ? '${ord.weight}kg' : ''}'),
+                                              ],
+                                            ),
+                                          ),
+                                          Visibility(
+                                            visible: !isChineseWarehouseStaff,
+                                            child: Divider(),
+                                          ),
+                                          Row(
+                                            children: [
+                                              HideOnCondition(
+                                                hideOn: ord.createdDate == null,
+                                                child: Padding(
+                                                  padding: EdgeInsets.only(
+                                                      top:
+                                                          isChineseWarehouseStaff
+                                                              ? 2.0
+                                                              : 0),
+                                                  child: Text(
+                                                    '${Utils.getDateString(ord.createdDate!, commonDateFormat)}',
+                                                    style: TextStyle(
+                                                      fontSize: 10.0,
+                                                      color: Theme.of(context)
+                                                          .disabledColor,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
+                                              Expanded(
+                                                child: Visibility(
+                                                  visible:
+                                                      !isChineseWarehouseStaff,
+                                                  child: Align(
+                                                    alignment:
+                                                        Alignment.centerRight,
+                                                    child: RichText(
+                                                      text: TextSpan(
+                                                          text:
+                                                              '${Utils.getLocale(context)!.intoMoney}: ',
+                                                          style: TextStyle(
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .disabledColor,
+                                                          ).merge(_small()),
+                                                          children: [
+                                                            TextSpan(
+                                                              text: ord.promotionDTO ==
+                                                                      null
+                                                                  ? ''
+                                                                  : (ord.totalFeeOriginal == null ||
+                                                                          ord.totalFeeOriginal <=
+                                                                              0 ||
+                                                                          ord.totalFee! >=
+                                                                              ord
+                                                                                  .totalFeeOriginal)
+                                                                      ? ''
+                                                                      : NumberFormat.currency(
+                                                                              locale: 'vi_VN',
+                                                                              symbol: 'đ')
+                                                                          .format(ord.totalFeeOriginal),
+                                                              style: TextStyle(
+                                                                color: Theme.of(
+                                                                        context)
+                                                                    .disabledColor,
+                                                                decoration:
+                                                                    TextDecoration
+                                                                        .lineThrough,
+                                                              ),
+                                                            ),
+                                                            TextSpan(
+                                                                text: (ord.promotionDTO != null &&
+                                                                            ord.totalFeeOriginal !=
+                                                                                null &&
+                                                                            ord.totalFeeOriginal >
+                                                                                0 &&
+                                                                            ord.totalFee! <
+                                                                                ord.totalFeeOriginal
+                                                                        ? ' '
+                                                                        : '') +
+                                                                    '${_getTotalFeeText(ord.totalFee ?? 0)}',
+                                                                style: TextStyle(
+                                                                  color: Colors
+                                                                      .red,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                )),
+                                                          ]),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                                Visibility(
-                                  visible: ![
-                                        UserType.customer,
-                                        UserType.saleStaff
-                                      ].contains(currentUser?.userType) &&
-                                      currentUser?.username == ord.saleId,
-                                  child: Positioned(
-                                    top: 4.0,
-                                    right: 4.0,
-                                    child: Icon(
-                                      Icons.shopping_cart,
-                                      color: Colors.red,
+                                  Visibility(
+                                    visible: ![
+                                          UserType.customer,
+                                          UserType.saleStaff
+                                        ].contains(currentUser?.userType) &&
+                                        currentUser?.username == ord.saleId,
+                                    child: Positioned(
+                                      top: 4.0,
+                                      right: 4.0,
+                                      child: Icon(
+                                        Icons.shopping_cart,
+                                        color: Colors.red,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        secondaryActions: _buildActions(ord),
-                      ),
+                          endActionPane: ActionPane(
+                            motion: const DrawerMotion(),
+                            extentRatio: 0.25,
+                            children: _buildActions(ord),
+                          )),
                     );
                   },
                   childCount: orders.length,
@@ -993,7 +1013,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _showWaiting() {
     Utils.showLoading(context,
-        textContent: Utils.getLocale(context).waitForLogin);
+        textContent: Utils.getLocale(context)!.waitForLogin);
   }
 
   void _popLoading() {
@@ -1007,13 +1027,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _makeCopyContext(Order ord) {
-    final RenderBox overlay = Overlay.of(context).context.findRenderObject();
+    final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
     showMenu(
         context: context,
         position: RelativeRect.fromRect(
             _tapPosition & Size(40, 40),
             // smaller rect, the touch area
-            Offset.zero & overlay.size // Bigger rect, the entire screen
+            Offset.zero & overlay!.size // Bigger rect, the entire screen
             ),
         items: <PopupMenuEntry>[
           PopupMenuItem(
@@ -1027,7 +1047,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: Theme.of(context).disabledColor,
                   ),
                   SizedBox(width: 5.0),
-                  Text('${Utils.getLocale(context).copy}'),
+                  Text('${Utils.getLocale(context)!.copy}'),
                 ],
               ),
             ),
@@ -1099,6 +1119,9 @@ class _HomeScreenState extends State<HomeScreen> {
         background = Colors.indigo;
         textColor = Colors.white;
         break;
+      default:
+        background = Colors.indigo;
+        textColor = Colors.white;
     }
 
     return Container(
@@ -1119,19 +1142,19 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Widget> _buildActions(Order order) {
     List<Widget> list = [];
     List<AllowAction> allowActions =
-        Utils.getAllowActionList(SessionUtil.instance().user, order);
+        Utils.getAllowActionList(SessionUtil.instance()!.user!, order);
     allowActions?.forEach((a) {
       switch (a) {
         case AllowAction.create:
           // ignored
           break;
         case AllowAction.edit:
-          list.add(IconSlideAction(
-            caption: '${Utils.getLocale(context).edit}',
+          list.add(SlidableAction(
+            label: '${Utils.getLocale(context)!.edit}',
             foregroundColor: Colors.white,
-            color: Colors.orangeAccent,
+            backgroundColor: Colors.orangeAccent,
             icon: Icons.edit,
-            onTap: () {
+            onPressed: (context) {
               Utils.updatePop(1);
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (_) => OrderFormScreen(order: order, update: true)));
@@ -1139,28 +1162,28 @@ class _HomeScreenState extends State<HomeScreen> {
           ));
           break;
         case AllowAction.cancel:
-          list.add(IconSlideAction(
-            caption: '${Utils.getLocale(context).cancelOrder}',
-            color: Colors.black12,
+          list.add(SlidableAction(
+            label: '${Utils.getLocale(context)!.cancelOrder}',
+            backgroundColor: Colors.black12,
             icon: Icons.close,
-            onTap: () async {
+            onPressed: (context) async {
               Utils.confirm(
                 context,
-                title: '${Utils.getLocale(context).confirmation}',
+                title: '${Utils.getLocale(context)!.confirmation}',
                 message:
-                    '${Utils.getLocale(context).confirmCancelOrderMessage}',
+                    '${Utils.getLocale(context)!.confirmCancelOrderMessage}',
                 onAccept: () async {
                   _showWaiting();
                   _delay(() async {
                     bool success = await HttpUtil.updateOrderTrackingStatus(
-                        order.orderId, ActionType.cancelOrder);
+                        order.orderId!, ActionType.cancelOrder);
                     // pop loading
                     _popLoading();
                     if (success) {
                       Order orderUpdated =
-                          await HttpUtil.getOrder(order.orderId);
+                          await HttpUtil.getOrder(order.orderId!);
                       if (orderUpdated != null) {
-                        AppProvider.of(context)
+                        AppProvider.of(context)!
                             .state
                             .orderBloc
                             .updateOrder(orderUpdated);
@@ -1168,15 +1191,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         // remove order from block if needed
                         Utils.removeOrderFromBloc(context, orderUpdated);
                       }
-                      _scaffoldKey.currentState.showSnackBar(SnackBar(
+                      _scaffoldMesKey.currentState?.showSnackBar(SnackBar(
                         content: Text(
-                          '${Utils.getLocale(context).cancelOrderSuccessMessage}',
+                          '${Utils.getLocale(context)!.cancelOrderSuccessMessage}',
                         ),
                       ));
                     } else {
-                      _scaffoldKey.currentState.showSnackBar(SnackBar(
+                      _scaffoldMesKey.currentState?.showSnackBar(SnackBar(
                         content: Text(
-                          '${Utils.getLocale(context).updateOrderStatusFailedMessage}!',
+                          '${Utils.getLocale(context)!.updateOrderStatusFailedMessage}!',
                         ),
                       ));
                     }
@@ -1187,22 +1210,22 @@ class _HomeScreenState extends State<HomeScreen> {
           ));
           break;
         case AllowAction.confirmWoodenPacking:
-          list.add(IconSlideAction(
+          list.add(SlidableAction(
             foregroundColor: Colors.white,
-            caption: '${Utils.getLocale(context).agreeToBoxWooden}',
-            color: Colors.green,
+            label: '${Utils.getLocale(context)!.agreeToBoxWooden}',
+            backgroundColor: Colors.green,
             icon: Icons.done,
-            onTap: () async {
+            onPressed: (context) async {
               _showWaiting();
               _delay(() async {
                 bool success = await HttpUtil.updateOrderTrackingStatus(
-                    order.orderId, ActionType.confirmWoodenPacking);
+                    order.orderId!, ActionType.confirmWoodenPacking);
                 // pop loading
                 _popLoading();
                 if (success) {
-                  Order orderUpdated = await HttpUtil.getOrder(order.orderId);
+                  Order orderUpdated = await HttpUtil.getOrder(order.orderId!);
                   if (orderUpdated != null) {
-                    AppProvider.of(context)
+                    AppProvider.of(context)!
                         .state
                         .orderBloc
                         .updateOrder(orderUpdated);
@@ -1210,15 +1233,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     // remove order from block if needed
                     Utils.removeOrderFromBloc(context, orderUpdated);
                   }
-                  _scaffoldKey.currentState.showSnackBar(SnackBar(
+                  _scaffoldMesKey.currentState?.showSnackBar(SnackBar(
                     content: Text(
-                      '${Utils.getLocale(context).agreeToBoxWoodedSuccessMessage}',
+                      '${Utils.getLocale(context)!.agreeToBoxWoodedSuccessMessage}',
                     ),
                   ));
                 } else {
-                  _scaffoldKey.currentState.showSnackBar(SnackBar(
+                  _scaffoldMesKey.currentState?.showSnackBar(SnackBar(
                     content: Text(
-                      '${Utils.getLocale(context).updateOrderStatusFailedMessage}!',
+                      '${Utils.getLocale(context)!.updateOrderStatusFailedMessage}!',
                     ),
                   ));
                 }
@@ -1227,21 +1250,23 @@ class _HomeScreenState extends State<HomeScreen> {
           ));
           break;
         case AllowAction.importChineseWarehouse:
-          list.add(IconSlideAction(
+          list.add(SlidableAction(
             foregroundColor: Colors.white,
-            caption: '${Utils.getLocale(context).input}',
-            color: Colors.green,
+            label: '${Utils.getLocale(context)!.input}',
+            backgroundColor: Colors.green,
             icon: Icons.system_update_alt,
-            onTap: () => _updateOrderStatus(order, ActionType.chineseWarehouse),
+            onPressed: (context) =>
+                _updateOrderStatus(order, ActionType.chineseWarehouse),
           ));
           break;
         case AllowAction.exportChineseWarehouse:
-          list.add(IconSlideAction(
+          list.add(SlidableAction(
             foregroundColor: Colors.white,
-            caption: '${Utils.getLocale(context).output}',
-            color: Colors.green,
+            label: '${Utils.getLocale(context)!.output}',
+            backgroundColor: Colors.green,
             icon: Icons.exit_to_app,
-            onTap: () => _updateOrderStatus(order, ActionType.chineseStockOut),
+            onPressed: (context) =>
+                _updateOrderStatus(order, ActionType.chineseStockOut),
           ));
           break;
         case AllowAction.importUongBiWarehouse:
@@ -1253,12 +1278,12 @@ class _HomeScreenState extends State<HomeScreen> {
           if (a == AllowAction.importSaiGonWarehouse)
             actionType = ActionType.saigonWarehouse;
 
-          list.add(IconSlideAction(
+          list.add(SlidableAction(
             foregroundColor: Colors.white,
-            caption: '${Utils.getLocale(context).input}',
-            color: Colors.green,
+            label: '${Utils.getLocale(context)!.input}',
+            backgroundColor: Colors.green,
             icon: Icons.system_update_alt,
-            onTap: () => _updateOrderStatus(order, actionType),
+            onPressed: (context) => _updateOrderStatus(order, actionType),
           ));
           break;
         case AllowAction.outputUongBi:
@@ -1269,28 +1294,28 @@ class _HomeScreenState extends State<HomeScreen> {
           if (a == AllowAction.outputSaiGon)
             actionType = ActionType.outputSaiGon;
 
-          list.add(IconSlideAction(
+          list.add(SlidableAction(
             foregroundColor: Colors.white,
-            caption: '${Utils.getLocale(context).output}',
-            color: Colors.green,
+            label: '${Utils.getLocale(context)!.output}',
+            backgroundColor: Colors.green,
             icon: Icons.exit_to_app,
-            onTap: () => _updateOrderStatus(order, actionType),
+            onPressed: (context) => _updateOrderStatus(order, actionType),
           ));
           break;
         case AllowAction.delivery:
-          list.add(IconSlideAction(
+          list.add(SlidableAction(
             foregroundColor: Colors.white,
-            caption: Utils.getLocale(context).delivery,
-            color: Colors.orange,
+            label: Utils.getLocale(context)!.delivery,
+            backgroundColor: Colors.orange,
             icon: Icons.more_horiz,
-            onTap: () => _updateOrderStatus(
+            onPressed: (context) => _updateOrderStatus(
                 order,
                 ActionType
                     .delivery) /*{
               Utils.confirm(
                 context,
-                title: Utils.getLocale(context).confirmation,
-                message: '${Utils.getLocale(context).orderDeliveryMessage}',
+                title: Utils.getLocale(context)!.confirmation,
+                message: '${Utils.getLocale(context)!.orderDeliveryMessage}',
                 onAccept: () => _updateOrderStatus(order, ActionType.delivery),
               );
             }*/
@@ -1298,29 +1323,30 @@ class _HomeScreenState extends State<HomeScreen> {
           ));
           break;
         case AllowAction.delivered:
-          list.add(IconSlideAction(
+          list.add(SlidableAction(
             foregroundColor: Colors.white,
-            caption: Utils.getLocale(context).delivered,
-            color: Colors.green,
+            label: Utils.getLocale(context)!.delivered,
+            backgroundColor: Colors.green,
             icon: Icons.done,
-            onTap: () {
-              _updateOrderStatus(order, ActionType.delivered);
+            onPressed: (context) => {
+              _updateOrderStatus(order, ActionType.delivered)
               /*Utils.confirm(
                 context,
-                title: Utils.getLocale(context).confirmation,
-                message: '${Utils.getLocale(context).orderDeliveredMessage}',
+                title: Utils.getLocale(context)!.confirmation,
+                message: '${Utils.getLocale(context)!.orderDeliveredMessage}',
                 onAccept: () => _updateOrderStatus(order, ActionType.delivered),
               );*/
             },
           ));
           break;
         case AllowAction.complete:
-          list.add(IconSlideAction(
+          list.add(SlidableAction(
             foregroundColor: Colors.white,
-            caption: Utils.getLocale(context).completed,
-            color: Colors.indigo,
+            label: Utils.getLocale(context)!.completed,
+            backgroundColor: Colors.indigo,
             icon: Icons.done_all,
-            onTap: () => _updateOrderStatus(order, ActionType.completed),
+            onPressed: (context) =>
+                _updateOrderStatus(order, ActionType.completed),
           ));
           break;
       }
@@ -1337,7 +1363,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ActionType.outputHaNoi
     ].contains(actionType)) output = true;
 
-    ConfirmationStatus status;
+    ConfirmationStatus? status;
     bool isOutput = false;
     if ([
       ActionType.chineseWarehouse,
@@ -1365,15 +1391,15 @@ class _HomeScreenState extends State<HomeScreen> {
     if (isOutput && status == null) return;
     /*if (status == null) {
       Utils.alert(context,
-          title: Utils.getLocale(context).failed,
-          message: Utils.getLocale(context).updateOrderStatusFailedMessage);
+          title: Utils.getLocale(context)!.failed,
+          message: Utils.getLocale(context)!.updateOrderStatusFailedMessage);
       return;
     }*/
 
     _showWaiting();
     _delay(() async {
       bool success = await HttpUtil.updateOrderTrackingStatus(
-        order.orderId,
+        order.orderId!,
         actionType,
         confirmStatus: status,
         error: (e) {
@@ -1389,22 +1415,22 @@ class _HomeScreenState extends State<HomeScreen> {
       // pop loading
       _popLoading();
       if (success) {
-        Order orderUpdated = await HttpUtil.getOrder(order.orderId);
+        Order orderUpdated = await HttpUtil.getOrder(order.orderId!);
         if (orderUpdated != null) {
-          AppProvider.of(context).state.orderBloc.updateOrder(orderUpdated);
+          AppProvider.of(context)!.state.orderBloc.updateOrder(orderUpdated);
 
           // remove order from block if needed
           Utils.removeOrderFromBloc(context, orderUpdated);
         }
-        _scaffoldKey.currentState.showSnackBar(SnackBar(
+        _scaffoldMesKey.currentState?.showSnackBar(SnackBar(
           content: Text(
-            '${Utils.getLocale(context).inputSuccessMessage}',
+            '${Utils.getLocale(context)!.inputSuccessMessage}',
           ),
         ));
       } else {
-        _scaffoldKey.currentState.showSnackBar(SnackBar(
+        _scaffoldMesKey.currentState?.showSnackBar(SnackBar(
           content: Text(
-            '${Utils.getLocale(context).updateOrderStatusFailedMessage}!',
+            '${Utils.getLocale(context)!.updateOrderStatusFailedMessage}!',
           ),
         ));
       }
@@ -1423,12 +1449,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   Navigator.of(context).pop(); // close the drawer
                   Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => ProfileScreen(
-                            currentUser: SessionUtil.instance().user,
+                            currentUser: SessionUtil.instance()!.user!,
                           )));
                 },
                 leading: Icon(Icons.account_circle),
                 title: Text(
-                  Utils.getLocale(context).profile,
+                  Utils.getLocale(context)!.profile,
                   style: _drawerTextStyle(),
                 ),
               ),
@@ -1442,7 +1468,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                   leading: Icon(Icons.location_on),
                   title: Text(
-                    Utils.getLocale(context).address,
+                    Utils.getLocale(context)!.address,
                     style: _drawerTextStyle(),
                   ),
                 ),
@@ -1457,7 +1483,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                   leading: Icon(Icons.group),
                   title: Text(
-                    Utils.getLocale(context).customer,
+                    Utils.getLocale(context)!.customer,
                     style: _drawerTextStyle(),
                   ),
                 ),
@@ -1485,7 +1511,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
                 leading: Icon(Icons.help),
                 title: Text(
-                  '${Utils.getLocale(context).help}',
+                  '${Utils.getLocale(context)!.help}',
                   style: _drawerTextStyle(),
                 ),
               ),
@@ -1497,7 +1523,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
                 leading: Icon(Icons.settings),
                 title: Text(
-                  '${Utils.getLocale(context).setting}',
+                  '${Utils.getLocale(context)!.setting}',
                   style: _drawerTextStyle(),
                 ),
               ),
@@ -1507,11 +1533,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   Navigator.of(context).pop(); // close the drawer
                   Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) =>
-                          ChangePasswordScreen(SessionUtil.instance().user)));
+                          ChangePasswordScreen(SessionUtil.instance()!.user!)));
                 },
                 leading: Icon(Icons.vpn_key),
                 title: Text(
-                  '${Utils.getLocale(context).changePassword}',
+                  '${Utils.getLocale(context)!.changePassword}',
                   style: _drawerTextStyle(),
                 ),
               ),
@@ -1527,7 +1553,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   /*Navigator.of(context).pushReplacement(
                             MaterialPageRoute(builder: (context) => LoginScreen()));*/
                   Utils.showLoading(context,
-                      textContent: Utils.getLocale(context).waitForLogin);
+                      textContent: Utils.getLocale(context)!.waitForLogin);
                   Future.delayed(Duration(milliseconds: 1000), () {
                     Navigator.of(context, rootNavigator: true).pop();
                     Navigator.of(context).pushReplacementNamed(AppRouter.login);
@@ -1535,7 +1561,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
                 leading: Icon(Icons.exit_to_app),
                 title: Text(
-                  Utils.getLocale(context).logout,
+                  Utils.getLocale(context)!.logout,
                   style: _drawerTextStyle(),
                 ),
               ),
@@ -1564,12 +1590,15 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) => NotificationScreen()));
             },
-            child: Badge(
-              position: BadgePosition.topEnd(top: 6, end: 6),
-              animationDuration: Duration(milliseconds: 300),
-              animationType: BadgeAnimationType.slide,
+            child: badges.Badge(
+              position: badges.BadgePosition.topEnd(top: 6, end: 6),
+              badgeAnimation: badges.BadgeAnimation.slide(
+                animationDuration: Duration(milliseconds: 300),
+              ),
+              badgeStyle: badges.BadgeStyle(
+                badgeColor: Colors.blue,
+              ),
               showBadge: count > 0,
-              badgeColor: Colors.blue,
               badgeContent: Text(
                 count < 10 ? count.toString() : '9+',
                 style: TextStyle(
@@ -1590,7 +1619,7 @@ class _HomeScreenState extends State<HomeScreen> {
 class SearchBoxFlexible extends StatelessWidget {
   final OrderBloc orderBloc;
   final double appBarHeight = 66.0;
-  final ValueChanged<String> onCustomerCodeChange;
+  final ValueChanged<String>? onCustomerCodeChange;
 
   const SearchBoxFlexible(this.orderBloc, {this.onCustomerCodeChange});
 
@@ -1612,7 +1641,7 @@ class SearchBoxFlexible extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 OrderFilterWidget(
-                  snapshot.data,
+                  snapshot.data!,
                   onCustomerCodeChange: this.onCustomerCodeChange,
                 ),
                 Padding(
@@ -1622,13 +1651,13 @@ class SearchBoxFlexible extends StatelessWidget {
                       List<int> result = await Navigator.of(context).push(
                           MaterialPageRoute(
                               builder: (_) => SelectOrderStatusScreen(
-                                  snapshot.data.statusList)));
+                                  snapshot.data!.statusList)));
 
                       if (result == null || result.isEmpty) {
                         result = []..addAll(OrderStatus.values);
                       }
 
-                      OrderFilter filter = snapshot.data;
+                      OrderFilter filter = snapshot.data!;
                       filter.statusList = result;
                       orderBloc.updateFilter(filter);
                     },
@@ -1636,7 +1665,7 @@ class SearchBoxFlexible extends StatelessWidget {
                       mainAxisSize: MainAxisSize.max,
                       children: [
                         Text(
-                          Utils.getLocale(context).status,
+                          Utils.getLocale(context)!.status,
                           style: TextStyle(color: Colors.white),
                         ),
                         const SizedBox(width: 10.0),
@@ -1651,7 +1680,7 @@ class SearchBoxFlexible extends StatelessWidget {
                                     alignment: Alignment.centerRight,
                                     child: Text(
                                       _getStatusText(
-                                          context, snapshot.data.statusList),
+                                          context, snapshot.data!.statusList),
                                       style: TextStyle(color: Colors.white),
                                       overflow: TextOverflow.ellipsis,
                                       maxLines: 1,
@@ -1678,7 +1707,7 @@ class SearchBoxFlexible extends StatelessWidget {
 
   String _getStatusText(BuildContext context, List<int> statusList) {
     if (statusList.length == OrderStatus.values.length)
-      return '${Utils.getLocale(context).all}';
+      return '${Utils.getLocale(context)!.all}';
     List<String> statusStrings =
         statusList.map((o) => Utils.getOrderStatusString(context, o)).toList();
     return statusStrings.join(', ');

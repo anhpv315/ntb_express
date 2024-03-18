@@ -12,10 +12,10 @@ part 'order.g.dart';
 
 @JsonSerializable()
 class Order {
-  String orderId;
+  String? orderId;
   int addressId;
   double? commission;
-  num createdDate;
+  num? createdDate;
   String createdId;
   String customerId;
   double? extFee;
@@ -23,7 +23,7 @@ class Order {
   String goodsDescr;
   int goodsType;
   double? intFee;
-  String intTrackNo;
+  String? intTrackNo;
   double? payOnBehalf;
   int needRepack;
   double? repackFee;
@@ -37,7 +37,7 @@ class Order {
   double? weight;
   String note;
   String nextWarehouse;
-  int promotionId;
+  int? promotionId;
   List<TCCOFile?>? tccoFileDTOS;
   Address? addressDTO;
   User? customerDTO;

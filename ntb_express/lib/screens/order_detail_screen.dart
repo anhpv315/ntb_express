@@ -16,6 +16,8 @@ import 'package:ntbexpress/widgets/image_gallery.dart';
 import 'package:ntbexpress/widgets/info_item.dart';
 import 'package:ntbexpress/widgets/order_tracking_timeline.dart';
 
+import '../widgets/raised_button.dart';
+
 class OrderDetailScreen extends StatefulWidget {
   final Order order;
 
@@ -32,36 +34,36 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
   bool _initialized = false;
   bool _statusTapped = false;
 
-  Order _order;
+  late Order _order;
 
   bool get isConfirmWoodenPacking =>
-      _order.orderStatus == OrderStatus.pendingWoodenPacking;
+       _order!.orderStatus == OrderStatus.pendingWoodenPacking;
 
   bool get canEdit =>
-      Utils.canEditOrders(SessionUtil.instance().user, _order) &&
+      Utils.canEditOrders(SessionUtil.instance()!.user!, _order) &&
       !isConfirmWoodenPacking;
 
   bool get isChineseStaff =>
       SessionUtil.instance()?.user?.userType == UserType.chineseWarehouseStaff;
 
   bool get isAllowEditAgentFee =>
-      SessionUtil.instance().user.userType == UserType.admin ||
-      SessionUtil.instance().user.userType == UserType.customer ||
-      SessionUtil.instance().user.userType == UserType.saleStaff;
+      SessionUtil.instance()?.user?.userType == UserType.admin ||
+      SessionUtil.instance()?.user?.userType == UserType.customer ||
+      SessionUtil.instance()?.user?.userType == UserType.saleStaff;
 
   @override
   void initState() {
     super.initState();
-    _order = widget.order == null ? null : Order.clone(widget.order);
+    _order = (widget.order == null ? null : Order.clone(widget.order))!;
   }
 
   Future<void> _init() async {
     _sortOrderTracks();
 
-    if (_order.tccoFileDTOS != null) {
-      for (var f in _order.tccoFileDTOS) {
+    if ( _order!.tccoFileDTOS != null) {
+      for (var f in  _order!.tccoFileDTOS!) {
         if (f == null) continue;
-        final url = '${ApiUrls.instance().baseUrl}/${f.flePath}';
+        final url = '${ApiUrls.instance()?.baseUrl}/${f.flePath}';
         if (!(await Utils.isUrlValid(url))) continue;
 
         setState(() {
@@ -76,8 +78,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
   }
 
   void _sortOrderTracks() {
-    if (_order.orderTrackDTOS != null) {
-      _order.orderTrackDTOS.sort((a, b) => b.actionDate - a.actionDate);
+    if ( _order!.orderTrackDTOS != null) {
+       _order!.orderTrackDTOS?.sort((a, b) => b!.actionDate - a!.actionDate);
     }
   }
 
@@ -99,7 +101,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
             Navigator.of(context).pop();
           },
         ),
-        title: Text('${Utils.getLocale(context).orderInformation}'),
+        title: Text('${Utils.getLocale(context)!.orderInformation}'),
         actions: [
           !canEdit
               ? SizedBox()
@@ -116,7 +118,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                                     order: _order, update: true)));
                         if (orderEdited == null) return;
                         HttpUtil.get(
-                          ApiUrls.instance().getOrderUrl(orderEdited.orderId),
+                          ApiUrls.instance()!.getOrderUrl(orderEdited.orderId!)!,
                           headers: {
                             'Content-Type': 'application/json; charset=utf-8'
                           },
@@ -140,7 +142,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                         padding: const EdgeInsets.all(8.0),
                         child: Center(
                           child: Text(
-                            '${Utils.getLocale(context).edit}',
+                            '${Utils.getLocale(context)!.edit}',
                             style: TextStyle(color: Colors.white, fontSize: 16),
                           ),
                         ),
@@ -160,85 +162,85 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                 HideOnCondition(
                   hideOn: isChineseStaff,
                   child: InfoItem(
-                    firstText: '${Utils.getLocale(context).customerName}',
-                    secondText: '${_order.customerDTO?.fullName}',
+                    firstText: '${Utils.getLocale(context)!.customerName}',
+                    secondText: '${ _order!.customerDTO?.fullName}',
                   ),
                 ),
                 _divider(),
                 HideOnCondition(
                   hideOn:
-                      Utils.isNullOrEmpty(_order.customerId) || isChineseStaff,
+                      Utils.isNullOrEmpty( _order!.customerId) || isChineseStaff,
                   child: InfoItem(
-                    firstText: '${Utils.getLocale(context).customerCode}',
-                    secondText: _order.customerId,
+                    firstText: '${Utils.getLocale(context)!.customerCode}',
+                    secondText:  _order!.customerId,
                   ),
                 ),
                 _divider(),
                 HideOnCondition(
-                  hideOn: _order.addressDTO == null || isChineseStaff,
+                  hideOn:  _order!.addressDTO == null || isChineseStaff,
                   child: InfoItem(
                     useWidget: true,
                     breakLine: true,
-                    firstChild: Text('${Utils.getLocale(context).address}'),
+                    firstChild: Text('${Utils.getLocale(context)!.address}'),
                     bottomChild: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '${_order.addressDTO.fullName}',
+                            '${ _order!.addressDTO?.fullName}',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          Text('${_order.addressDTO.phoneNumber}'),
+                          Text('${ _order!.addressDTO?.phoneNumber}'),
                           Text('${[
-                            _order.addressDTO.address,
-                            _order.addressDTO.wards,
-                            _order.addressDTO.district,
-                            _order.addressDTO.province
+                             _order!.addressDTO?.address,
+                             _order!.addressDTO?.wards,
+                             _order!.addressDTO?.district,
+                             _order!.addressDTO?.province
                           ].join(', ')?.replaceAll(' ,', '')}'),
                         ],
                       ),
-                    ),
+                    ), firstText: '',
                   ),
                 ),
                 _divider(),
                 HideOnCondition(
-                  hideOn: Utils.isNullOrEmpty(_order.intTrackNo),
+                  hideOn: Utils.isNullOrEmpty( _order!.intTrackNo),
                   child: InfoItem(
-                    firstText: '${Utils.getLocale(context).chineseWaybillCode}',
-                    secondText: _order.intTrackNo,
+                    firstText: '${Utils.getLocale(context)!.chineseWaybillCode}',
+                    secondText:  _order!.intTrackNo,
                   ),
                 ),
                 _divider(),
                 HideOnCondition(
-                  hideOn: Utils.isNullOrEmpty(_order.orderId),
+                  hideOn: Utils.isNullOrEmpty( _order!.orderId),
                   child: InfoItem(
                     useWidget: true,
                     firstChild: Text(
-                        '${Utils.getLocale(context).internationalWaybillCode}'),
+                        '${Utils.getLocale(context)!.internationalWaybillCode}'),
                     secondChild: Text(
-                      Utils.getDisplayOrderId(_order.orderId),
+                      Utils.getDisplayOrderId( _order!.orderId!),
                       style: TextStyle(
                           fontWeight: FontWeight.bold, color: Colors.orange),
-                    ),
+                    ), firstText: '',
                   ),
                 ),
                 _divider(),
                 HideOnCondition(
-                  hideOn: _order.packCount == null || _order.packCount == 0,
+                  hideOn:  _order!.packCount == null ||  _order!.packCount == 0,
                   child: InfoItem(
-                    firstText: '${Utils.getLocale(context).packageQuantity}',
-                    secondText: '${_order.packCount}',
+                    firstText: '${Utils.getLocale(context)!.packageQuantity}',
+                    secondText: '${ _order!.packCount}',
                   ),
                 ),
                 _divider(),
                 HideOnCondition(
-                  hideOn: _order.orderStatus == null,
+                  hideOn:  _order!.orderStatus == null,
                   child: InfoItem(
                     useWidget: true,
-                    firstChild: Text('${Utils.getLocale(context).status}'),
+                    firstChild: Text('${Utils.getLocale(context)!.status}'),
                     secondChild: Material(
                       child: InkWell(
                         onTap: () {
@@ -247,7 +249,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                           });
                         },
                         child: Text(
-                          '${Utils.getOrderStatusString(context, _order.orderStatus)}',
+                          '${Utils.getOrderStatusString(context,  _order!.orderStatus)}',
                           style: TextStyle(
                             color: Colors.blue,
                           ),
@@ -255,120 +257,119 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                       ),
                     ),
                     bottomChild: AnimatedSize(
-                      vsync: this,
                       duration: const Duration(milliseconds: 200),
                       child: !_statusTapped
                           ? null
                           : OrderTrackingTimeline(
-                              tracks: _order.orderTrackDTOS,
+                              tracks:  _order!.orderTrackDTOS!,
                             ),
-                    ),
+                    ), firstText: '',
                   ),
                 ),
                 _divider(),
                 HideOnCondition(
-                  hideOn: _order.createdDate == null,
+                  hideOn:  _order!.createdDate == null,
                   child: InfoItem(
-                    firstText: '${Utils.getLocale(context).timeCreated}',
-                    //secondText: _order.createdDate,
+                    firstText: '${Utils.getLocale(context)!.timeCreated}',
+                    //secondText:  _order!.createdDate,
                     secondText: Utils.getDateString(
-                        _order.createdDate, commonDateFormat),
+                         _order!.createdDate!, commonDateFormat),
                   ),
                 ),
                 _divider(),
                 HideOnCondition(
-                  hideOn: _order.goodsType == null || _order.goodsType == 0,
+                  hideOn:  _order!.goodsType == null ||  _order!.goodsType == 0,
                   child: InfoItem(
-                    firstText: '${Utils.getLocale(context).type}',
+                    firstText: '${Utils.getLocale(context)!.type}',
                     secondText:
-                        Utils.getGoodsTypeString(context, _order.goodsType),
+                        Utils.getGoodsTypeString(context,  _order!.goodsType),
                   ),
                 ),
                 _divider(),
                 HideOnCondition(
-                  hideOn: Utils.isNullOrEmpty(_order.goodsDescr),
+                  hideOn: Utils.isNullOrEmpty( _order!.goodsDescr),
                   child: InfoItem(
-                    firstText: '${Utils.getLocale(context).description}',
-                    secondText: _order.goodsDescr,
+                    firstText: '${Utils.getLocale(context)!.description}',
+                    secondText:  _order!.goodsDescr,
                   ),
                 ),
                 _divider(),
                 HideOnCondition(
-                  hideOn: _order.weight == null || _order.weight == 0.0,
+                  hideOn:  _order!.weight == null ||  _order!.weight == 0.0,
                   child: InfoItem(
-                    firstText: '${Utils.getLocale(context).weight}',
-                    secondText: '${_order.weight} (kg)',
+                    firstText: '${Utils.getLocale(context)!.weight}',
+                    secondText: '${ _order!.weight} (kg)',
                   ),
                 ),
                 _divider(),
                 HideOnCondition(
-                  hideOn: _order.size == null || _order.size == 0.0,
+                  hideOn:  _order!.size == null ||  _order!.size == 0.0,
                   child: InfoItem(
-                    firstText: '${Utils.getLocale(context).size}',
-                    secondText: '${_order.size} (m³)',
+                    firstText: '${Utils.getLocale(context)!.size}',
+                    secondText: '${ _order!.size} (m³)',
                   ),
                 ),
                 _divider(),
                 HideOnCondition(
-                  hideOn: Utils.isNullOrEmpty(_order.note),
+                  hideOn: Utils.isNullOrEmpty( _order!.note),
                   child: InfoItem(
-                    firstText: '${Utils.getLocale(context).note}',
-                    secondText: '${_order.note}',
+                    firstText: '${Utils.getLocale(context)!.note}',
+                    secondText: '${ _order!.note}',
                   ),
                 ),
                 _divider(),
                 HideOnCondition(
-                  hideOn: Utils.isNullOrEmpty(_order.licensePlates),
+                  hideOn: Utils.isNullOrEmpty( _order!.licensePlates),
                   child: InfoItem(
-                    firstText: '${Utils.getLocale(context).licensePlates}',
-                    secondText: '${_order.licensePlates}',
+                    firstText: '${Utils.getLocale(context)!.licensePlates}',
+                    secondText: '${ _order!.licensePlates}',
                   ),
                 ),
                 _divider(),
                 HideOnCondition(
-                  hideOn: _order.intFee == null || _order.intFee == 0.0,
+                  hideOn:  _order!.intFee == null ||  _order!.intFee == 0.0,
                   child: InfoItem(
                     firstText:
-                        '${Utils.getLocale(context).domesticShippingFee}',
-                    secondText: '${Utils.getMoneyString(_order.intFee)}',
+                        '${Utils.getLocale(context)!.domesticShippingFee}',
+                    secondText: '${Utils.getMoneyString( _order!.intFee!)}',
                   ),
                 ),
                 _divider(),
                 HideOnCondition(
                   hideOn: isChineseStaff ||
-                      (_order.extFee == null || _order.extFee == 0.0),
+                      ( _order!.extFee == null ||  _order!.extFee == 0.0),
                   child: InfoItem(
                       useWidget: true,
                       firstChild: Text(
-                          '${Utils.getLocale(context).internationalShippingFee}'),
+                          '${Utils.getLocale(context)!.internationalShippingFee}'),
                       secondChild: RichText(
                         textAlign: TextAlign.right,
                         text: TextSpan(text: '', children: [
                           TextSpan(
-                            text: _order.promotionDTO == null
+                            text:  _order!.promotionDTO == null
                                 ? ''
-                                : (_order.totalFeeOriginal == null ||
-                                        _order.totalFeeOriginal <= 0 ||
-                                        _order.totalFee >=
-                                            _order.totalFeeOriginal)
+                                : ( _order!.totalFeeOriginal == null ||
+                                         _order!.totalFeeOriginal <= 0 ||
+                                         _order!.totalFee! >=
+                                             _order!.totalFeeOriginal!)
                                     ? ''
                                     : NumberFormat.currency(
                                             locale: 'vi_VN', symbol: 'đ')
-                                        .format(_order.totalFeeOriginal),
+                                        .format( _order!.totalFeeOriginal),
                             style: TextStyle(
                                 color: Theme.of(context).disabledColor,
                                 decoration: TextDecoration.lineThrough,
                                 fontSize: 11.0),
                           ),
                           TextSpan(
-                            text: (_order.promotionDTO != null &&
-                                        _order.totalFeeOriginal != null &&
-                                        _order.totalFeeOriginal > 0 &&
-                                        _order.totalFee <
-                                            _order.totalFeeOriginal
+                            text: ( _order!.promotionDTO != null &&
+                                         _order!.totalFeeOriginal != null &&
+                                         _order!.totalFeeOriginal > 0 &&
+                                         _order!.totalFee! <
+                                             _order!.totalFeeOriginal!
                                     ? ' '
                                     : '') +
-                                '${Utils.getMoneyString(_order.totalFee ?? 0)}',
+                                '${Utils.getMoneyString( _order!.totalFee ?? 0)}',
                             style: TextStyle(
                               color: Colors.red,
                               fontWeight: FontWeight.bold,
@@ -378,18 +379,18 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                             text: !isAllowEditAgentFee
                                 ? ''
                                 : (_order == null ||
-                                        _order.totalFeeDaiLong == null ||
-                                        _order.totalFeeDaiLong == 0
+                                         _order!.totalFeeDaiLong == null ||
+                                         _order!.totalFeeDaiLong == 0
                                     ? ''
-                                    : ' (${Utils.getMoneyString(_order.totalFeeDaiLong ?? 0)})'),
+                                    : ' (${Utils.getMoneyString( _order!.totalFeeDaiLong ?? 0)})'),
                             style: TextStyle(
                               color: Colors.amber,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ]),
-                      ) /*Text(
-                      '${Utils.getMoneyString(_order.extFee)}',
+                      ), firstText: '', /*Text(
+                      '${Utils.getMoneyString( _order!.extFee)}',
                       style: TextStyle(
                         color: Colors.red,
                         fontWeight: FontWeight.bold,
@@ -399,11 +400,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                 ),
                 isChineseStaff ? SizedBox() : _divider(),
                 HideOnCondition(
-                  hideOn: _order.needRepack == null || _order.needRepack == 0,
+                  hideOn:  _order!.needRepack == null ||  _order!.needRepack == 0,
                   child: InfoItem(
-                    firstText: '${Utils.getLocale(context).packedByWoodenBox}',
+                    firstText: '${Utils.getLocale(context)!.packedByWoodenBox}',
                     secondText:
-                        '${_order?.needRepack != null && _order.needRepack > 0 ? '${Utils.getLocale(context).yes}${!isChineseStaff ? ' (${Utils.getMoneyString(_order.repackFee)})' : ''}' : '${Utils.getLocale(context).no}'}',
+                        '${_order?.needRepack != null &&  _order!.needRepack > 0 ? '${Utils.getLocale(context)!.yes}${!isChineseStaff ? ' (${Utils.getMoneyString( _order!.repackFee!)})' : ''}' : '${Utils.getLocale(context)!.no}'}',
                   ),
                 ),
                 _divider(),
@@ -414,10 +415,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('${Utils.getLocale(context).photosAttached}'),
+                      Text('${Utils.getLocale(context)!.photosAttached}'),
                       _files.isEmpty
                           ? Text(
-                              '${Utils.getLocale(context).empty}',
+                              '${Utils.getLocale(context)!.empty}',
                               style: TextStyle(
                                   color: Theme.of(context).disabledColor),
                             )
@@ -457,7 +458,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                                     child: GridTile(
                                       child: fileHolder == null
                                           ? Text(
-                                              '${Utils.getLocale(context).empty}')
+                                              '${Utils.getLocale(context)!.empty}')
                                           : Stack(
                                               fit: StackFit.expand,
                                               children: [
@@ -467,7 +468,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                                                         fit: BoxFit.cover,
                                                       )
                                                     : Image.file(
-                                                        fileHolder.file,
+                                                        fileHolder.file!,
                                                         fit: BoxFit.cover,
                                                       ),
                                               ],
@@ -497,7 +498,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
 
   Widget _buildButtons() {
     List<AllowAction> allowActions =
-        Utils.getAllowActionList(SessionUtil.instance().user, _order);
+        Utils.getAllowActionList(SessionUtil.instance()!.user!, _order);
     if (allowActions.isEmpty) return SizedBox();
     if (allowActions.length == 1 && allowActions.first == AllowAction.edit)
       return SizedBox();
@@ -519,21 +520,21 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                 onPressed: () {
                   Utils.confirm(
                     context,
-                    title: '${Utils.getLocale(context).confirmation}',
+                    title: '${Utils.getLocale(context)!.confirmation}',
                     message:
-                        '${Utils.getLocale(context).confirmCancelOrderMessage}',
+                        '${Utils.getLocale(context)!.confirmCancelOrderMessage}',
                     onAccept: () async {
                       _showWaiting();
                       _delay(() async {
                         bool success = await HttpUtil.updateOrderTrackingStatus(
-                            _order.orderId, ActionType.cancelOrder);
+                             _order!.orderId!, ActionType.cancelOrder);
                         // pop loading
                         _popLoading();
                         if (success) {
                           Order orderUpdated =
-                              await HttpUtil.getOrder(_order.orderId);
+                              await HttpUtil.getOrder( _order!.orderId!);
                           if (orderUpdated != null) {
-                            AppProvider.of(context)
+                            AppProvider.of(context)!
                                 .state
                                 .orderBloc
                                 .updateOrder(orderUpdated);
@@ -547,23 +548,23 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                           }
 
                           Utils.alert(context,
-                              title: Utils.getLocale(context).success,
-                              message: Utils.getLocale(context)
+                              title: Utils.getLocale(context)!.success,
+                              message: Utils.getLocale(context)!
                                   .cancelOrderSuccessMessage,
                               onAccept: () => Utils.popToFirstScreen(context));
-                          /*_scaffoldKey.currentState.showSnackBar(SnackBar(
+                          /*_scaffoldMesKey.currentState.showSnackBar(SnackBar(
                             content: Text(
-                              '${Utils.getLocale(context).cancelOrderSuccessMessage}',
+                              '${Utils.getLocale(context)!.cancelOrderSuccessMessage}',
                             ),
                           ));*/
                         } else {
                           Utils.alert(context,
-                              title: Utils.getLocale(context).failed,
-                              message: Utils.getLocale(context)
+                              title: Utils.getLocale(context)!.failed,
+                              message: Utils.getLocale(context)!
                                   .updateOrderStatusFailedMessage);
-                          /*_scaffoldKey.currentState.showSnackBar(SnackBar(
+                          /*_scaffoldMesKey.currentState.showSnackBar(SnackBar(
                             content: Text(
-                              '${Utils.getLocale(context).updateOrderStatusFailedMessage}!',
+                              '${Utils.getLocale(context)!.updateOrderStatusFailedMessage}!',
                             ),
                           ));*/
                         }
@@ -572,7 +573,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                   );
                 },
                 child: Text(
-                  '${Utils.getLocale(context).cancelOrder}',
+                  '${Utils.getLocale(context)!.cancelOrder}',
                   style: TextStyle(color: Colors.white),
                 ),
               ),
@@ -589,14 +590,14 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                   _showWaiting();
                   _delay(() async {
                     bool success = await HttpUtil.updateOrderTrackingStatus(
-                        _order.orderId, ActionType.confirmWoodenPacking);
+                         _order!.orderId!, ActionType.confirmWoodenPacking);
                     // pop loading
                     _popLoading();
                     if (success) {
                       Order orderUpdated =
-                          await HttpUtil.getOrder(_order.orderId);
+                          await HttpUtil.getOrder( _order!.orderId!);
                       if (orderUpdated != null) {
-                        AppProvider.of(context)
+                        AppProvider.of(context)!
                             .state
                             .orderBloc
                             .updateOrder(orderUpdated);
@@ -610,23 +611,23 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                       }
 
                       Utils.alert(context,
-                          title: Utils.getLocale(context).success,
-                          message: Utils.getLocale(context)
+                          title: Utils.getLocale(context)!.success,
+                          message: Utils.getLocale(context)!
                               .agreeToBoxWoodedSuccessMessage,
                           onAccept: () => Utils.popToFirstScreen(context));
-                      /*_scaffoldKey.currentState.showSnackBar(SnackBar(
+                      /*_scaffoldMesKey.currentState.showSnackBar(SnackBar(
                         content: Text(
-                          '${Utils.getLocale(context).agreeToBoxWoodedSuccessMessage}',
+                          '${Utils.getLocale(context)!.agreeToBoxWoodedSuccessMessage}',
                         ),
                       ));*/
                     } else {
                       Utils.alert(context,
-                          title: Utils.getLocale(context).failed,
-                          message: Utils.getLocale(context)
+                          title: Utils.getLocale(context)!.failed,
+                          message: Utils.getLocale(context)!
                               .updateOrderStatusFailedMessage);
-                      /*_scaffoldKey.currentState.showSnackBar(SnackBar(
+                      /*_scaffoldMesKey.currentState.showSnackBar(SnackBar(
                         content: Text(
-                          '${Utils.getLocale(context).failed}!',
+                          '${Utils.getLocale(context)!.failed}!',
                         ),
                       ));*/
                     }
@@ -634,7 +635,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                 },
                 color: Colors.green,
                 child: Text(
-                  '${Utils.getLocale(context).agreeToBoxWooden}',
+                  '${Utils.getLocale(context)!.agreeToBoxWooden}',
                   style: TextStyle(color: Colors.white),
                 ),
               ),
@@ -651,7 +652,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                     _updateOrderStatus(ActionType.chineseWarehouse),
                 color: Colors.green,
                 child: Text(
-                  '${Utils.getLocale(context).input}',
+                  '${Utils.getLocale(context)!.input}',
                   style: TextStyle(color: Colors.white),
                 ),
               ),
@@ -667,7 +668,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                 onPressed: () => _updateOrderStatus(ActionType.chineseStockOut),
                 color: Colors.green,
                 child: Text(
-                  '${Utils.getLocale(context).output}',
+                  '${Utils.getLocale(context)!.output}',
                   style: TextStyle(color: Colors.white),
                 ),
               ),
@@ -691,7 +692,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                 onPressed: () => _updateOrderStatus(actionType),
                 color: Colors.green,
                 child: Text(
-                  '${Utils.getLocale(context).input}',
+                  '${Utils.getLocale(context)!.input}',
                   style: TextStyle(color: Colors.white),
                 ),
               ),
@@ -714,7 +715,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                 onPressed: () => _updateOrderStatus(actionType),
                 color: Colors.green,
                 child: Text(
-                  '${Utils.getLocale(context).output}',
+                  '${Utils.getLocale(context)!.output}',
                   style: TextStyle(color: Colors.white),
                 ),
               ),
@@ -731,15 +732,15 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                     .delivery) /*{
                   Utils.confirm(
                     context,
-                    title: Utils.getLocale(context).confirmation,
-                    message: '${Utils.getLocale(context).orderDeliveryMessage}',
+                    title: Utils.getLocale(context)!.confirmation,
+                    message: '${Utils.getLocale(context)!.orderDeliveryMessage}',
                     onAccept: () => _updateOrderStatus(ActionType.delivery),
                   );
                 }*/
                 ,
                 color: Colors.orange,
                 child: Text(
-                  '${Utils.getLocale(context).delivery}',
+                  '${Utils.getLocale(context)!.delivery}',
                   style: TextStyle(color: Colors.white),
                 ),
               ),
@@ -756,15 +757,15 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                   _updateOrderStatus(ActionType.delivered);
                   /*Utils.confirm(
                     context,
-                    title: Utils.getLocale(context).confirmation,
+                    title: Utils.getLocale(context)!.confirmation,
                     message:
-                        '${Utils.getLocale(context).orderDeliveredMessage}',
+                        '${Utils.getLocale(context)!.orderDeliveredMessage}',
                     onAccept: () => _updateOrderStatus(ActionType.delivered),
                   );*/
                 },
                 color: Colors.green,
                 child: Text(
-                  '${Utils.getLocale(context).delivered}',
+                  '${Utils.getLocale(context)!.delivered}',
                   style: TextStyle(color: Colors.white),
                 ),
               ),
@@ -780,7 +781,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                 onPressed: () => _updateOrderStatus(ActionType.completed),
                 color: Colors.indigo,
                 child: Text(
-                  '${Utils.getLocale(context).completed}',
+                  '${Utils.getLocale(context)!.completed}',
                   style: TextStyle(color: Colors.white),
                 ),
               ),
@@ -803,7 +804,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
       ActionType.outputHaNoi
     ].contains(actionType)) output = true;
 
-    ConfirmationStatus status;
+    ConfirmationStatus? status;
     bool isOutput = false;
     if ([
       ActionType.chineseWarehouse,
@@ -833,14 +834,14 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
     _showWaiting();
     _delay(() async {
       bool success = await HttpUtil.updateOrderTrackingStatus(
-          _order.orderId, actionType,
+           _order!.orderId!, actionType,
           confirmStatus: status);
       // pop loading
       _popLoading();
       if (success) {
-        Order orderUpdated = await HttpUtil.getOrder(_order.orderId);
+        Order orderUpdated = await HttpUtil.getOrder( _order!.orderId!);
         if (orderUpdated != null) {
-          AppProvider.of(context).state.orderBloc.updateOrder(orderUpdated);
+          AppProvider.of(context)!.state.orderBloc.updateOrder(orderUpdated);
 
           setState(() {
             _order = orderUpdated;
@@ -852,21 +853,21 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
         }
 
         Utils.alert(context,
-            title: Utils.getLocale(context).success,
-            message: Utils.getLocale(context).orderStatusUpdatedMessage,
+            title: Utils.getLocale(context)!.success,
+            message: Utils.getLocale(context)!.orderStatusUpdatedMessage,
             onAccept: () => Utils.popToFirstScreen(context));
-        /*_scaffoldKey.currentState.showSnackBar(SnackBar(
+        /*_scaffoldMesKey.currentState.showSnackBar(SnackBar(
           content: Text(
-            '${Utils.getLocale(context).inputSuccessMessage}',
+            '${Utils.getLocale(context)!.inputSuccessMessage}',
           ),
         ));*/
       } else {
         Utils.alert(context,
-            title: Utils.getLocale(context).failed,
-            message: Utils.getLocale(context).updateOrderStatusFailedMessage);
-        /*_scaffoldKey.currentState.showSnackBar(SnackBar(
+            title: Utils.getLocale(context)!.failed,
+            message: Utils.getLocale(context)!.updateOrderStatusFailedMessage);
+        /*_scaffoldMesKey.currentState.showSnackBar(SnackBar(
           content: Text(
-            '${Utils.getLocale(context).updateOrderStatusFailedMessage}',
+            '${Utils.getLocale(context)!.updateOrderStatusFailedMessage}',
           ),
         ));*/
       }
@@ -881,7 +882,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
 
   void _showWaiting() {
     Utils.showLoading(context,
-        textContent: Utils.getLocale(context).waitForLogin);
+        textContent: Utils.getLocale(context)!.waitForLogin);
   }
 
   void _popLoading() {

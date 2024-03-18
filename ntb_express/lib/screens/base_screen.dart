@@ -61,7 +61,7 @@ class _BaseScreenState extends State<BaseScreen> {
                 color: Utils.accentColor,
                 textColor: Colors.white,
                 child: Text(
-                  Utils.getLocale(context).login,
+                  Utils.getLocale(context)!.login,
                   style: TextStyle(
                     fontSize: 20.0,
                   ),
@@ -77,7 +77,7 @@ class _BaseScreenState extends State<BaseScreen> {
                 color: Utils.accentColor,
                 textColor: Colors.white,
                 child: Text(
-                  Utils.getLocale(context).register,
+                  Utils.getLocale(context)!.register,
                   style: TextStyle(
                     fontSize: 20.0,
                   ),

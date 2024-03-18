@@ -11,7 +11,7 @@ import 'package:ntbexpress/util/utils.dart';
 import 'package:random_string/random_string.dart';
 
 class RegisterScreen extends StatefulWidget {
-  final User currentUser;
+  final User? currentUser;
 
   RegisterScreen({this.currentUser});
 
@@ -30,10 +30,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _phoneNumberFocusNode = FocusNode();
   final _emailFocusNode = FocusNode();
   bool _hasChanged = false;
-  User _user;
-  User _immutableUser;
+  late User _user;
+  late User _immutableUser;
 
-  User get currentUser => SessionUtil.instance().user;
+  User? get currentUser => SessionUtil.instance()?.user;
 
   @override
   void initState() {
@@ -80,8 +80,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
               Utils.confirm(
                 context,
-                title: '${Utils.getLocale(context).saveChanges}?',
-                message: Utils.getLocale(context).saveChangesMessage,
+                title: '${Utils.getLocale(context)?.saveChanges}?',
+                message: Utils.getLocale(context)!.saveChangesMessage,
                 onAccept: () {
                   _saveData(done: (user) => Navigator.of(context).pop(user));
                 },
@@ -90,7 +90,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             },
             icon: Icon(Icons.close, color: Colors.white,),
           ),
-          title: Text('${Utils.getLocale(context).register}'),
+          title: Text('${Utils.getLocale(context)?.register}'),
           actions: [
             IconButton(
               onPressed: !_hasChanged
@@ -118,9 +118,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       controller: _fullNameController,
                       textInputAction: TextInputAction.next,
                       decoration: InputDecoration(
-                        labelText: Utils.getLocale(context).fullName,
+                        labelText: Utils.getLocale(context)?.fullName,
                         hintText:
-                            '${Utils.getLocale(context).enter} ${Utils.getLocale(context).fullName.toLowerCase()}...',
+                            '${Utils.getLocale(context)?.enter} ${Utils.getLocale(context)?.fullName.toLowerCase()}...',
                         counterText: '',
                       ),
                       maxLength: 50,
@@ -132,7 +132,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       validator: (value) {
                         if (value == null || value!.isEmpty)
 
-                          return Utils.getLocale(context).required;
+                          return Utils.getLocale(context)?.required;
 
                         return null;
                       },
@@ -143,9 +143,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       keyboardType: TextInputType.phone,
                       textInputAction: TextInputAction.next,
                       decoration: InputDecoration(
-                        labelText: Utils.getLocale(context).phoneNumber,
+                        labelText: Utils.getLocale(context)?.phoneNumber,
                         hintText:
-                        '${Utils.getLocale(context).enter} ${Utils.getLocale(context).phoneNumber.toLowerCase()}...',
+                        '${Utils.getLocale(context)?.enter} ${Utils.getLocale(context)?.phoneNumber.toLowerCase()}...',
                         counterText: '',
                       ),
                       maxLength: 12,
@@ -157,9 +157,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       validator: (value) {
                         if (value == null || value!.isEmpty)
 
-                          return Utils.getLocale(context).required;
+                          return Utils.getLocale(context)?.required;
                         if (!Utils.isPhoneNumberValid(value))
-                          return '${Utils.getLocale(context).phoneNumber} ${Utils.getLocale(context).wrongFormat}';
+                          return '${Utils.getLocale(context)?.phoneNumber} ${Utils.getLocale(context)?.wrongFormat}';
 
                         return null;
                       },
@@ -170,18 +170,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         controller: _customerCodeController,
                         textInputAction: TextInputAction.next,
                         decoration: InputDecoration(
-                          labelText: Utils.getLocale(context).customerCode,
+                          labelText: Utils.getLocale(context)?.customerCode,
                           hintText:
-                              '${Utils.getLocale(context).enter} ${Utils.getLocale(context).customerCode.toLowerCase()}...',
+                              '${Utils.getLocale(context)?.enter} ${Utils.getLocale(context)?.customerCode.toLowerCase()}...',
                           counterText: '',
                         ),
                         maxLength: 50,
                         validator: (value) {
                           if (value == null || value!.isEmpty)
 
-                            return '${Utils.getLocale(context).required}';
+                            return '${Utils.getLocale(context)?.required}';
                           if (RegExp(r'[^a-zA-Z_0-9]+').hasMatch(value))
-                            return '${Utils.getLocale(context).customerCode} ${Utils.getLocale(context).wrongFormat}';
+                            return '${Utils.getLocale(context)?.customerCode} ${Utils.getLocale(context)?.wrongFormat}';
 
                           return null;
                         },
@@ -193,9 +193,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       keyboardType: TextInputType.emailAddress,
                       textInputAction: TextInputAction.done,
                       decoration: InputDecoration(
-                        labelText: Utils.getLocale(context).email,
+                        labelText: Utils.getLocale(context)?.email,
                         hintText:
-                            '${Utils.getLocale(context).enter} ${Utils.getLocale(context).email.toLowerCase()}...',
+                            '${Utils.getLocale(context)?.enter} ${Utils.getLocale(context)?.email.toLowerCase()}...',
                         counterText: '',
                       ),
                       maxLength: 50,
@@ -205,9 +205,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       validator: (value) {
                         if (value == null || value!.isEmpty)
 
-                          return '${Utils.getLocale(context).required}';
+                          return '${Utils.getLocale(context)?.required}';
                         if (!Utils.isEmailValid(value))
-                          return '${Utils.getLocale(context).email} ${Utils.getLocale(context).wrongFormat}';
+                          return '${Utils.getLocale(context)?.email} ${Utils.getLocale(context)?.wrongFormat}';
 
                         return null;
                       },
@@ -223,15 +223,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  void _saveData({ValueChanged<User> done}) {
-    if (!_formKey.currentState.validate()) {
+  void _saveData({ValueChanged<User?>? done}) {
+    if (!_formKey.currentState!.validate()) {
       return;
     }
 
     // prepare data
     _user.username = _user.phoneNumber;
     _user.password = _generatePassword();
-    //_user.managerId = currentUser.username;
+    //_user.managerId = currentUser?.username;
     _user.userType = UserType.customer;
     _user.isCreate = 1; // 1: create new, other: update
     if (Utils.isNullOrEmpty(_user.email)) {
@@ -242,7 +242,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _showWaiting();
     Future.delayed(Duration(milliseconds: 500), () async {
       HttpUtil.postRegister(
-        ApiUrls.instance().getRegisterUrl(),
+        ApiUrls.instance()!.getRegisterUrl()!,
         user: _user,
         onDone: (resp) async {
           print(resp);
@@ -254,9 +254,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             String error = json == null ? '' : json['message'];
             Utils.alert(
               context,
-              title: Utils.getLocale(context).failed,
+              title: Utils.getLocale(context)?.failed,
               message:
-                  '${Utils.getLocale(context).errorOccurred} ${resp?.statusCode}\n$error',
+                  '${Utils.getLocale(context)?.errorOccurred} ${resp?.statusCode}\n$error',
               onAccept: () {
                 // ignored
               },
@@ -265,13 +265,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
           }
 
           dynamic json = jsonDecode(utf8.decode(resp.bodyBytes));
-          User savedUser = json == null ? null : User.fromJson(json);
+          User? savedUser = json == null ? null : User.fromJson(json);
           if (savedUser != null) {
             _popLoading();
             Utils.alert(
               context,
-              title: Utils.getLocale(context).success,
-              message: Utils.getLocale(context).registerSuccessMessage,
+              title: Utils.getLocale(context)?.success,
+              message: Utils.getLocale(context)?.registerSuccessMessage,
               onAccept: () {
                 if (done != null) {
                   done(savedUser);
@@ -282,8 +282,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             _popLoading();
             Utils.alert(
               context,
-              title: Utils.getLocale(context).success,
-              message: '${Utils.getLocale(context).createUserSuccessMessage}',
+              title: Utils.getLocale(context)?.success,
+              message: '${Utils.getLocale(context)?.createUserSuccessMessage}',
               onAccept: () {
                 if (done != null) {
                   done(savedUser);
@@ -304,7 +304,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   void _showWaiting() {
     Utils.showLoading(context,
-        textContent: Utils.getLocale(context).waitForLogin);
+        textContent: Utils.getLocale(context)!.waitForLogin);
   }
 
   void _popLoading() {
@@ -351,19 +351,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
             _user.phoneNumber.length > 4 ? _user.phoneNumber.length - 4 : 0);
     _customerCodeController.text =
         Utils.changeAlias('${name.toLowerCase()}$phone');
-    _user.customerId = _customerCodeController.text?.trim();
+    _user.customerId = _customerCodeController.text!.trim();
   }
 
   // Listeners
   void _fullNameListener() {
-    _user.fullName = _fullNameController.text?.trim();
+    _user.fullName = _fullNameController.text!.trim();
     _makeCustomerId();
 
     _updateUI();
   }
 
   void _phoneNumberListener() {
-    _user.phoneNumber = _phoneNumberController.text?.trim();
+    _user.phoneNumber = _phoneNumberController.text!.trim();
     _makeCustomerId();
 
     _updateUI();
@@ -375,7 +375,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void _customerIdListener() {
-    _user.customerId = _customerCodeController.text?.trim();
+    _user.customerId = _customerCodeController.text!.trim();
     _updateUI();
   }
 

@@ -87,7 +87,7 @@ class _GalleryPhotoViewWrapperState extends State<GalleryPhotoViewWrapper> {
     return PhotoViewGalleryPageOptions(
       imageProvider: (item.isNetworkImage
           ? NetworkImage(item.fileUrl)
-          : FileImage(item.file)) as ImageProvider,
+          : FileImage(item.file!)) as ImageProvider,
       initialScale: PhotoViewComputedScale.contained,
       minScale: PhotoViewComputedScale.contained * (0.5 + index / 10),
       maxScale: PhotoViewComputedScale.covered * 1.1,

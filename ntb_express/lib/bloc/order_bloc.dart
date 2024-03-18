@@ -59,7 +59,7 @@ class OrderBloc {
   }
 
   // Update filter
-  void updateFilter(OrderFilter filter, {required VoidCallback done}) {
+  void updateFilter(OrderFilter filter, {VoidCallback? done}) {
     if (filter == null) return;
     _filter.statusList = filter.statusList;
     _filter.customerId = filter.customerId;
@@ -74,7 +74,7 @@ class OrderBloc {
     fetch(reset: true, done: done);
   }
 
-  void fetch({int page = 0, bool reset = false, required VoidCallback done}) {
+  void fetch({int page = 0, bool reset = false, VoidCallback? done}) {
     if (reset) page = 0;
     _currentPage = page;
 
@@ -120,12 +120,12 @@ class OrderBloc {
       );
     } else {
       print('User does not logged in!');
-      done.call();
+      done?.call();
     }
   }
 
   void _sort() {
-    _orders.sort((a, b) => (b.createdDate - a.createdDate).toInt());
+    _orders.sort((a, b) => (b.createdDate! - a.createdDate!).toInt());
   }
 
   void _addAll(List<Order> orderList) {

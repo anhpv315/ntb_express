@@ -41,18 +41,18 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
     if (!widget.isUpdate) {
       User? user = widget.forUser;
       if (user == null) {
-        user = User.clone(SessionUtil.instance().user);
+        user = User.clone(SessionUtil.instance()?.user);
       }
 
       _address?.userName = user.username;
     } else {
-      _address?.updatedId = SessionUtil.instance().user.username;
+      _address?.updatedId = SessionUtil.instance()!.user!.username;
     }
 
     if (widget.forUser != null) {
       _address?.fullName = widget.forUser!.fullName;
       _address?.phoneNumber = widget.forUser!.phoneNumber;
-      _address?.email = widget.forUser!.email;
+      _address?.email = widget.forUser!.email!;
     }
     _immutableAddress = Address.clone(_address)!;
   }
@@ -155,9 +155,9 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
                   onTap: () async {
                     if (Utils.isNullOrEmpty(_address!.province)) {
                       Utils.alert(context,
-                          title: Utils.getLocale(context).required,
+                          title: Utils.getLocale(context)!.required,
                           message:
-                              '${Utils.getLocale(context).mustSelect} ${Utils.getLocale(context).province}!');
+                              '${Utils.getLocale(context)!.mustSelect} ${Utils.getLocale(context)!.province}!');
                       return;
                     }
 
@@ -167,7 +167,7 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
                       currentProvince: _address!.province,
                       currentDistrict: _address!.district,
                       title:
-                          '${Utils.getLocale(context).select} ${Utils.getLocale(context).district}',
+                          '${Utils.getLocale(context)!.select} ${Utils.getLocale(context)!.district}',
                     );
 
                     if (_address?.district != selectedDistrict) {
@@ -182,14 +182,14 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
                 ),
                 Divider(height: _dividerHeight),
                 InfoItem(
-                  firstText: '${Utils.getLocale(context).wards} ',
+                  firstText: '${Utils.getLocale(context)!.wards} ',
                   secondText: _address?.wards ?? '',
                   onTap: () async {
                     if (Utils.isNullOrEmpty(_address!.district)) {
                       Utils.alert(context,
-                          title: Utils.getLocale(context).required,
+                          title: Utils.getLocale(context)!.required,
                           message:
-                              '${Utils.getLocale(context).mustSelect} ${Utils.getLocale(context).district}!');
+                              '${Utils.getLocale(context)!.mustSelect} ${Utils.getLocale(context)!.district}!');
                       return;
                     }
 
@@ -200,7 +200,7 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
                       currentDistrict: _address!.district,
                       currentWards: _address!.wards,
                       title:
-                          '${Utils.getLocale(context).select} ${Utils.getLocale(context).wards}',
+                          '${Utils.getLocale(context)!.select} ${Utils.getLocale(context)!.wards}',
                     );
                     setState(() {
                       _address?.wards = selectedWards;
@@ -211,7 +211,7 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
                 Divider(height: _dividerHeight),
                 InfoItem(
                   firstText:
-                      '${Utils.getLocale(context).address} (${Utils.getLocale(context).apartmentNumberAndStreet}) ',
+                      '${Utils.getLocale(context)!.address} (${Utils.getLocale(context)!.apartmentNumberAndStreet}) ',
                   secondText: _address?.address ?? '',
                   alignTop: true,
                   breakLine: true,
@@ -233,16 +233,16 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
     String updatedText = await Utils.editScreen(context,
         currentValue: _address!.fullName,
         title:
-            '${Utils.getLocale(context).edit} ${Utils.getLocale(context).fullName.toLowerCase()}',
+            '${Utils.getLocale(context)!.edit} ${Utils.getLocale(context)!.fullName.toLowerCase()}',
         hintText:
-            '${Utils.getLocale(context).enter} ${Utils.getLocale(context).fullName.toLowerCase()}...',
+            '${Utils.getLocale(context)!.enter} ${Utils.getLocale(context)!.fullName.toLowerCase()}...',
         length: 50, onValidate: (value) {
       if (value == null || value!.isEmpty)
  {
         Utils.alert(context,
-            title: '${Utils.getLocale(context).errorOccurred}!',
+            title: '${Utils.getLocale(context)!.errorOccurred}!',
             message:
-                '${Utils.getLocale(context).mustEnter} ${Utils.getLocale(context).fullName.toLowerCase()}!');
+                '${Utils.getLocale(context)!.mustEnter} ${Utils.getLocale(context)!.fullName.toLowerCase()}!');
         return false;
       }
 
@@ -258,19 +258,19 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
   }
 
   Future<void> _updateEmail() async {
-    String email = Utils.getLocale(context).email.toLowerCase();
-    String errorOccurred = Utils.getLocale(context).errorOccurred;
+    String email = Utils.getLocale(context)!.email.toLowerCase();
+    String errorOccurred = Utils.getLocale(context)!.errorOccurred;
 
     String updatedText = await Utils.editScreen(context,
         currentValue: _address!.email,
-        title: '${Utils.getLocale(context).edit} $email',
-        hintText: '${Utils.getLocale(context).enter} $email...',
+        title: '${Utils.getLocale(context)!.edit} $email',
+        hintText: '${Utils.getLocale(context)!.enter} $email...',
         length: 50, onValidate: (value) {
       if (value == null || value!.isEmpty)
  {
         Utils.alert(context,
             title: '$errorOccurred!',
-            message: '${Utils.getLocale(context).mustEnter} $email!');
+            message: '${Utils.getLocale(context)!.mustEnter} $email!');
         return false;
       }
 
@@ -278,7 +278,7 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
         Utils.alert(context,
             title: '$errorOccurred!',
             message:
-                '${Utils.getLocale(context).email} ${Utils.getLocale(context).wrongFormat}!');
+                '${Utils.getLocale(context)!.email} ${Utils.getLocale(context)!.wrongFormat}!');
         return false;
       }
 
@@ -294,19 +294,19 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
   }
 
   Future<void> _updatePhoneNumber() async {
-    String phoneNumber = Utils.getLocale(context).phoneNumber.toLowerCase();
-    String errorOccurred = Utils.getLocale(context).errorOccurred;
+    String phoneNumber = Utils.getLocale(context)!.phoneNumber.toLowerCase();
+    String errorOccurred = Utils.getLocale(context)!.errorOccurred;
 
     String updatedText = await Utils.editScreen(context,
         currentValue: _address!.phoneNumber,
-        title: '${Utils.getLocale(context).edit} $phoneNumber',
-        hintText: '${Utils.getLocale(context).enter} $phoneNumber...',
+        title: '${Utils.getLocale(context)!.edit} $phoneNumber',
+        hintText: '${Utils.getLocale(context)!.enter} $phoneNumber...',
         length: 12, onValidate: (value) {
       if (value == null || value!.isEmpty)
  {
         Utils.alert(context,
             title: '$errorOccurred!',
-            message: '${Utils.getLocale(context).mustEnter} $phoneNumber!');
+            message: '${Utils.getLocale(context)!.mustEnter} $phoneNumber!');
         return false;
       }
 
@@ -314,7 +314,7 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
         Utils.alert(context,
             title: '$errorOccurred!',
             message:
-                '${Utils.getLocale(context).phoneNumber} ${Utils.getLocale(context).wrongFormat}!');
+                '${Utils.getLocale(context)!.phoneNumber} ${Utils.getLocale(context)!.wrongFormat}!');
         return false;
       }
 
@@ -330,13 +330,13 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
   }
 
   Future<void> _updateAddress() async {
-    String address = Utils.getLocale(context).address.toLowerCase();
+    String address = Utils.getLocale(context)!.address.toLowerCase();
 
     String updatedText = await Utils.editScreen(
       context,
       currentValue: _address!.address,
-      title: '${Utils.getLocale(context).edit} $address',
-      hintText: '${Utils.getLocale(context).enter} $address...',
+      title: '${Utils.getLocale(context)!.edit} $address',
+      hintText: '${Utils.getLocale(context)!.enter} $address...',
       length: 250,
     );
 
@@ -355,10 +355,10 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
     }
 
     Utils.showLoading(context,
-        textContent: Utils.getLocale(context).waitForLogin);
+        textContent: Utils.getLocale(context)!.waitForLogin);
     Future.delayed(Duration(milliseconds: 500), () async {
       HttpUtil.post(
-        ApiUrls.instance().getSaveAddressUrl(),
+        ApiUrls.instance()!.getSaveAddressUrl()!,
         headers: {'Content-Type': 'application/json; charset=utf-8'},
         body: _address!.toJson(),
         onResponse: (resp) async {
@@ -367,8 +367,8 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
             Navigator.of(context, rootNavigator: true).pop();
             Utils.alert(
               context,
-              title: Utils.getLocale(context).failed,
-              message: '${Utils.getLocale(context).cannotSaveAddressMessage}',
+              title: Utils.getLocale(context)!.failed,
+              message: '${Utils.getLocale(context)!.cannotSaveAddressMessage}',
               onAccept: () {
                 done?.call();
               },

@@ -261,7 +261,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
                                       fit: BoxFit.cover,
                                     )
                                   : Image.file(
-                                      fileHolder.file,
+                                      fileHolder.file!,
                                       fit: BoxFit.cover,
                                     ),
                               !widget.allowToDelete

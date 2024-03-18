@@ -1,4 +1,9 @@
 buildscript {
+//    ext{
+//        ext.kotlin_version = '1.9.10'
+//    }
+        ext.kotlin_version = '1.9.10' // Change here
+
     repositories {
         google()
         jcenter()
@@ -7,6 +12,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.0'
         classpath 'com.google.gms:google-services:4.3.3'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
@@ -25,6 +31,6 @@ subprojects {
     project.evaluationDependsOn(':app')
 }
 
-task clean(type: Delete) {
+tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class RaisedButton extends StatelessWidget {
   final Widget child;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final Color color;
   final Color textColor;
   final Color disabledColor;
@@ -11,7 +11,7 @@ class RaisedButton extends StatelessWidget {
   const RaisedButton({
     Key? key,
     required this.child,
-    required this.onPressed,
+    this.onPressed,
     this.color = Colors.blue,
     this.textColor = Colors.white,
     this.disabledColor = Colors.grey,

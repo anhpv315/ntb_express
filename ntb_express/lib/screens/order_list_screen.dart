@@ -12,14 +12,14 @@ import 'package:ntbexpress/util/extensions.dart';
 
 class OrderColor {
   static final Color newlyCreated = Colors.white;
-  static final Color waitWoodenConfirm = Colors.brown[50];
-  static final Color cancelled = Colors.grey[50];
-  static final Color myUser = Colors.green[100];
+  static final Color waitWoodenConfirm = Colors.brown[50]!;
+  static final Color cancelled = Colors.grey[50]!;
+  static final Color myUser = Colors.green[100]!;
 }
 
 class OrderFilterWidget extends StatefulWidget {
   final OrderFilter filter;
-  final ValueChanged<String> onCustomerCodeChange;
+  final ValueChanged<String>? onCustomerCodeChange;
 
   OrderFilterWidget(this.filter, {this.onCustomerCodeChange});
 
@@ -131,7 +131,7 @@ class _OrderFilterWidgetState extends State<OrderFilterWidget> {
                                           cursorColor: Colors.white,
                                           controller: _goodsDescrController,
                                           decoration: _decoration(
-                                            hintText: Utils.getLocale(context).description,
+                                            hintText: Utils.getLocale(context)!.description,
                                           ),
                                           style: TextStyle(
                                             color: Colors.white,
@@ -145,7 +145,7 @@ class _OrderFilterWidgetState extends State<OrderFilterWidget> {
                                           cursorColor: Colors.white,
                                           controller: _licensePlatesController,
                                           decoration: _decoration(
-                                            hintText: Utils.getLocale(context).licensePlates,
+                                            hintText: Utils.getLocale(context)!.licensePlates,
                                           ),
                                           style: TextStyle(
                                             color: Colors.white,
@@ -165,9 +165,9 @@ class _OrderFilterWidgetState extends State<OrderFilterWidget> {
                                                     ?.user
                                                     ?.userType ==
                                                 UserType.chineseWarehouseStaff
-                                            ? Utils.getLocale(context)
+                                            ? Utils.getLocale(context)!
                                                 .chineseWaybillCode
-                                            : Utils.getLocale(context)
+                                            : Utils.getLocale(context)!
                                                 .internationalWaybillCode),
                                     style: TextStyle(
                                       color: Colors.white,
@@ -181,7 +181,7 @@ class _OrderFilterWidgetState extends State<OrderFilterWidget> {
                                 onTap: () {
                                   FlutterBarcodeScanner.scanBarcode(
                                     '#ff6666',
-                                    '${Utils.getLocale(context).cancel}',
+                                    '${Utils.getLocale(context)!.cancel}',
                                     true,
                                     ScanMode.DEFAULT,
                                   ).then((value) {
@@ -228,7 +228,7 @@ class _OrderFilterWidgetState extends State<OrderFilterWidget> {
                       cursorColor: Colors.white,
                       controller: _customerIdController,
                       decoration: _decoration(
-                          hintText: Utils.getLocale(context).customerCode),
+                          hintText: Utils.getLocale(context)!.customerCode),
                       style: TextStyle(
                         color: Colors.white,
                       ),
@@ -245,7 +245,7 @@ class _OrderFilterWidgetState extends State<OrderFilterWidget> {
                       controller: _packCountController,
                       keyboardType: TextInputType.number,
                       decoration: _decoration(
-                          hintText: '${Utils.getLocale(context).packs[0].toUpperCase()}${Utils.getLocale(context).packs.substring(1)}'),
+                          hintText: '${Utils.getLocale(context)?.packs[0].toUpperCase()}${Utils.getLocale(context)?.packs.substring(1)}'),
                       style: TextStyle(
                         color: Colors.white,
                       ),
@@ -263,12 +263,12 @@ class _OrderFilterWidgetState extends State<OrderFilterWidget> {
     /*return Container(
       child: ExpansionTile(
         maintainState: true,
-        title: Text('${Utils.getLocale(context).search}'),
+        title: Text('${Utils.getLocale(context)!.search}'),
         childrenPadding: const EdgeInsets.all(10.0),
         backgroundColor: Colors.white,
         children: [
           InfoItem(
-            firstText: '${Utils.getLocale(context).status}',
+            firstText: '${Utils.getLocale(context)!.status}',
             secondText: _statusText,
             breakLine: _statusText.contains(',') ? true : false,
             onTap: () async {
@@ -290,7 +290,7 @@ class _OrderFilterWidgetState extends State<OrderFilterWidget> {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('${Utils.getLocale(context).customerCode}: '),
+              Text('${Utils.getLocale(context)!.customerCode}: '),
               Expanded(
                 child: Align(
                   alignment: Alignment.centerRight,
@@ -309,7 +309,7 @@ class _OrderFilterWidgetState extends State<OrderFilterWidget> {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('${Utils.getLocale(context).chineseWaybillCode}: '),
+              Text('${Utils.getLocale(context)!.chineseWaybillCode}: '),
               Expanded(
                 child: Align(
                   alignment: Alignment.centerRight,
@@ -328,7 +328,7 @@ class _OrderFilterWidgetState extends State<OrderFilterWidget> {
                           onTap: () {
                             FlutterBarcodeScanner.scanBarcode(
                               '#ff6666',
-                              '${Utils.getLocale(context).cancel}',
+                              '${Utils.getLocale(context)!.cancel}',
                               true,
                               ScanMode.DEFAULT,
                             ).then((value) {
@@ -353,7 +353,7 @@ class _OrderFilterWidgetState extends State<OrderFilterWidget> {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('${Utils.getLocale(context).internationalWaybillCode}: '),
+              Text('${Utils.getLocale(context)!.internationalWaybillCode}: '),
               Expanded(
                 child: Align(
                   alignment: Alignment.centerRight,
@@ -372,7 +372,7 @@ class _OrderFilterWidgetState extends State<OrderFilterWidget> {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('${Utils.getLocale(context).time}: '),
+              Text('${Utils.getLocale(context)!.time}: '),
               Expanded(
                 child: Align(
                   alignment: Alignment.centerRight,
@@ -484,21 +484,21 @@ class _OrderFilterWidgetState extends State<OrderFilterWidget> {
           _showWaiting();
           Future.delayed(Duration(milliseconds: 500), () async {
             _getStatistics();
-            AppProvider.of(context).state.orderBloc.updateFilter(
+            AppProvider.of(context)?.state.orderBloc.updateFilter(
               OrderFilter(
                 statusList: _statusList,
-                customerId: _customerIdController.text?.trim(),
-                externalTrackNo: SessionUtil.instance().user.userType !=
+                customerId: _customerIdController.text!.trim(),
+                externalTrackNo: (SessionUtil.instance()?.user?.userType !=
                         UserType.chineseWarehouseStaff
-                    ? _internalTrackNoController.text?.trim()
-                    : '',
-                internalTrackNo: SessionUtil.instance().user.userType ==
+                    ? _internalTrackNoController.text!.trim()
+                    : ''),
+                internalTrackNo: SessionUtil.instance()?.user?.userType ==
                         UserType.chineseWarehouseStaff
-                    ? _internalTrackNoController.text?.trim()
+                    ? _internalTrackNoController.text!.trim()
                     : '',
-                fromDate: _fromDateController.text?.trim(),
-                toDate: _toDateController.text?.trim(),
-                packCount: _packCountController.text?.trim()?.parseInt(),
+                fromDate: _fromDateController.text!.trim(),
+                toDate: _toDateController.text!.trim(),
+                packCount: _packCountController.text.trim()!.parseInt(),
                 goodsDescr: _goodsDescrController.text?.trim() ?? '',
                 licensePlates: _licensePlatesController.text?.trim() ?? ''
               ),
@@ -519,8 +519,8 @@ class _OrderFilterWidgetState extends State<OrderFilterWidget> {
 
   void _getStatistics() {
     if (this.widget.onCustomerCodeChange == null) return;
-    final String text = _customerIdController.text?.trim();
-    this.widget.onCustomerCodeChange(text);
+    final String? text = _customerIdController.text?.trim();
+    this.widget.onCustomerCodeChange!(text!);
   }
 
   void _reset() {
@@ -535,12 +535,12 @@ class _OrderFilterWidgetState extends State<OrderFilterWidget> {
     _packCountController.clear();
     _goodsDescrController.clear();
     _licensePlatesController.clear();
-    _searchButton.onTap();
+    _searchButton.onTap!();
   }
 
   void _showWaiting() {
     Utils.showLoading(context,
-        textContent: Utils.getLocale(context).waitForLogin);
+        textContent: Utils.getLocale(context)!.waitForLogin);
   }
 
   void _popLoading() {
@@ -548,8 +548,8 @@ class _OrderFilterWidgetState extends State<OrderFilterWidget> {
   }
 
   bool _validateSearchForm() {
-    DateTime fromDate;
-    DateTime toDate;
+    DateTime? fromDate;
+    DateTime? toDate;
 
     if (!Utils.isNullOrEmpty(_fromDateController.text?.trim())) {
       try {
@@ -569,8 +569,8 @@ class _OrderFilterWidgetState extends State<OrderFilterWidget> {
 
     if (fromDate != null && toDate != null && fromDate.isAfter(toDate)) {
       Utils.alert(context,
-          title: Utils.getLocale(context).errorOccurred,
-          message: '${Utils.getLocale(context).wrongDateRangeMessage}');
+          title: Utils.getLocale(context)?.errorOccurred,
+          message: '${Utils.getLocale(context)?.wrongDateRangeMessage}');
       return false;
     }
 
@@ -592,13 +592,13 @@ class _OrderFilterWidgetState extends State<OrderFilterWidget> {
 
   /*String _getStatusText() {
     if (_statusList.length == OrderStatus.values.length)
-      return '${Utils.getLocale(context).all}';
+      return '${Utils.getLocale(context)!.all}';
     List<String> statusStrings =
         _statusList.map((o) => Utils.getOrderStatusString(context, o)).toList();
     return statusStrings.join(', ');
   }*/
 
-  InputDecoration _decoration({String hintText}) {
+  InputDecoration _decoration({String? hintText}) {
     return InputDecoration(
       border: OutlineInputBorder(
         borderSide: BorderSide(width: 0.5, color: Colors.white),

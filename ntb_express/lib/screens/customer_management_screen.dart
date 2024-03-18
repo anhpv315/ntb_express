@@ -50,7 +50,7 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen> {
         _showLoading = true;
       });
       Future.delayed(Duration(seconds: 1), () async {
-        AppProvider.of(context).state.userBloc?.loadMore(done: () {
+        AppProvider.of(context)!.state.userBloc?.loadMore(done: () {
           setState(() {
             _showLoading = false;
           });
@@ -61,12 +61,12 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final userBloc = AppProvider.of(context).state.userBloc;
+    final userBloc = AppProvider.of(context)!.state.userBloc;
 
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text(Utils.getLocale(context).customer),
+        title: Text(Utils.getLocale(context)!.customer),
       ),
       body: Container(
         constraints: const BoxConstraints.expand(),
@@ -104,7 +104,7 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen> {
 
                   return Center(
                     child: Text(
-                      '${Utils.getLocale(context).empty}',
+                      '${Utils.getLocale(context)!.empty}',
                       style: TextStyle(
                         color: Theme.of(context).disabledColor,
                       ),
@@ -140,7 +140,7 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen> {
   }
 
   Future<void> _onRefresh() async {
-    AppProvider.of(context).state.userBloc.fetch(reset: true, done: () {  });
+    AppProvider.of(context)!.state.userBloc.fetch(reset: true, done: () {  });
   }
 
   Widget _content(List<User> customers) {
@@ -169,7 +169,7 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen> {
                               updatedUser.avatarImgDTO!.flePath +
                                   '?t=${DateTime.now().millisecondsSinceEpoch}';
                         }
-                        AppProvider.of(context)
+                        AppProvider.of(context)!
                             .state
                             .userBloc
                             .updateCustomer(updatedUser);
@@ -182,7 +182,7 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen> {
                         radius: 20.0,
                         backgroundImage: (cus.avatarImgDTO != null
                             ? NetworkImage(
-                                '${ApiUrls.instance().baseUrl}/${cus.avatarImgDTO!.flePath}')
+                                '${ApiUrls.instance()?.baseUrl}/${cus.avatarImgDTO!.flePath}')
                             : AssetImage('assets/images/default-avatar.png')) as ImageProvider,
                       ),
                     ),
@@ -204,8 +204,8 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen> {
                       onPressed: (context) {
                         Utils.confirm(
                           context,
-                          title: Utils.getLocale(context).confirmation,
-                          message: Utils.getLocale(context)
+                          title: Utils.getLocale(context)!.confirmation,
+                          message: Utils.getLocale(context)!
                               .confirmDeleteCustomerMessage,
                           onAccept: () => _deleteUser(cus),
                         );
@@ -213,7 +213,7 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen> {
                       icon: Icons.delete,
                       backgroundColor: Colors.red,
                       foregroundColor: Colors.white,
-                      label: Utils.getLocale(context).delete,
+                      label: Utils.getLocale(context)!.delete,
                     ),
                   ],),
 
@@ -251,10 +251,10 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen> {
 
   Future<void> _deleteUser(User user) async {
     if (user == null || Utils.isNullOrEmpty(user.username)) return;
-    Utils.showLoading(context, textContent: Utils.getLocale(context).waitForLogin);
+    Utils.showLoading(context, textContent: Utils.getLocale(context)!.waitForLogin);
     Future.delayed(Duration(milliseconds: 500), () {
       HttpUtil.delete(
-        ApiUrls.instance().getDeleteUserUrl(user.username),
+        ApiUrls.instance()!.getDeleteUserUrl(user.username)!,
         onResponse: (resp) {
           Navigator.of(context, rootNavigator: true).pop(); // pop waiting
           if (resp == null || resp.statusCode != 200) {
@@ -264,27 +264,27 @@ class _CustomerManagementScreenState extends State<CustomerManagementScreen> {
 
             Utils.alert(
               context,
-              title: Utils.getLocale(context).failed,
+              title: Utils.getLocale(context)!.failed,
               message:
-              '${Utils.getLocale(context).errorOccurred} ${resp.statusCode}\n${json == null ? '' : json['message']}',
+              '${Utils.getLocale(context)!.errorOccurred} ${resp.statusCode}\n${json == null ? '' : json['message']}',
             );
             return;
           }
 
           Utils.alert(
             context,
-            title: Utils.getLocale(context).success,
-            message: Utils.getLocale(context).deleteCustomerSuccessMessage,
+            title: Utils.getLocale(context)!.success,
+            message: Utils.getLocale(context)!.deleteCustomerSuccessMessage,
             onAccept: () {
-              AppProvider.of(context).state.userBloc.removeCustomer(user);
+              AppProvider.of(context)!.state.userBloc.removeCustomer(user);
             },
           );
         },
         onTimeout: () {
           Navigator.of(context, rootNavigator: true).pop(); // pop waiting
           Utils.alert(context,
-              title: Utils.getLocale(context).failed,
-              message: Utils.getLocale(context).requestTimeout);
+              title: Utils.getLocale(context)!.failed,
+              message: Utils.getLocale(context)!.requestTimeout);
         },
       );
     });

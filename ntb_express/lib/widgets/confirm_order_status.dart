@@ -61,10 +61,10 @@ class _ConfirmOrderStatusWidgetState extends State<ConfirmOrderStatusWidget> {
     }
 
     if (_order != null) {
-      _weightController.text = '${_order.weight}';
-      _sizeController.text = '${_order.size}';
-      _payOnBehalfController.text = '${_order.payOnBehalf}';
-      _intFeeController.text = '${_order.intFee}';
+      _weightController.text = '${ _order!.weight}';
+      _sizeController.text = '${ _order!.size}';
+      _payOnBehalfController.text = '${ _order!.payOnBehalf}';
+      _intFeeController.text = '${ _order!.intFee}';
     }
   }
 
@@ -87,40 +87,40 @@ class _ConfirmOrderStatusWidgetState extends State<ConfirmOrderStatusWidget> {
   }
 
   void _getFormData() {
-    _order.weight = _weightController.text.trim().parseDouble();
-    _order.size = _sizeController.text.trim().parseDouble();
-    _order.payOnBehalf = _payOnBehalfController.text.trim().parseDouble();
-    _order.intFee = _intFeeController.text.trim().parseDouble();
+     _order!.weight = _weightController.text.trim().parseDouble();
+     _order!.size = _sizeController.text.trim().parseDouble();
+     _order!.payOnBehalf = _payOnBehalfController.text.trim().parseDouble();
+     _order!.intFee = _intFeeController.text.trim().parseDouble();
   }
 
   double _getTotalFee() {
     return PriceCalculationUtil.calculatePrice(
-        repackFee: _order.repackFee ?? 0,
-        payOnBehalf: _order.payOnBehalf ?? 0,
-        intFee: _order.intFee ?? 0,
-        extFee: _order.extFee ?? 0);
+        repackFee:  _order!.repackFee ?? 0,
+        payOnBehalf:  _order!.payOnBehalf ?? 0,
+        intFee:  _order!.intFee ?? 0,
+        extFee:  _order!.extFee ?? 0);
   }
 
   double _getTotalFeeOriginal() {
     return PriceCalculationUtil.calculatePrice(
-        repackFee: _order.repackFee ?? 0,
-        payOnBehalf: _order.payOnBehalf ?? 0,
-        intFee: _order.intFee?? 0,
+        repackFee:  _order!.repackFee ?? 0,
+        payOnBehalf:  _order!.payOnBehalf ?? 0,
+        intFee:  _order!.intFee?? 0,
         extFee: PriceCalculationUtil.calculateExtFee(
-            address: _order.addressDTO,
-            goodsType: _order.goodsType,
-            size: _order.size!,
-            weight: _order.weight!));
+            address:  _order!.addressDTO,
+            goodsType:  _order!.goodsType,
+            size:  _order!.size!,
+            weight:  _order!.weight!));
   }
 
   double _getExtFee() {
     return PriceCalculationUtil.calculateExtFee(
-        address: _order.addressDTO,
-        goodsType: _order.goodsType,
-        size: _order.size!,
-        weight: _order.weight!,
-        feeBySize: _order.feeBySize!,
-        feeByWeight: _order.feeByWeight!);
+        address:  _order!.addressDTO,
+        goodsType:  _order!.goodsType,
+        size:  _order!.size!,
+        weight:  _order!.weight!,
+        feeBySize:  _order!.feeBySize!,
+        feeByWeight:  _order!.feeByWeight!);
   }
 
   @override
@@ -467,7 +467,7 @@ class _ConfirmOrderStatusWidgetState extends State<ConfirmOrderStatusWidget> {
                 return;
               }
 
-              List<File> files =
+              List<File?> files =
               _filesController.files.map((fh) => fh.file).toList();
               if (files != null) files.removeWhere((f) => f == null);
               // check if does not attach files & is chinese staff
@@ -505,22 +505,22 @@ class _ConfirmOrderStatusWidgetState extends State<ConfirmOrderStatusWidget> {
   Future<bool> updateOrder() async {
     var c = Completer<bool>();
     _getFormData();
-    if (_order.weight != widget.forOrder?.weight ||
-        _order.size != widget.forOrder?.size ||
-        _order.payOnBehalf != widget.forOrder?.payOnBehalf ||
-        _order.intFee != widget.forOrder?.intFee) {
+    if ( _order!.weight != widget.forOrder?.weight ||
+         _order!.size != widget.forOrder?.size ||
+         _order!.payOnBehalf != widget.forOrder?.payOnBehalf ||
+         _order!.intFee != widget.forOrder?.intFee) {
       // get new price
-      _order.extFee = _getExtFee();
-      _order.totalFee = _getTotalFee();
-      _order.totalFeeOriginal = _getTotalFeeOriginal();
+       _order!.extFee = _getExtFee();
+       _order!.totalFee = _getTotalFee();
+       _order!.totalFeeOriginal = _getTotalFeeOriginal();
 
-      widget.forOrder?.weight = _order.weight;
-      widget.forOrder?.size = _order.size;
-      widget.forOrder?.payOnBehalf = _order.payOnBehalf;
-      widget.forOrder?.intFee = _order.intFee;
-      widget.forOrder?.extFee = _order.extFee;
-      widget.forOrder?.totalFee = _order.totalFee;
-      widget.forOrder?.totalFeeOriginal = _order.totalFeeOriginal;
+      widget.forOrder?.weight =  _order!.weight;
+      widget.forOrder?.size =  _order!.size;
+      widget.forOrder?.payOnBehalf =  _order!.payOnBehalf;
+      widget.forOrder?.intFee =  _order!.intFee;
+      widget.forOrder?.extFee =  _order!.extFee;
+      widget.forOrder?.totalFee =  _order!.totalFee;
+      widget.forOrder?.totalFeeOriginal =  _order!.totalFeeOriginal;
 
       HttpUtil.postOrder(
         ApiUrls.instance()!.getOrdersUrl()!,
@@ -557,18 +557,24 @@ class ChineseCurrencyInput extends StatelessWidget {
   final TextEditingController controller;
   final String labelText;
   final String hintText;
+  final TextStyle? style;
+  final bool? enabled;
 
   const ChineseCurrencyInput({
     Key? key,
     required this.controller,
     required this.labelText,
     required this.hintText,
+    this.style,
+    this.enabled,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
+      style: style,
+      enabled: enabled,
       decoration: InputDecoration(
         labelText: labelText,
         hintText: hintText,

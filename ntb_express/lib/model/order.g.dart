@@ -47,7 +47,7 @@ Order _$OrderFromJson(Map<String, dynamic> json) {
     orderTrackDTOS: (json['orderTrackDTOS'] as List)
         ?.map((e) =>
             e == null ? null : OrderTrack.fromJson(e as Map<String, dynamic>))
-        ?.toList(),
+        !.toList(),
     promotionDTO: json['promotionDTO'] == null
         ? null
         : Promotion.fromJson(json['promotionDTO'] as Map<String, dynamic>),

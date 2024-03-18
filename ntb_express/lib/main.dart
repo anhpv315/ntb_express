@@ -56,7 +56,7 @@ Future<void> main() async {
 class NTBExpress extends StatelessWidget {
   final AppState state;
 
-  NTBExpress({@required this.state});
+  NTBExpress({required this.state});
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +84,9 @@ class NTBExpress extends StatelessWidget {
                   color: Utils.primaryColor,
                 ),
                 primarySwatch: Colors.blue,
-                accentColor: Utils.primaryColor,
+                colorScheme: ColorScheme.fromSwatch().copyWith(
+                  secondary: Utils.primaryColor,
+                ),
                 visualDensity: VisualDensity.adaptivePlatformDensity,
                 pageTransitionsTheme: PageTransitionsTheme(builders: {
                   TargetPlatform.android: CupertinoPageTransitionsBuilder(),
@@ -102,7 +104,7 @@ class NTBExpress extends StatelessWidget {
 }
 
 class HandleWrapper extends StatefulWidget {
-  final Widget child;
+  final Widget? child;
 
   HandleWrapper({this.child});
 
@@ -113,10 +115,10 @@ class HandleWrapper extends StatefulWidget {
 class _HandleWrapperState extends State<HandleWrapper> {
   static final _flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
-  final _firebaseMessaging = FirebaseMessaging();
+  final _firebaseMessaging = FirebaseMessaging.instance;
   static final _notificationProvider = NotificationProvider();
-  static NotificationBloc _notificationBloc;
-  static OrderBloc _orderBloc;
+  static late NotificationBloc _notificationBloc;
+  static late OrderBloc _orderBloc;
   bool _initialized = false;
 
   static bool _isDoubleMessage =
@@ -190,73 +192,82 @@ class _HandleWrapperState extends State<HandleWrapper> {
   void _initLocalNotifications() {
     var initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/launcher_icon');
-    var initializationSettingsIOS = IOSInitializationSettings(
+    var initializationSettingsIOS = DarwinInitializationSettings(
       onDidReceiveLocalNotification: (id, title, body, payload) async {
         didReceiveLocalNotificationSubject.add(ReceivedNotification(
-            id: id, title: title, body: body, payload: payload));
+            id: id, title: title!, body: body!, payload: payload!));
       },
     );
-    var initializationSettings = InitializationSettings(
-        initializationSettingsAndroid, initializationSettingsIOS);
+    var initializationSettings = InitializationSettings(android: initializationSettingsAndroid, iOS: initializationSettingsIOS);
     _flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onSelectNotification: (payload) async {
-      selectNotificationSubject.add(payload);
+        onDidReceiveNotificationResponse : (payload) async {
+      selectNotificationSubject.add(payload as String);
     });
   }
 
-  void _initFirebaseMessaging({BuildContext context}) {
-    _firebaseMessaging.configure(
-      onMessage: (Map<String, dynamic> message) async {
-        if (Platform.isIOS) {
-          if (!_isDoubleMessage) {
-            print("onMessage: $message");
-            _showNotificationOnForeground(
-                jsonDecode(jsonEncode(message)), context);
-            _saveNotification(jsonDecode(jsonEncode(message)));
-          }
-          _isDoubleMessage = !_isDoubleMessage;
-        } else {
+  void _initFirebaseMessaging({required BuildContext context}) {
+
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      if (Platform.isIOS) {
+        if (!_isDoubleMessage) {
           print("onMessage: $message");
           _showNotificationOnForeground(
               jsonDecode(jsonEncode(message)), context);
           _saveNotification(jsonDecode(jsonEncode(message)));
         }
-      },
-      onBackgroundMessage: Platform.isIOS ? null : _myBackgroundMessageHandler,
-      onLaunch: (Map<String, dynamic> message) async {
-        print("onLaunch: $message");
-        if (Platform.isIOS) {
-          await _saveNotification(jsonDecode(jsonEncode(message)));
-        }
-        _navigateToItemDetail(message);
-      },
-      onResume: (Map<String, dynamic> message) async {
-        if (Platform.isIOS) {
-          if (!_isDoubleResume) {
-            print("onResume: $message");
-            await _saveNotification(jsonDecode(jsonEncode(message)));
-            _navigateToItemDetail(message);
-          }
-          _isDoubleResume = !_isDoubleResume;
-        } else {
-          print("onResume: $message");
-          await _saveNotification(jsonDecode(jsonEncode(message)));
-          _navigateToItemDetail(message);
-        }
-      },
-    );
-    _firebaseMessaging.requestNotificationPermissions(
-        const IosNotificationSettings(
-            sound: true, badge: true, alert: true, provisional: false));
-    _firebaseMessaging.onIosSettingsRegistered
-        .listen((IosNotificationSettings settings) {
-      print("Settings registered: $settings");
+        _isDoubleMessage = !_isDoubleMessage;
+      } else {
+        print("onMessage: $message");
+        _showNotificationOnForeground(
+            jsonDecode(jsonEncode(message)), context);
+        _saveNotification(jsonDecode(jsonEncode(message)));
+      }
     });
+
+    FirebaseMessaging.instance.getInitialMessage().then((message) async {
+      print("onLaunch: $message");
+      if (Platform.isIOS) {
+        await _saveNotification(jsonDecode(jsonEncode(message)));
+      }
+      _navigateToItemDetail(message as Map<String, dynamic>);
+    });
+
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
+      if (Platform.isIOS) {
+      if (!_isDoubleResume) {
+      print("onResume: $message");
+      await _saveNotification(jsonDecode(jsonEncode(message)));
+      _navigateToItemDetail(message as Map<String, dynamic>);
+      }
+      _isDoubleResume = !_isDoubleResume;
+      } else {
+      print("onResume: $message");
+      await _saveNotification(jsonDecode(jsonEncode(message)));
+      _navigateToItemDetail(message as Map<String, dynamic>);
+      }
+    });
+
+
+
+    FirebaseMessaging.onBackgroundMessage((RemoteMessage message) async {
+      if(!Platform.isIOS) await _myBackgroundMessageHandler(message as Map<String, dynamic>);
+    });
+
+
+
+    _firebaseMessaging.requestPermission(
+            sound: true, badge: true, alert: true, provisional: false);
+    // _firebaseMessaging.onIosSettingsRegistered
+    //     .listen((IosNotificationSettings settings) {
+    //   print("Settings registered: $settings");
+    // });
     _firebaseMessaging.onTokenRefresh.listen((token) {
       if (Utils.isNullOrEmpty(token)) return;
       // TODO: check if logged in => update fcmToken for user
       // save token to session
-      SessionUtil.instance().fcmToken = token;
+      SessionUtil.instance()!.fcmToken = token;
       print('FCM TOKEN: $token');
     });
     _firebaseMessaging.subscribeToTopic('all');
@@ -279,7 +290,7 @@ class _HandleWrapperState extends State<HandleWrapper> {
     String orderId = data['order_id'];
     String status = data['body'];
     String locale = data['title'] ?? 'en';
-    Map<String, String> msg = await _parsePushMessage(orderId, status, locale);
+    Map<String, String>? msg = await _parsePushMessage(orderId, status, locale);
     if (msg == null) return;
 
     pushTitle = msg['title'];
@@ -289,24 +300,24 @@ class _HandleWrapperState extends State<HandleWrapper> {
     _saveNotification(message);
 
     // @formatter:off
-    var platformChannelSpecificsAndroid = new AndroidNotificationDetails(
-        'ntb_express', 'DL Express', 'DL Express notification channel',
-        channelShowBadge: true,
-        playSound: true,
-        enableVibration: true,
-        enableLights: true,
-        importance: Importance.Max,
-        priority: Priority.High,
-        visibility: NotificationVisibility.Public);
-    // @formatter:on
+    var platformChannelSpecificsAndroid = new AndroidNotificationDetails('ntb_express', 'DL Express', channelDescription: 'DL Express notification channel', channelShowBadge: true,
+            playSound: true,
+            enableVibration: true,
+            enableLights: true,
+            importance: Importance.max,
+            priority: Priority.high,
+            visibility: NotificationVisibility.public);
+
+
+      // @formatter:on
     var platformChannelSpecificsIos =
-        IOSNotificationDetails(presentSound: true);
+    DarwinNotificationDetails(presentSound: true);
     var platformChannelSpecifics = NotificationDetails(
-        platformChannelSpecificsAndroid, platformChannelSpecificsIos);
+        android: platformChannelSpecificsAndroid, iOS: platformChannelSpecificsIos);
 
     Future.delayed(Duration.zero, () {
       Vibration.vibrate();
-      FlutterRingtonePlayer.playNotification();
+      FlutterRingtonePlayer().playNotification();
       _flutterLocalNotificationsPlugin.show(
         Random().nextInt(100),
         pushTitle,
@@ -327,7 +338,7 @@ class _HandleWrapperState extends State<HandleWrapper> {
     String orderId = data['order_id'];
     String status = data['body'];
     String locale = data['title'] ?? 'en';
-    Map<String, String> msg = await _parsePushMessage(orderId, status, locale);
+    Map<String, String>? msg = await _parsePushMessage(orderId, status, locale);
     if (msg != null) {
       data['title'] = msg['title'];
       data['body'] = msg['body'];
@@ -343,12 +354,12 @@ class _HandleWrapperState extends State<HandleWrapper> {
 
       final result = await _notificationProvider.insert(dataToInsert);
       if (_notificationBloc != null) {
-        User currentUser = SessionUtil.instance()?.user;
-        Order order = await HttpUtil.getOrder(result.orderId);
+        User? currentUser = SessionUtil.instance()?.user;
+        Order order = await HttpUtil.getOrder(result!.orderId);
         if ((order != null && currentUser != null) &&
             ([UserType.customer, UserType.saleStaff]
-                    .contains(currentUser.userType) ||
-                (currentUser.username == order.saleId &&
+                    .contains(currentUser?.userType) ||
+                (currentUser?.username == order.saleId &&
                     order.orderStatus == OrderStatus.pendingWoodenPacking))) {
           // add or update new order to view list
           _orderBloc?.updateOrder(order);
@@ -358,7 +369,7 @@ class _HandleWrapperState extends State<HandleWrapper> {
           // update unread count
           _notificationProvider
               .getUnreadCount()
-              .then((count) => _notificationBloc.setUnreadCount(count));
+              .then((count) => _notificationBloc.setUnreadCount(count!));
         }
 
         if (order != null && order.createdId == currentUser?.username) {
@@ -378,7 +389,7 @@ class _HandleWrapperState extends State<HandleWrapper> {
     String orderId = data['order_id'];
     String status = data['body'];
     String locale = data['title'] ?? 'en';
-    Map<String, String> msg = await _parsePushMessage(orderId, status, locale);
+    Map<String, String>? msg = await _parsePushMessage(orderId, status, locale);
     if (msg == null) return;
 
     Future.delayed(Duration(seconds: 2), () async {
@@ -390,7 +401,7 @@ class _HandleWrapperState extends State<HandleWrapper> {
       }
       if (SessionUtil.instance()?.user?.userType == UserType.customer) {
         Vibration.vibrate();
-        FlutterRingtonePlayer.playNotification();
+        FlutterRingtonePlayer().playNotification();
         Utils.alert(context,
             title: '${msg['title'] ?? 'Thông báo'}', message: '${msg['body']}');
       }
@@ -399,8 +410,8 @@ class _HandleWrapperState extends State<HandleWrapper> {
 
   @override
   Widget build(BuildContext context) {
-    _notificationBloc = AppProvider.of(context).state.notificationBloc;
-    _orderBloc = AppProvider.of(context).state.orderBloc;
+    _notificationBloc = AppProvider.of(context)!.state.notificationBloc;
+    _orderBloc = AppProvider.of(context)!.state.orderBloc;
     _notificationBloc.setNotifications([]);
     if (!_initialized) {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -409,7 +420,7 @@ class _HandleWrapperState extends State<HandleWrapper> {
       _initialized = true;
     }
 
-    return widget.child;
+    return widget.child!;
   }
 
   Future<void> _navigateToItemDetail(Map<String, dynamic> message) async {
@@ -429,9 +440,9 @@ class _HandleWrapperState extends State<HandleWrapper> {
     AppProvider.of(context)?.state?.notificationBloc?.setNotifications([]);
 
     // check if logged in => get order detail & navigate to order detail screen
-    if (SessionUtil.instance().isLoggedIn()) {
+    if (SessionUtil.instance()!.isLoggedIn()) {
       HttpUtil.get(
-        ApiUrls.instance().getOrderUrl(orderId),
+        ApiUrls.instance()!.getOrderUrl(orderId)!,
         headers: {'Content-Type': 'application/json; charset=utf-8'},
         onResponse: (resp) async {
           if (resp != null && resp.statusCode == 200) {
@@ -444,14 +455,15 @@ class _HandleWrapperState extends State<HandleWrapper> {
             AppProvider.of(context)?.state?.orderBloc?.fetch(reset: true);
 
             // reset unread count
-            int unreadCount = await _notificationProvider.getUnreadCount();
+            int? unreadCount = await _notificationProvider.getUnreadCount();
+            if(unreadCount != null)
             AppProvider.of(context)
                 ?.state
                 ?.notificationBloc
-                ?.setUnreadCount(unreadCount);
+                ?.setUnreadCount(unreadCount!);
 
             // navigate to order detail screen
-            if (SessionUtil.instance().canPop == 0) {
+            if (SessionUtil.instance()!.canPop == 0) {
               Utils.updatePop(1);
               await Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => OrderDetailScreen(order)));
@@ -462,7 +474,7 @@ class _HandleWrapperState extends State<HandleWrapper> {
     }
   }
 
-  static Future<Map<String, String>> _parsePushMessage(
+  static Future<Map<String, String>?> _parsePushMessage(
       String orderId, String status, String locale) async {
     if (Utils.isNullOrEmpty(status)) return null;
     locale = locale.split('_')[0].toLowerCase();
@@ -471,7 +483,11 @@ class _HandleWrapperState extends State<HandleWrapper> {
     final bool isZh = locale.contains('zh');
     final String ordId = Utils.isNullOrEmpty(orderId) ? '' : ' $orderId';
 
-    rs['title'] = isVi ? 'Cập nhật đơn hàng' : isZh ? '更新訂單' : 'Update orders';
+    rs['title'] = isVi
+        ? 'Cập nhật đơn hàng'
+        : isZh
+            ? '更新訂單'
+            : 'Update orders';
     if (status == 'import_to_vn') {
       rs['body'] = isVi
           ? 'Đơn hàng$ordId đã nhập tổng kho tại Việt Nam.'
@@ -495,7 +511,9 @@ class _HandleWrapperState extends State<HandleWrapper> {
         case OrderStatus.newlyCreated:
           rs['body'] = isVi
               ? 'Đơn hàng$ordId đã được tạo.'
-              : isZh ? '$ordId訂單已創建。' : 'The$ordId order has been created.';
+              : isZh
+                  ? '$ordId訂單已創建。'
+                  : 'The$ordId order has been created.';
           break;
         case OrderStatus.chineseWarehoused:
           rs['body'] = isVi
@@ -521,7 +539,9 @@ class _HandleWrapperState extends State<HandleWrapper> {
         case OrderStatus.delivery:
           rs['body'] = isVi
               ? 'Đơn hàng$ordId đang được giao.'
-              : isZh ? '$ordId訂單已交貨。' : 'The$ordId order is on delivery.';
+              : isZh
+                  ? '$ordId訂單已交貨。'
+                  : 'The$ordId order is on delivery.';
           break;
       }
     }

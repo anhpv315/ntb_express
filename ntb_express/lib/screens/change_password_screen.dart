@@ -39,7 +39,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
       child: Scaffold(
         appBar: AppBar(
-          title: Text('${Utils.getLocale(context).changePassword}'),
+          title: Text('${Utils.getLocale(context)!.changePassword}'),
         ),
         body: Container(
           color: Utils.backgroundColor,
@@ -74,9 +74,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.done,
                     decoration: InputDecoration(
-                      labelText: Utils.getLocale(context).password,
+                      labelText: Utils.getLocale(context)!.password,
                       hintText:
-                          '${Utils.getLocale(context).enter} ${Utils.getLocale(context).password.toLowerCase()}...',
+                          '${Utils.getLocale(context)!.enter} ${Utils.getLocale(context)!.password.toLowerCase()}...',
                       counterText: '',
                       suffixIcon: IconButton(
                         onPressed: () {
@@ -89,9 +89,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     ),
                     validator: (String? value) {
                       if (value == null || value!.isEmpty)
-                        return Utils.getLocale(context).required;
+                        return Utils.getLocale(context)!.required;
                       if (value.length < 8)
-                        return '${Utils.getLocale(context).passwordLengthRequired}';
+                        return '${Utils.getLocale(context)!.passwordLengthRequired}';
 
                       return null;
                     },
@@ -104,9 +104,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.done,
                     decoration: InputDecoration(
-                      labelText: '${Utils.getLocale(context).newPassword}',
+                      labelText: '${Utils.getLocale(context)!.newPassword}',
                       hintText:
-                          '${Utils.getLocale(context).enter} ${Utils.getLocale(context).password.toLowerCase()}...',
+                          '${Utils.getLocale(context)!.enter} ${Utils.getLocale(context)!.password.toLowerCase()}...',
                       counterText: '',
                       suffixIcon: IconButton(
                         onPressed: () {
@@ -119,11 +119,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value!.isEmpty)
-                        return Utils.getLocale(context).required;
+                        return Utils.getLocale(context)!.required;
                       if (value.length < 8)
-                        return '${Utils.getLocale(context).passwordLengthRequired}';
+                        return '${Utils.getLocale(context)!.passwordLengthRequired}';
                       if (_passwordController.text.trim() == value)
-                        return '${Utils.getLocale(context).newPasswordNotMatchMessage}';
+                        return '${Utils.getLocale(context)!.newPasswordNotMatchMessage}';
 
                       return null;
                     },
@@ -137,9 +137,9 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     textInputAction: TextInputAction.done,
                     decoration: InputDecoration(
                       labelText:
-                          '${Utils.getLocale(context).confirmNewPassword}',
+                          '${Utils.getLocale(context)!.confirmNewPassword}',
                       hintText:
-                          '${Utils.getLocale(context).enter} ${Utils.getLocale(context).password.toLowerCase()}...',
+                          '${Utils.getLocale(context)!.enter} ${Utils.getLocale(context)!.password.toLowerCase()}...',
                       counterText: '',
                       suffixIcon: IconButton(
                         onPressed: () {
@@ -153,11 +153,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                     ),
                     validator: (value) {
                       if (value == null || value!.isEmpty)
-                        return Utils.getLocale(context).required;
+                        return Utils.getLocale(context)!.required;
                       if (value.length < 8)
-                        return '${Utils.getLocale(context).passwordLengthRequired}';
+                        return '${Utils.getLocale(context)!.passwordLengthRequired}';
                       if (_newPasswordController.text.trim() != value)
-                        return '${Utils.getLocale(context).confirmPasswordNotMatchMessage}';
+                        return '${Utils.getLocale(context)!.confirmPasswordNotMatchMessage}';
 
                       return null;
                     },
@@ -173,7 +173,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                       color: Utils.accentColor,
                       textColor: Colors.white,
                       child: Text(
-                        '${Utils.getLocale(context).changePassword}',
+                        '${Utils.getLocale(context)!.changePassword}',
                         style: TextStyle(fontSize: 18.0),
                       ),
                     ),
@@ -195,7 +195,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     _showWaiting();
     Future.delayed(Duration(milliseconds: 500), () async {
       HttpUtil.put(
-        ApiUrls.instance().getChangePasswordUrl(),
+        ApiUrls.instance()!.getChangePasswordUrl()!,
         headers: {'Content-Type': 'application/json; charset=utf-8'},
         body: {
           'username': user.username,
@@ -212,24 +212,24 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             String message = json == null ? '' : json['message'];
 
             Utils.alert(context,
-                title: Utils.getLocale(context).failed,
+                title: Utils.getLocale(context)!.failed,
                 message:
-                    '${Utils.getLocale(context).errorOccurred} ${resp?.statusCode}\n$message');
+                    '${Utils.getLocale(context)!.errorOccurred} ${resp?.statusCode}\n$message');
             return;
           }
 
           _popLoading();
           Utils.alert(context,
-              title: Utils.getLocale(context).success,
+              title: Utils.getLocale(context)!.success,
               message:
-                  '${Utils.getLocale(context).changePasswordSuccessMessage}',
+                  '${Utils.getLocale(context)!.changePasswordSuccessMessage}',
               onAccept: _reset);
         },
         onTimeout: () {
           _popLoading();
           Utils.alert(context,
-              title: Utils.getLocale(context).failed,
-              message: '${Utils.getLocale(context).requestTimeout}');
+              title: Utils.getLocale(context)!.failed,
+              message: '${Utils.getLocale(context)!.requestTimeout}');
         },
       );
     });
@@ -243,7 +243,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
   void _showWaiting() {
     Utils.showLoading(context,
-        textContent: Utils.getLocale(context).waitForLogin);
+        textContent: Utils.getLocale(context)!.waitForLogin);
   }
 
   void _popLoading() {

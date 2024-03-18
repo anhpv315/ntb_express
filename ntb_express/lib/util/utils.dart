@@ -843,7 +843,7 @@ class ConfirmationStatus {
   int? packCount;
   String? note;
   String? nextWarehouse;
-  List<File>? files;
+  List<File?>? files;
 
   ConfirmationStatus(
       {this.packCount, this.note, this.nextWarehouse, this.files});

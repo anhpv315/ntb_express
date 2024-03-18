@@ -28,7 +28,7 @@ class _AddressManagementScreenState extends State<AddressManagementScreen> {
     super.initState();
 
     currentUser = widget.forUser == null
-        ? User.clone(SessionUtil.instance().user)
+        ? User.clone(SessionUtil.instance()?.user)
         : User.clone(widget.forUser);
   }
 
@@ -36,7 +36,7 @@ class _AddressManagementScreenState extends State<AddressManagementScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(Utils.getLocale(context).myAddresses),
+        title: Text(Utils.getLocale(context)!.myAddresses),
       ),
       body: SafeArea(
         child: Container(
@@ -54,7 +54,7 @@ class _AddressManagementScreenState extends State<AddressManagementScreen> {
                 if (snapshot.hasError) {
                   return Center(
                     child: Text(
-                        '${Utils.getLocale(context).errorOccurred}: ${snapshot.error.toString()}'),
+                        '${Utils.getLocale(context)!.errorOccurred}: ${snapshot.error.toString()}'),
                   );
                 }
 
@@ -65,7 +65,7 @@ class _AddressManagementScreenState extends State<AddressManagementScreen> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(4.0),
                         child: Text(
-                          '${Utils.getLocale(context).addressNoteMessage}',
+                          '${Utils.getLocale(context)!.addressNoteMessage}',
                           style: TextStyle(
                             fontStyle: FontStyle.italic,
                             color: Theme.of(context).disabledColor,
@@ -75,7 +75,7 @@ class _AddressManagementScreenState extends State<AddressManagementScreen> {
                       Expanded(
                         child: Center(
                           child: Text(
-                            '${Utils.getLocale(context).empty}',
+                            '${Utils.getLocale(context)!.empty}',
                             style:
                                 TextStyle(color: Theme.of(context).disabledColor),
                           ),
@@ -93,7 +93,7 @@ class _AddressManagementScreenState extends State<AddressManagementScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(4.0),
                       child: Text(
-                        '${Utils.getLocale(context).addressNoteMessage}',
+                        '${Utils.getLocale(context)!.addressNoteMessage}',
                         style: TextStyle(
                           fontStyle: FontStyle.italic,
                           color: Theme.of(context).disabledColor,
@@ -167,17 +167,17 @@ class _AddressManagementScreenState extends State<AddressManagementScreen> {
   Future<List<Address>> _getAddressList() async {
     final Completer<List<Address>> c = Completer();
     final url =
-        ApiUrls.instance().getAddressListByUserUrl(currentUser!.username);
+        ApiUrls.instance()?.getAddressListByUserUrl(currentUser!.username);
 
     HttpUtil.get(
-      url,
+      url!,
       headers: {'Content-Type': 'application/json; charset=utf-8'},
       onResponse: (resp) {
         if (resp == null || resp.statusCode != 200) {
           Utils.alert(context,
-              title: Utils.getLocale(context).failed,
+              title: Utils.getLocale(context)!.failed,
               message:
-                  '${Utils.getLocale(context).errorOccurred}: ${resp?.statusCode}');
+                  '${Utils.getLocale(context)!.errorOccurred}: ${resp?.statusCode}');
 
           if (!c.isCompleted) {
             c.complete([]);
@@ -199,8 +199,8 @@ class _AddressManagementScreenState extends State<AddressManagementScreen> {
       },
       onTimeout: () {
         Utils.alert(context,
-            title: Utils.getLocale(context).errorOccurred,
-            message: Utils.getLocale(context).requestTimeout);
+            title: Utils.getLocale(context)!.errorOccurred,
+            message: Utils.getLocale(context)!.requestTimeout);
 
         if (!c.isCompleted) {
           c.complete([]);
