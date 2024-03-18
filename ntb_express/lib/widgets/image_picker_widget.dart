@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:multi_image_picker/multi_image_picker.dart';
+import 'package:multi_image_picker_view/multi_image_picker_view.dart';
 import 'package:ntbexpress/model/file_holder.dart';
 import 'package:ntbexpress/util/utils.dart';
 import 'package:ntbexpress/widgets/image_gallery.dart';
@@ -49,6 +49,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
   final List<FileHolder> _files = [];
   final ImagePicker picker = ImagePicker();
 
+
   Future<void> _getImage() async {
     showModalBottomSheet(
         context: context,
@@ -73,6 +74,8 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
   }
 
   Future<void> _cameraRoll() async {
+
+
     Navigator.of(context).pop(); // hide bottom sheet
     List<Asset> files;
     try {

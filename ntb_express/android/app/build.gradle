@@ -21,7 +21,10 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
+
+
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 apply plugin: 'com.google.gms.google-services'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
@@ -32,7 +35,9 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 33
+
+    namespace 'dev.fluttercommunity.plus.device_info'
 
     lintOptions {
         disable 'InvalidPackage'
@@ -42,7 +47,7 @@ android {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "vn.com.a2m.ntbexpress"
         minSdkVersion flutter.minSdkVersion
-        targetSdkVersion 30
+        targetSdkVersion 33
         multiDexEnabled true
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -64,7 +69,8 @@ android {
             // signingConfig signingConfigs.debug
             signingConfig signingConfigs.release
             minifyEnabled true
-            useProguard true
+//            useProguard true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             shrinkResources true
         }

@@ -38,23 +38,24 @@ dependencies:
   flutter_barcode_scanner: ^2.0.0
   sqflite: ^2.3.2
   firebase_messaging: ^14.6.9
-  flutter_local_notifications: ^17.0.0
+  flutter_local_notifications: ^16.3.3
   badges: ^3.1.2
   intl: ^0.18.1
   mask_text_input_formatter: ^2.9.0
   photo_view: ^0.14.0
   timeline_tile: ^2.0.0
-  device_info_plus: ^9.1.2
+  device_info_plus: ^8.2.2
   settings_ui: ^2.0.2
   image: ^4.0.15
-  file: ^7.0.0
-  multi_image_picker: ^4.6.9
+  file: ^6.0.0
+#  multi_image_picker: ^4.6.9
+#  multiple_images_picker: ^1.0.1
+  multi_image_picker_view: ^1.0.0
   flutter_ringtone_player: ^4.0.0+2
   vibration: ^1.4.0
   devicelocale: ^0.7.1
   notification_permissions: ^0.6.1
   app_settings: ^4.0.2
-
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
