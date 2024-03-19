@@ -37,7 +37,10 @@ dependencies:
   random_string: ^2.0.1
   flutter_barcode_scanner: ^2.0.0
   sqflite: ^2.3.2
-  firebase_messaging: ^14.6.9
+
+  firebase_messaging: ^11.2.7
+  firebase_core: ^1.10.0
+
   flutter_local_notifications: ^16.3.3
   badges: ^3.1.2
   intl: ^0.18.1
@@ -50,6 +53,7 @@ dependencies:
   file: ^6.0.0
 #  multi_image_picker: ^4.6.9
 #  multiple_images_picker: ^1.0.1
+  file_picker: ^5.3.1
   multi_image_picker_view: ^1.0.0
   flutter_ringtone_player: ^4.0.0+2
   vibration: ^1.4.0
@@ -61,6 +65,9 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
   android_id: ^0.3.6
+
+dependency_overrides:
+  firebase_core_platform_interface: 4.5.1
 
 dev_dependencies:
   flutter_test:

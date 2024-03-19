@@ -10,7 +10,7 @@ class District implements Location {
   String location;
   String type;
   @JsonKey(name: 'tinh_id')
-  int provinceId;
+  int? provinceId;
 
   District({required this.id, required this.name, required this.location, required this.type, required this.provinceId});
 

@@ -8,19 +8,19 @@ part of 'address.dart';
 
 Address _$AddressFromJson(Map<String, dynamic> json) {
   return Address(
-    addressId: json['addressId'] as int,
-    userName: json['username'] as String,
-    fullName: json['fullname'] as String,
-    phoneNumber: json['phoneNumber'] as String,
-    email: json['email'] as String,
-    province: json['province'] as String,
-    district: json['district'] as String,
-    wards: json['wards'] as String,
-    address: json['address'] as String,
-    createdId: json['createdId'] as String,
-    createdDate: json['createdDate'] as String,
-    updatedId: json['updatedId'] as String,
-    updatedDate: json['updatedDate'] as String,
+    addressId: json['addressId']== null? 0 : (json['addressId'] as int),
+    userName: json['username'] ?? ''  as String,
+    fullName: json['fullname'] ?? ''  as String,
+    phoneNumber: json['phoneNumber'] ?? ''  as String,
+    email: json['email'] ?? ''  as String,
+    province: json['province'] ?? ''  as String,
+    district: json['district'] ?? ''  as String,
+    wards: json['wards'] ?? ''  as String,
+    address: json['address'] ?? ''  as String,
+    createdId: json['createdId'] ?? ''  as String,
+    createdDate: json['createdDate'] ?? ''  as String,
+    updatedId: json['updatedId'] ?? ''  as String,
+    updatedDate: json['updatedDate'] ?? ''  as String,
   );
 }
 

@@ -7,33 +7,34 @@ part of 'order.dart';
 // **************************************************************************
 
 Order _$OrderFromJson(Map<String, dynamic> json) {
+
   return Order(
-    orderId: json['orderId'] as String,
-    addressId: json['addressId'] as int,
-    commission: (json['commission'] as num)?.toDouble(),
-    createdDate: json['createdDate'] as num,
-    createdId: json['createdId'] as String,
-    customerId: json['customerId'] as String,
-    extFee: (json['extFee'] as num)?.toDouble(),
-    extTrackNo: json['extTrackNo'] as String,
-    goodsDescr: json['goodsDescr'] as String,
-    goodsType: json['goodsType'] as int,
+    orderId: json['orderId'] ?? ''  as String,
+    addressId: json['addressId']== null? null : (json['addressId'] as int),
+    commission: json['commission']== null?  null: (json['commission'] as num)?.toDouble(),
+    createdDate: json['createdDate']== null? null : (json['createdDate'] as num),
+    createdId: json['createdId'] ?? ''  as String,
+    customerId: json['customerId'] ?? ''  as String,
+    extFee: json['extFee'] == null? 0: (json['extFee'] as num)?.toDouble(),
+    extTrackNo: json['extTrackNo'] ?? ''  as String,
+    goodsDescr: json['goodsDescr'] ?? ''  as String,
+    goodsType: json['goodsType']== null? null : (json['goodsType'] as int),
     intFee: (json['intFee'] as num)?.toDouble(),
-    intTrackNo: json['intTrackNo'] as String,
+    intTrackNo: json['intTrackNo'] ?? ''  as String,
     payOnBehalf: (json['payOnBehalf'] as num)?.toDouble(),
-    needRepack: json['needRepack'] as int,
+    needRepack: json['needRepack']== null? null : (json['needRepack'] as int),
     repackFee: (json['repackFee'] as num)?.toDouble(),
-    orderStatus: json['orderStatus'] as int,
-    packCount: json['packCount'] as int,
-    saleId: json['saleId'] as String,
+    orderStatus: json['orderStatus']== null? null : (json['orderStatus'] as int),
+    packCount: json['packCount']== null? null : (json['packCount'] as int),
+    saleId: json['saleId'] ?? ''  as String,
     size: (json['size'] as num)?.toDouble(),
     feeBySize: (json['feeBySize'] as num)?.toDouble(),
     feeByWeight: (json['feeByWeight'] as num)?.toDouble(),
     totalFee: (json['totalFee'] as num)?.toDouble(),
     weight: (json['weight'] as num)?.toDouble(),
-    note: json['note'] as String,
-    nextWarehouse: json['nextWarehouse'] as String,
-    promotionId: json['promotionId'] as int,
+    note: json['note'] ?? ''  as String,
+    nextWarehouse: json['nextWarehouse'] ?? ''  as String,
+    promotionId: json['promotionId']== null? null : (json['promotionId'] as int),
     tccoFileDTOS: (json['tccoFileDTOS'] as List)
         ?.map((e) =>
             e == null ? null : TCCOFile.fromJson(e as Map<String, dynamic>))
@@ -55,7 +56,7 @@ Order _$OrderFromJson(Map<String, dynamic> json) {
     feeBySizeDealer: json['feeBySizeDealer'] as double,
     feeByWeightDealer: json['feeByWeightDealer'] as double,
     totalFeeDaiLong: json['totalFeeDaiLong'] as double,
-    licensePlates: json['licensePlates'] as String,
+    licensePlates: json['licensePlates'] ?? ''  as String,
   );
 }
 

@@ -12,8 +12,8 @@ class TCCOFile {
   String fleSz;
   String descrpt;
   String insId;
-  num insDt;
-  num uptDt;
+  num? insDt;
+  num? uptDt;
   String fleUri;
 
   TCCOFile(

@@ -8,17 +8,17 @@ part of 'tcco_file.dart';
 
 TCCOFile _$TCCOFileFromJson(Map<String, dynamic> json) {
   return TCCOFile(
-    atchFleSeq: json['atchFleSeq'] as String,
-    fleTP: json['fleTP'] as String,
-    flePath: json['flePath'] as String,
-    fleNm: json['fleNm'] as String,
-    newFleNm: json['newFleNm'] as String,
-    fleSz: json['fleSz'] as String,
-    descrpt: json['descrpt'] as String,
-    insId: json['insId'] as String,
-    insDt: json['insDt'] as num,
-    uptDt: json['uptDt'] as num,
-    fleUri: json['fleUri'] as String,
+    atchFleSeq: json['atchFleSeq'] ?? ''  as String,
+    fleTP: json['fleTP'] ?? ''  as String,
+    flePath: json['flePath'] ?? ''  as String,
+    fleNm: json['fleNm'] ?? ''  as String,
+    newFleNm: json['newFleNm'] ?? ''  as String,
+    fleSz: json['fleSz'] ?? ''  as String,
+    descrpt: json['descrpt'] ?? ''  as String,
+    insId: json['insId'] ?? ''  as String,
+    insDt: json['insDt']== null? null : (json['insDt'] as num),
+    uptDt: json['uptDt']== null? null : (json['uptDt'] as num),
+    fleUri: json['fleUri'] ?? ''  as String,
   );
 }
 

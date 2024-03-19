@@ -120,7 +120,7 @@ class PriceCalculationUtil {
   static double _getDiscountPrice(double price, Promotion promotion) {
     if (promotion != null &&
         promotion.valid &&
-        (promotion.countOrder == -1 || promotion.countOrder > 0)) {
+        (promotion.countOrder == -1 || promotion.countOrder! > 0)) {
       double discountPrice = 0;
       if (promotion.promotionType == PromotionType.percent) {
         discountPrice = (price * promotion.discountValue!) / 100; // 100%

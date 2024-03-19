@@ -8,12 +8,12 @@ part of 'order_track.dart';
 
 OrderTrack _$OrderTrackFromJson(Map<String, dynamic> json) {
   return OrderTrack(
-    trackId: json['trackId'] as int,
-    actionDate: json['actionDate'] as int,
-    actionId: json['actionId'] as String,
-    actionType: json['actionType'] as int,
-    orderId: json['orderId'] as String,
-    note: json['note'] as String,
+    trackId: json['trackId']== null? 0 : (json['trackId'] as int),
+    actionDate: json['actionDate']== null? null : (json['actionDate'] as int),
+    actionId: json['actionId'] ?? ''  as String,
+    actionType: json['actionType']== null? null : (json['actionType'] as int),
+    orderId: json['orderId'] ?? ''  as String,
+    note: json['note'] ?? ''  as String,
   );
 }
 

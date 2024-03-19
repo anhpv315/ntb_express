@@ -8,11 +8,11 @@ part of 'notification_detail.dart';
 
 NotificationDetail _$NotificationDetailFromJson(Map<String, dynamic> json) {
   return NotificationDetail(
-    id: json['id'] as int,
-    orderId: json['order_id'] as String,
-    title: json['title'] as String,
-    body: json['body'] as String,
-    insertTime: json['insert_time'] as String,
+    id: json['id']== null? 0 : (json['id'] as int),
+    orderId: json['order_id'] ?? ''  as String,
+    title: json['title'] ?? ''  as String,
+    body: json['body'] ?? ''  as String,
+    insertTime: json['insert_time'] ?? ''  as String,
   );
 }
 

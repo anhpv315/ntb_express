@@ -8,11 +8,11 @@ part of 'wards.dart';
 
 Wards _$WardsFromJson(Map<String, dynamic> json) {
   return Wards(
-    id: json['id'] as int,
-    name: json['name'] as String,
-    location: json['location'] as String,
-    type: json['type'] as String,
-    districtId: json['huyen_id'] as int,
+    id: json['id']== null? 0 : (json['id'] as int),
+    name: json['name'] ?? ''  as String,
+    location: json['location'] ?? ''  as String,
+    type: json['type'] ?? ''  as String,
+    districtId: json['huyen_id']== null? null : (json['huyen_id'] as int),
   );
 }
 

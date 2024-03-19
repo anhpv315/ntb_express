@@ -5,9 +5,9 @@ part 'order_track.g.dart';
 @JsonSerializable()
 class OrderTrack {
   int trackId;
-  int actionDate;
+  int? actionDate;
   String actionId;
-  int actionType;
+  int? actionType;
   String orderId;
   String note;
 

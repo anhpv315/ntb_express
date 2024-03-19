@@ -116,8 +116,8 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
     _dobController.text =
         _user.dob == null ? '' : Utils.getDateString(_user.dob!, _datePattern);
     _emailController.text = _user.email!;
-    _refUserController.text = _user.refId;
-    _customerCodeController.text = _user.customerId;
+    _refUserController.text = _user.refId?? '';
+    _customerCodeController.text = _user.customerId?? '';
   }
 
   @override

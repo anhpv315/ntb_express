@@ -33,7 +33,7 @@ class HttpUtil {
     http.Response? resp;
     try {
       resp = await http
-          .get(url as Uri, headers: _headers)
+          .get(Uri.parse(url), headers: _headers)
           .timeout(const Duration(seconds: timeout), onTimeout: () {
         onTimeout?.call();
         return Future.delayed(const Duration(seconds: 3));
@@ -61,7 +61,7 @@ class HttpUtil {
     http.Response resp;
     try {
       resp = await http
-          .get(url as Uri, headers: _headers)
+          .get(Uri.parse(url), headers: _headers)
           .timeout(const Duration(seconds: timeout), onTimeout: () {
         onTimeout?.call();
         return Future.delayed(const Duration(seconds: 3));
@@ -93,7 +93,7 @@ class HttpUtil {
     http.Response resp;
     try {
       resp = await http
-          .head(url as Uri, headers: _headers)
+          .head(Uri.parse(url), headers: _headers)
           .timeout(const Duration(seconds: timeout), onTimeout: () {
         onTimeout?.call();
         return Future.delayed(const Duration(seconds: 3));
@@ -126,7 +126,7 @@ class HttpUtil {
     http.Response resp;
     try {
       resp = await http
-          .put(url as Uri, headers: _headers, body: jsonEncode(body))
+          .put(Uri.parse(url), headers: _headers, body: jsonEncode(body))
           .timeout(const Duration(seconds: timeout), onTimeout: () {
         onTimeout?.call();
         return   Future.delayed(const Duration(seconds: 3))
@@ -159,7 +159,7 @@ class HttpUtil {
     http.Response resp;
     try {
       resp = await http
-          .delete(url as Uri, headers: _headers)
+          .delete(Uri.parse(url), headers: _headers)
           .timeout(const Duration(seconds: timeout), onTimeout: () {
         onTimeout?.call();
         return   Future.delayed(const Duration(seconds: 3));
@@ -194,7 +194,7 @@ class HttpUtil {
 
     try {
       resp = await http
-          .post(url as Uri, headers: _headers, body: jsonEncode(body))
+          .post(Uri.parse(url), headers: _headers, body: jsonEncode(body))
           .timeout(const Duration(seconds: timeout), onTimeout: () {
         onTimeout?.call();
         return   Future.delayed(const Duration(seconds: 2))

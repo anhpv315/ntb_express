@@ -13,7 +13,7 @@ part 'order.g.dart';
 @JsonSerializable()
 class Order {
   String? orderId;
-  int addressId;
+  int? addressId;
   double? commission;
   num? createdDate;
   String createdId;
@@ -21,14 +21,14 @@ class Order {
   double? extFee;
   String extTrackNo;
   String goodsDescr;
-  int goodsType;
+  int? goodsType;
   double? intFee;
   String? intTrackNo;
   double? payOnBehalf;
-  int needRepack;
+  int? needRepack;
   double? repackFee;
-  int orderStatus;
-  int packCount;
+  int? orderStatus;
+  int? packCount;
   String saleId;
   double? size;
   double? feeBySize;

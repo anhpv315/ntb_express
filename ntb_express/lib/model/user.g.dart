@@ -7,31 +7,32 @@ part of 'user.dart';
 // **************************************************************************
 
 User _$UserFromJson(Map<String, dynamic> json) {
+  print(json);
   return User(
-    username: json['username'] as String,
-    password: json['password'] as String,
-    fullName: json['fullname'] as String,
-    email: json['email'] as String,
-    avatarImg: json['avatarImg'] as String,
-    userType: json['userType'] as int,
-    status: json['status'] as int,
-    langKey: json['langKey'] as String,
-    createdId: json['createdId'] as String,
-    createdDate: json['createdDate'] as num,
-    updatedId: json['updatedId'] as String,
-    updatedDate: json['updatedDate'] as num,
-    address: json['address'] as String,
-    phoneNumber: json['phoneNumber'] as String,
-    customerId: json['customerId'] as String,
-    managerId: json['managerId'] as String,
-    commission: (json['commission'] as num)?.toDouble(),
-    dob: json['dob'] as num,
+    username: json['username'] ?? ''  as String,
+    password: json['password'] ?? ''  as String,
+    fullName: json['fullname'] ?? ''  as String,
+    email: json['email'] ?? ''  as String,
+    avatarImg: json['avatarImg']?? '' as String,
+    userType: json['userType']== null? null : (json['userType'] as int),
+    status: json['status']== null? null : (json['status'] as int),
+    langKey: json['langKey']?? '' as String,
+    createdId: json['createdId'] ?? ''  as String,
+    createdDate: json['createdDate']== null? null : (json['createdDate']as num),
+    updatedId: json['updatedId'] ?? ''  as String,
+    updatedDate: json['updatedDate']== null? null : (json['updatedDate']as num),
+    address: json['address']?? '' as String,
+    phoneNumber: json['phoneNumber'] ?? ''  as String,
+    customerId: json['customerId']?? '' as String,
+    managerId: json['managerId']?? '' as String,
+    commission: json['commission']== null? null : (json['commission']as num)?.toDouble(),
+    dob: json['dob']== null? null : (json['dob']as num),
     avatarImgDTO: json['avatarImgDTO'] == null
         ? null
         : TCCOFile.fromJson(json['avatarImgDTO'] as Map<String, dynamic>),
-    refId: json['refId'] as String,
-    resetToken: json['resetToken'] as String,
-    isCreate: json['isCreate'] as int,
+    refId: json['refId']?? '' as String,
+    resetToken: json['resetToken']?? '' as String,
+    isCreate: json['isCreate']== null? null : (json['isCreate']as num) as int,
   );
 }
 

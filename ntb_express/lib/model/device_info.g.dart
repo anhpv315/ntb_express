@@ -8,12 +8,12 @@ part of 'device_info.dart';
 
 DeviceInfo _$DeviceInfoFromJson(Map<String, dynamic> json) {
   return DeviceInfo(
-    id: json['id'] as int,
-    username: json['username'] as String,
-    deviceId: json['deviceId'] as String,
-    fcmToken: json['fcmToken'] as String,
-    platform: json['platform'] as String,
-    locale: json['locale'] as String,
+    id: json['id']== null? null : (json['id'] as int),
+    username: json['username'] ?? ''  as String,
+    deviceId: json['deviceId'] ?? ''  as String,
+    fcmToken: json['fcmToken'] ?? ''  as String,
+    platform: json['platform'] ?? ''  as String,
+    locale: json['locale'] ?? ''  as String,
   );
 }
 

@@ -4,7 +4,7 @@ part 'device_info.g.dart';
 
 @JsonSerializable()
 class DeviceInfo {
-  int id;
+  int? id;
   String username;
   String deviceId;
   String fcmToken;

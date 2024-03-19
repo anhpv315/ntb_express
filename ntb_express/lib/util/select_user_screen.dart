@@ -105,7 +105,7 @@ class _SelectUserScreenState extends State<SelectUserScreen> {
                             (!Utils.isNullOrEmpty(element.phoneNumber) &&
                                 element.phoneNumber.contains(value)) ||
                             (!Utils.isNullOrEmpty(element.customerId) &&
-                                element.customerId
+                                element.customerId!
                                     .toLowerCase()
                                     .contains(value.toLowerCase())))
                         .toList();

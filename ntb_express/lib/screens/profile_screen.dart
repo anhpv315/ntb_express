@@ -26,7 +26,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  late File? _image;
+  late File? _image = null;
   final picker = ImagePicker();
   final _dividerHeight = 0.5;
   late User _user;
@@ -90,7 +90,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return await Utils.resizeImage(MemoryFileSystem()
         .file(file.path.substring(file.path.lastIndexOf('/') + 1))
-          ..writeAsBytesSync(file.readAsBytesSync()));
+      ..writeAsBytesSync(file.readAsBytesSync()));
   }
 
   @override
@@ -131,15 +131,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: CircleAvatar(
                         radius: 40.0,
                         backgroundImage: (_image != null
-                            ? FileImage(_image!)
-                            : (_user != null &&
-                                    _user.avatarImgDTO != null &&
-                                    !Utils.isNullOrEmpty(
-                                        _user.avatarImgDTO?.flePath))
-                                ? NetworkImage(
-                                    '${ApiUrls.instance()?.baseUrl}/${_user.avatarImgDTO?.flePath}?t=${DateTime.now().millisecondsSinceEpoch}')
-                                : AssetImage(
-                                    'assets/images/default-avatar.png')) as ImageProvider,
+                                ? FileImage(_image!)
+                                : (_user != null &&
+                                        _user.avatarImgDTO != null &&
+                                        !Utils.isNullOrEmpty(
+                                            _user.avatarImgDTO?.flePath))
+                                    ? NetworkImage(
+                                        '${ApiUrls.instance()?.baseUrl}/${_user.avatarImgDTO?.flePath}?t=${DateTime.now().millisecondsSinceEpoch}')
+                                    : AssetImage(
+                                        'assets/images/default-avatar.png'))
+                            as ImageProvider,
                       ),
                     ),
                   ),
@@ -192,7 +193,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               InfoItem(
                 firstText: '${Utils.getLocale(context)?.type} ',
                 secondText:
-                    '${Utils.getUserTypeString(context, _user.userType)}',
+                    '${Utils.getUserTypeString(context, _user.userType ?? 0)}',
               ),
               Divider(height: _dividerHeight),
               InfoItem(
@@ -260,8 +261,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: '${Utils.getLocale(context)?.edit} $email',
         hintText: '${Utils.getLocale(context)?.enter} $email...',
         length: 50, onValidate: (value) {
-      if (value == null || value!.isEmpty)
- {
+      if (value == null || value!.isEmpty) {
         Utils.alert(context,
             title: '$errorOccurred!',
             message: '${Utils.getLocale(context)?.mustEnter} $email!');
@@ -296,8 +296,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: '${Utils.getLocale(context)?.edit} $phoneNumber',
         hintText: '${Utils.getLocale(context)?.enter} $phoneNumber...',
         length: 12, onValidate: (value) {
-      if (value == null || value!.isEmpty)
- {
+      if (value == null || value!.isEmpty) {
         Utils.alert(context,
             title: '$errorOccurred!',
             message: '${Utils.getLocale(context)?.mustEnter} $phoneNumber!');
@@ -332,8 +331,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: '${Utils.getLocale(context)?.edit} $dob',
         hintText: '${Utils.getLocale(context)?.enter} $dob...',
         length: 10, onValidate: (value) {
-      if (value == null || value!.isEmpty)
- {
+      if (value == null || value!.isEmpty) {
         Utils.alert(context,
             title: '$errorOccurred!',
             message: '${Utils.getLocale(context)?.mustEnter} $dob!');
@@ -400,7 +398,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       HttpUtil.postUser(
         ApiUrls.instance()!.getUsersUrl()!,
         user: _user,
-        avatar: _image == null ? null : FileHolder(file: _image!, key: '', fileUrl: ''),
+        avatar: _image == null
+            ? null
+            : FileHolder(file: _image!, key: '', fileUrl: ''),
         onDone: (resp) async {
           _popLoading();
           if (resp == null || resp.statusCode != 200) {
@@ -429,8 +429,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   dynamic json = jsonDecode(utf8.decode(resp.bodyBytes));
                   User? user = json == null ? null : User.fromJson(json);
                   if (user == null) return;
-                  if (user.avatarImgDTO != null && !Utils.isNullOrEmpty(user.avatarImgDTO?.flePath)) {
-                    user.avatarImgDTO?.flePath += '?t=${DateTime.now().millisecondsSinceEpoch}';
+                  if (user.avatarImgDTO != null &&
+                      !Utils.isNullOrEmpty(user.avatarImgDTO?.flePath)) {
+                    user.avatarImgDTO?.flePath +=
+                        '?t=${DateTime.now().millisecondsSinceEpoch}';
                   }
                   SessionUtil.instance()?.user = user;
                   AppProvider.of(context)

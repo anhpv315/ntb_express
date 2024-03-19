@@ -659,7 +659,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                           child: Container(
                             decoration: BoxDecoration(
-                              color: _getColor(ord.orderStatus),
+                              color: _getColor(ord.orderStatus!),
                             ),
                             child: InkWell(
                               onTapDown: _storePosition,
@@ -833,7 +833,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             child: Wrap(
                                               children: [
                                                 _buildStatusTag(
-                                                    ord.orderStatus),
+                                                    ord.orderStatus!),
                                                 Text(
                                                     '${ord.packCount != null ? ' - ' : ''}${ord.packCount} ${Utils.getLocale(context)!.packs}',
                                                     style: TextStyle(

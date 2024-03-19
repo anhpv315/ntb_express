@@ -138,8 +138,8 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
     _getFeeTable();
     if (widget.order != null) {
       _order = Order.clone(widget.order!);
-      _status =  _order!.orderStatus;
-      _goodsType =  _order!.goodsType;
+      _status =  _order!.orderStatus?? 0;
+      _goodsType =  _order!.goodsType?? 0;
       _customer =  _order!.customerDTO!;
       _address =  _order!.addressDTO!;
       _goodsTypeDescrController.text =  _order!.goodsDescr;

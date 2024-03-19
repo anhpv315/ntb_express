@@ -674,7 +674,7 @@ class Utils {
             isNewOrder) ||
         (isChineseWarehouseStaff &&
             [OrderStatus.newlyCreated, OrderStatus.chineseWarehoused]
-                    .indexOf(order.orderStatus) >
+                    .indexOf(order.orderStatus!) >
                 -1)) {
       list.add(AllowAction.edit);
     } else if (isChineseWarehouseStaff &&

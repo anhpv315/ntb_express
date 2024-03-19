@@ -15,7 +15,7 @@ class Notification {
   String customerId;
   String title;
   String body;
-  int read;
+  int? read;
   @JsonKey(name: 'insert_time')
   String insertTime;
 

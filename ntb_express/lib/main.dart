@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -38,6 +39,7 @@ final BehaviorSubject<String> selectNotificationSubject =
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
 
   // prevent device orientation change
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
@@ -227,14 +229,17 @@ class _HandleWrapperState extends State<HandleWrapper> {
 
     FirebaseMessaging.instance.getInitialMessage().then((message) async {
       print("onLaunch: $message");
-      if (Platform.isIOS) {
-        await _saveNotification(jsonDecode(jsonEncode(message)));
+      if(message != null){
+        if (Platform.isIOS) {
+          await _saveNotification(jsonDecode(jsonEncode(message)));
+        }
+        _navigateToItemDetail(message as Map<String, dynamic>);
       }
-      _navigateToItemDetail(message as Map<String, dynamic>);
+
     });
 
 
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
+    FirebaseMessaging.onMessageOpenedApp.listen((message) async {
       if (Platform.isIOS) {
       if (!_isDoubleResume) {
       print("onResume: $message");
@@ -251,9 +256,7 @@ class _HandleWrapperState extends State<HandleWrapper> {
 
 
 
-    FirebaseMessaging.onBackgroundMessage((RemoteMessage message) async {
-      if(!Platform.isIOS) await _myBackgroundMessageHandler(message as Map<String, dynamic>);
-    });
+    FirebaseMessaging.onBackgroundMessage(_myBackgroundMessageHandler);
 
 
 
@@ -273,12 +276,13 @@ class _HandleWrapperState extends State<HandleWrapper> {
     _firebaseMessaging.subscribeToTopic('all');
   }
 
-  static Future<dynamic> _myBackgroundMessageHandler(
-      Map<String, dynamic> message) {
-    print('onBackground: ');
-    print(jsonEncode(message));
-    _showNotification(message);
-    return Future<void>.value();
+  static Future<void> _myBackgroundMessageHandler(RemoteMessage message) async {
+    if(!Platform.isIOS){
+      print('onBackground: ');
+      print(jsonEncode(message));
+      _showNotification(message as Map<String, dynamic>);
+    }
+
   }
 
   static Future _showNotification(Map<String, dynamic> message) async {

@@ -458,10 +458,12 @@ class _LoginScreenState extends State<LoginScreen> {
       _setLoading(true);
       Future.delayed(Duration(milliseconds: 500), () async {
         http.Response resp;
+        var uri = Uri.parse(ApiUrls.instance()!.getLoginUrl()!);
+        print(uri);
         try {
           // send HTTP request to login
           resp = await http
-              .post(ApiUrls.instance()?.getLoginUrl() as Uri,
+              .post(uri,
                   headers: {'Content-Type': 'application/json'},
                   body: jsonEncode({
                     'username': _usernameController.text?.trim(),
@@ -546,6 +548,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     '${Utils.getLocale(context)!.wrongCredentialsMessage}');
           }
         } catch (e) {
+          print(e);
           _setLoading(false);
         }
       });

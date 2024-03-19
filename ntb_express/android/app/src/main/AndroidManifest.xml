@@ -13,10 +13,11 @@
          FlutterApplication and put your custom class here. -->
     <!-- io.flutter.app.FlutterApplication -->
     <application
-        android:name=".Application"
+        android:name="${applicationName}"
         android:label="Đại Long Express"
         android:icon="@mipmap/launcher_icon"
         android:requestLegacyExternalStorage="true"
+        android:enableOnBackInvokedCallback="true"
         tools:ignore="MissingClass">
         <activity
             android:name=".MainActivity"

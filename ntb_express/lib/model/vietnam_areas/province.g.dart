@@ -8,10 +8,10 @@ part of 'province.dart';
 
 Province _$ProvinceFromJson(Map<String, dynamic> json) {
   return Province(
-    id: json['id'] as int,
-    name: json['name'] as String,
-    location: json['location'] as String,
-    type: json['type'] as String,
+    id: json['id']== null? 0 : (json['id'] as int),
+    name: json['name'] ?? ''  as String,
+    location: json['location'] ?? ''  as String,
+    type: json['type'] ?? ''  as String,
   );
 }
 

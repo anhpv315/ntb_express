@@ -90,7 +90,7 @@ class _SelectPromotionScreenState extends State<SelectPromotionScreen> {
                                   children: [
                                     TextSpan(
                                       text: Utils.getGoodsTypeString(
-                                          context, promotion.goodsType),
+                                          context, promotion.goodsType!),
                                       style: TextStyle(color: Colors.orange),
                                     ),
                                   ],
@@ -99,7 +99,7 @@ class _SelectPromotionScreenState extends State<SelectPromotionScreen> {
                               Text(promotion.description),
                               //Text(promotion.description ?? ''),
                               Text(
-                                  '${Utils.getLocale(context)?.expiryDate}: ${Utils.getDateString(promotion.startDate, 'dd.MM.yyyy')} - ${Utils.getDateString(promotion.endDate, 'dd.MM.yyyy')}'),
+                                  '${Utils.getLocale(context)?.expiryDate}: ${Utils.getDateString(promotion.startDate!, 'dd.MM.yyyy')} - ${Utils.getDateString(promotion.endDate!, 'dd.MM.yyyy')}'),
                             ],
                           ),
                           trailing: _current != null &&

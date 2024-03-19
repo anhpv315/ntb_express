@@ -4,8 +4,11 @@ import 'package:file/memory.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart';
 import 'package:multi_image_picker_view/multi_image_picker_view.dart';
+import 'package:file_picker/file_picker.dart';
+
+import 'package:image_picker/image_picker.dart';
 import 'package:ntbexpress/model/file_holder.dart';
 import 'package:ntbexpress/util/utils.dart';
 import 'package:ntbexpress/widgets/image_gallery.dart';
@@ -77,10 +80,25 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
 
 
     Navigator.of(context).pop(); // hide bottom sheet
-    List<Asset> files;
+    List<PlatformFile> files = [];
+    List<MultipartFile> multipartFiles = [];
+    FilePickerResult? result;
+
     try {
-      files = await MultiImagePicker.pickImages(
-          maxImages: widget.maxImages - _files.length, enableCamera: true);
+      // files = await MultipleImagesPicker.pickImages(
+      //     maxImages: widget.maxImages - _files.length, enableCamera: true);
+
+      result = await await FilePicker.platform
+          .pickFiles(allowMultiple: true, type: FileType.image);
+      if (result != null) {
+        files = result.files;
+        multipartFiles = result.files
+            .map((file) =>
+            MultipartFile.fromBytes(
+              'file', file.bytes as List<int>,
+              filename: file.name,
+            )).toList();
+      }
     } catch (e) {
       Utils.alert(context,
           title: Utils.getLocale(context)?.errorOccurred,
@@ -94,8 +112,8 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
     _files.addAll(files.map((e) => FileHolder(file: File(''), key: '', fileUrl: '')));
     setState(() {});
 
-    for (Asset a in files) {
-      ByteData byteData = await a.getByteData();
+    for (PlatformFile a in files) {
+      ByteData byteData = (await a.bytes) as ByteData;
       if (byteData == null) continue;
 
       final fileHolder = FileHolder(

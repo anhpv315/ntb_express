@@ -79,7 +79,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
 
   void _sortOrderTracks() {
     if ( _order!.orderTrackDTOS != null) {
-       _order!.orderTrackDTOS?.sort((a, b) => b!.actionDate - a!.actionDate);
+       _order!.orderTrackDTOS?.sort((a, b) => b!.actionDate?? 0 - a!.actionDate!??0);
     }
   }
 
@@ -249,7 +249,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                           });
                         },
                         child: Text(
-                          '${Utils.getOrderStatusString(context,  _order!.orderStatus)}',
+                          '${Utils.getOrderStatusString(context,  _order!.orderStatus!)}',
                           style: TextStyle(
                             color: Colors.blue,
                           ),
@@ -282,7 +282,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                   child: InfoItem(
                     firstText: '${Utils.getLocale(context)!.type}',
                     secondText:
-                        Utils.getGoodsTypeString(context,  _order!.goodsType),
+                        Utils.getGoodsTypeString(context,  _order!.goodsType!),
                   ),
                 ),
                 _divider(),
@@ -404,7 +404,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen>
                   child: InfoItem(
                     firstText: '${Utils.getLocale(context)!.packedByWoodenBox}',
                     secondText:
-                        '${_order?.needRepack != null &&  _order!.needRepack > 0 ? '${Utils.getLocale(context)!.yes}${!isChineseStaff ? ' (${Utils.getMoneyString( _order!.repackFee!)})' : ''}' : '${Utils.getLocale(context)!.no}'}',
+                        '${_order?.needRepack != null &&  _order!.needRepack! > 0 ? '${Utils.getLocale(context)!.yes}${!isChineseStaff ? ' (${Utils.getMoneyString( _order!.repackFee!)})' : ''}' : '${Utils.getLocale(context)!.no}'}',
                   ),
                 ),
                 _divider(),

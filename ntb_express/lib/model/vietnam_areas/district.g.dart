@@ -8,11 +8,11 @@ part of 'district.dart';
 
 District _$DistrictFromJson(Map<String, dynamic> json) {
   return District(
-    id: json['id'] as int,
-    name: json['name'] as String,
-    location: json['location'] as String,
-    type: json['type'] as String,
-    provinceId: json['tinh_id'] as int,
+    id: json['id'] == null? 0 : json['id'] as int,
+    name: json['name'] ?? ''  as String,
+    location: json['location'] ?? ''  as String,
+    type: json['type'] ?? ''  as String,
+    provinceId: json['tinh_id']== null? null : (json['tinh_id'] as int),
   );
 }
 

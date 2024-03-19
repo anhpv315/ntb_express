@@ -10,7 +10,7 @@ class Wards implements Location {
   String location;
   String type;
   @JsonKey(name: 'huyen_id')
-  int districtId;
+  int? districtId;
 
   Wards({this.id = 0, this.name = '', this.location = '', this.type = '', this.districtId = 0});
 

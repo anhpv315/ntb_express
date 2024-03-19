@@ -12,9 +12,9 @@ class User {
   @JsonKey(name: 'fullname')
   String fullName;
   String? email;
-  String avatarImg;
-  int userType;
-  int status;
+  String? avatarImg;
+  int? userType;
+  int? status;
   String langKey;
   String createdId;
   num? createdDate;
@@ -22,13 +22,13 @@ class User {
   num? updatedDate;
   String address;
   String phoneNumber;
-  String customerId;
-  String managerId;
+  String? customerId;
+  String? managerId;
   double? commission;
   num? dob;
   TCCOFile? avatarImgDTO;
-  String refId;
-  String resetToken;
+  String? refId;
+  String? resetToken;
   int? isCreate;
 
 
