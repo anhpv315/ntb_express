@@ -106,15 +106,12 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
       print('Error occurred when trying to pick multiple images!');
       return;
     }
-
-    if (files == null) return;
     files.removeWhere((a) => a == null); // cleanup
     _files.addAll(files.map((e) => FileHolder(file: File(''), key: '', fileUrl: '')));
     setState(() {});
 
     for (PlatformFile a in files) {
       ByteData byteData = (await a.bytes) as ByteData;
-      if (byteData == null) continue;
 
       final fileHolder = FileHolder(
           file: await compute(_computeFile as ComputeCallback<FileHolderParser, File>,
@@ -133,7 +130,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
       }
 
       setState(() {});
-      widget?.controller?.files = _files;
+      widget.controller?.files = _files;
     }
   }
 

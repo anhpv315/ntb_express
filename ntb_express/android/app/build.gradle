@@ -37,16 +37,15 @@ if (keystorePropertiesFile.exists()) {
 subprojects{
     afterEvaluate {
         android {
-            namespace 'dev.fluttercommunity.plus.device_info'
+            namespace 'vn.com.a2m.ntbexpress'
         }
     }
 }
 
 android {
     compileSdkVersion 33
-//    useAndroidX true
-//    enableJetifier true
-    namespace 'dev.fluttercommunity.plus.device_info'
+    namespace 'vn.com.a2m.ntbexpress'
+//    buildToolsVersion "33.0.3"
 
     lintOptions {
         disable 'InvalidPackage'
@@ -54,10 +53,9 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "vn.com.a2m.ntbexpress"
+//        applicationId "vn.com.a2m.ntbexpress"
         minSdkVersion 23
         targetSdkVersion 33
-        buildToolsVersion "33.0.2"
 
         multiDexEnabled true
         versionCode flutterVersionCode.toInteger()
@@ -87,8 +85,12 @@ android {
         }
     }
 
+    compileOptions {
+        sourceCompatibility 17
+        targetCompatibility 17
+    }
     composeOptions {
-        kotlinCompilerExtensionVersion '1.4.0'
+        kotlinCompilerExtensionVersion '1.7.10'
     }
 
 }
@@ -103,7 +105,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:11.8.0'
 //    implementation 'androidx.multidex:multidex:2.0.1'
         implementation 'com.android.support:multidex:2.0.1'
-    implementation "org.jetbrains.kotlin:kotlin-reflect:1.7.10"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.9.10"
 
 
 
