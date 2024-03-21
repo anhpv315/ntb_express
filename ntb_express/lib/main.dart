@@ -29,7 +29,7 @@ import 'package:ntbexpress/util/session_util.dart';
 import 'package:ntbexpress/util/utils.dart';
 import 'package:ntbexpress/widgets/app_provider.dart';
 import 'package:rxdart/subjects.dart';
-import 'package:vibration/vibration.dart';
+// import 'package:vibration/vibration.dart';
 
 final BehaviorSubject<ReceivedNotification> didReceiveLocalNotificationSubject =
     BehaviorSubject<ReceivedNotification>();
@@ -320,7 +320,7 @@ class _HandleWrapperState extends State<HandleWrapper> {
         android: platformChannelSpecificsAndroid, iOS: platformChannelSpecificsIos);
 
     Future.delayed(Duration.zero, () {
-      Vibration.vibrate();
+      // Vibration.vibrate();
       FlutterRingtonePlayer().playNotification();
       _flutterLocalNotificationsPlugin.show(
         Random().nextInt(100),
@@ -404,7 +404,7 @@ class _HandleWrapperState extends State<HandleWrapper> {
         return;
       }
       if (SessionUtil.instance()?.user?.userType == UserType.customer) {
-        Vibration.vibrate();
+        // Vibration.vibrate();
         FlutterRingtonePlayer().playNotification();
         Utils.alert(context,
             title: '${msg['title'] ?? 'Thông báo'}', message: '${msg['body']}');

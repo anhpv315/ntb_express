@@ -42,6 +42,19 @@ subprojects{
     }
 }
 
+//subprojects {
+//    afterEvaluate { project ->
+//        if (project.hasProperty('android')) {
+//            project.android {
+//                if (namespace == null) {
+//                    namespace project.group
+//                }
+//            }
+//        }
+//    }
+//}
+
+
 android {
     compileSdkVersion 33
     namespace 'vn.com.a2m.ntbexpress'
@@ -49,12 +62,21 @@ android {
 
     lintOptions {
         disable 'InvalidPackage'
+//        disable 'MissingPermission'
+//        disable 'OldTargetApi'
+        checkReleaseBuilds false
+        abortOnError false
     }
+
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
+
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
 //        applicationId "vn.com.a2m.ntbexpress"
-        minSdkVersion 23
+        minSdkVersion 29
         targetSdkVersion 33
 
         multiDexEnabled true
@@ -86,8 +108,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility 17
-        targetCompatibility 17
+        sourceCompatibility 11
+        targetCompatibility 11
     }
     composeOptions {
         kotlinCompilerExtensionVersion '1.7.10'

@@ -9,7 +9,7 @@ import io.flutter.plugin.common.PluginRegistry.PluginRegistrantCallback;
 import com.dexterous.flutterlocalnotifications.FlutterLocalNotificationsPlugin;
 import io.flutter.plugins.pathprovider.PathProviderPlugin;
 import com.tekartik.sqflite.SqflitePlugin;
-import com.benjaminabel.vibration.VibrationPlugin;
+//import com.benjaminabel.vibration.VibrationPlugin;
 import io.inway.ringtone.player.FlutterRingtonePlayerPlugin;
 
 public class Application extends FlutterApplication implements PluginRegistrantCallback {

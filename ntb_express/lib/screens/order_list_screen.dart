@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:ntbexpress/bloc/order_bloc.dart';
 import 'package:ntbexpress/util/contants.dart';
 import 'package:ntbexpress/util/session_util.dart';

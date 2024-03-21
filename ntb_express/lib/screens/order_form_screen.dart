@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 
 /// create/update the order
 import 'package:flutter/material.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:intl/intl.dart';
 import 'package:ntbexpress/model/address.dart';
 import 'package:ntbexpress/model/fee_item.dart';
@@ -24,7 +23,11 @@ import 'package:ntbexpress/util/session_util.dart';
 import 'package:ntbexpress/util/utils.dart';
 import 'package:ntbexpress/widgets/app_provider.dart';
 import 'package:ntbexpress/widgets/currency_swap_input.dart';
+// import 'package:ai_barcode/ai_barcode.dart';
+
+
 import 'package:ntbexpress/widgets/image_picker_widget.dart';
+import 'package:qrcode_barcode_scanner/qrcode_barcode_scanner.dart';
 
 import '../widgets/confirm_order_status.dart';
 import '../widgets/raised_button.dart';
@@ -124,7 +127,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
       !Utils.isNullOrEmpty(_sizeController.text) &&
       (_order != null &&
           ![OrderStatus.delivery, OrderStatus.delivered, OrderStatus.completed]
-              .contains( _order!.orderStatus) &&
+              .contains(_order!.orderStatus) &&
           !isSaleStaff);
 
   bool get isAllowEditAgentFee =>
@@ -138,53 +141,53 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
     _getFeeTable();
     if (widget.order != null) {
       _order = Order.clone(widget.order!);
-      _status =  _order!.orderStatus?? 0;
-      _goodsType =  _order!.goodsType?? 0;
-      _customer =  _order!.customerDTO!;
-      _address =  _order!.addressDTO!;
-      _goodsTypeDescrController.text =  _order!.goodsDescr;
-      _intTrackNoController.text =  _order!.intTrackNo!;
-      _packCountController.text =  _order!.packCount!.toString();
-      _weightController.text =  _order!.weight!.toString();
-      _sizeController.text =  _order!.size!.toString();
-      _boxedWood =  _order!.needRepack == 1;
-      _payOnBehalfController.text =  _order!.payOnBehalf!.toString();
-      _repackFeeController.text =  _order!.repackFee!.toString();
-      _intFeeController.text =  _order!.intFee!.toString();
-      _extFeeController.text =  _order!.extFee!.toString();
-      _noteController.text =  _order!.note;
+      _status = _order!.orderStatus ?? 0;
+      _goodsType = _order!.goodsType ?? 0;
+      _customer = _order!.customerDTO!;
+      _address = _order!.addressDTO!;
+      _goodsTypeDescrController.text = _order!.goodsDescr;
+      _intTrackNoController.text = _order!.intTrackNo!;
+      _packCountController.text = _order!.packCount!.toString();
+      _weightController.text = _order!.weight!.toString();
+      _sizeController.text = _order!.size!.toString();
+      _boxedWood = _order!.needRepack == 1;
+      _payOnBehalfController.text = _order!.payOnBehalf!.toString();
+      _repackFeeController.text = _order!.repackFee!.toString();
+      _intFeeController.text = _order!.intFee!.toString();
+      _extFeeController.text = _order!.extFee!.toString();
+      _noteController.text = _order!.note;
       _parseImages();
-      _promotion = ( _order!.promotionDTO == null
+      _promotion = (_order!.promotionDTO == null
           ? null
-          : Promotion.fromJson( _order!.promotionDTO!.toJson()))!;
-      _totalFee =  _order!.totalFeeDaiLong ?? 0;
+          : Promotion.fromJson(_order!.promotionDTO!.toJson()))!;
+      _totalFee = _order!.totalFeeDaiLong ?? 0;
       _feeBySizeController.text =
-           _order!.feeBySize == null ? '0' :  _order!.feeBySize.toString();
+          _order!.feeBySize == null ? '0' : _order!.feeBySize.toString();
       _feeByWeightController.text =
-           _order!.feeByWeight == null ? '0' :  _order!.feeByWeight.toString();
-      if ( _order!.feeBySize != null &&  _order!.feeBySize! > 0 ||
-           _order!.feeByWeight != null &&  _order!.feeByWeight! > 0) {
+          _order!.feeByWeight == null ? '0' : _order!.feeByWeight.toString();
+      if (_order!.feeBySize != null && _order!.feeBySize! > 0 ||
+          _order!.feeByWeight != null && _order!.feeByWeight! > 0) {
         _priceType = PriceType.fixed;
       }
 
       Map<String, double> fees = PriceCalculationUtil.getAgentFee(
-          address:  _order!.addressDTO,
-          goodsType:  _order!.goodsType,
-          weight:  _order!.weight == null? 0:  _order!.weight!,
-          size:  _order!.size == null? 0:   _order!.size!,
-          feeBySize:  _order!.feeBySize == null? 0:  _order!.feeBySize!,
-          feeByWeight:  _order!.feeByWeight == null? 0 :  _order!.feeByWeight!);
+          address: _order!.addressDTO,
+          goodsType: _order!.goodsType,
+          weight: _order!.weight == null ? 0 : _order!.weight!,
+          size: _order!.size == null ? 0 : _order!.size!,
+          feeBySize: _order!.feeBySize == null ? 0 : _order!.feeBySize!,
+          feeByWeight: _order!.feeByWeight == null ? 0 : _order!.feeByWeight!);
 
       _minAgentWeightFee = fees["weight"]!;
       _minAgentSizeFee = fees["size"]!;
 
-      _feeByWeightDealerController.text =  _order!.feeByWeightDealer == null
+      _feeByWeightDealerController.text = _order!.feeByWeightDealer == null
           ? '0'
-          :  _order!.feeByWeightDealer.toString();
-      _feeBySizeDealerController.text =  _order!.feeBySizeDealer == null
+          : _order!.feeByWeightDealer.toString();
+      _feeBySizeDealerController.text = _order!.feeBySizeDealer == null
           ? '0'
-          :  _order!.feeBySizeDealer.toString();
-      _agentTotalFee =  _order!.totalFee ?? 0;
+          : _order!.feeBySizeDealer.toString();
+      _agentTotalFee = _order!.totalFee ?? 0;
       //Future.delayed(const Duration(milliseconds: 500), _updateTotalFee);
     }
 
@@ -238,13 +241,13 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
   }
 
   Future<void> _parseImages() async {
-    if ( _order!.tccoFileDTOS != null) {
-      for (var f in  _order!.tccoFileDTOS!) {
+    if (_order!.tccoFileDTOS != null) {
+      for (var f in _order!.tccoFileDTOS!) {
         if (f == null) continue;
         final url = '${ApiUrls.instance()?.baseUrl}/${f.flePath}';
         if (!(await Utils.isUrlValid(url))) continue;
 
-        if ( widget.update !=null && widget.update!) {
+        if (widget.update != null && widget.update!) {
           _filesController.add(FileHolder(
               key: f.atchFleSeq, isNetworkImage: true, fileUrl: url));
         } else {
@@ -262,30 +265,30 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
       _updateAgentTotalFee();
 
       _totalFee = PriceCalculationUtil.calculatePrice(
-          repackFee:  _order!.repackFee!,
-          payOnBehalf:  _order!.payOnBehalf!,
-          intFee:  _order!.intFee!,
-          extFee:  _order!.extFee!);
+          repackFee: _order!.repackFee!,
+          payOnBehalf: _order!.payOnBehalf!,
+          intFee: _order!.intFee!,
+          extFee: _order!.extFee!);
 
       _totalFeeOrigin = PriceCalculationUtil.calculatePrice(
-          repackFee:  _order!.repackFee!,
-          payOnBehalf:  _order!.payOnBehalf!,
-          intFee:  _order!.intFee!,
+          repackFee: _order!.repackFee!,
+          payOnBehalf: _order!.payOnBehalf!,
+          intFee: _order!.intFee!,
           extFee: PriceCalculationUtil.calculateExtFee(
               address: _address,
-              goodsType:  _order!.goodsType,
-              size:  _order!.size!,
-              weight:  _order!.weight!));
+              goodsType: _order!.goodsType,
+              size: _order!.size!,
+              weight: _order!.weight!));
     });
   }
 
   void _updateAgentTotalFee() {
     _agentTotalFee = PriceCalculationUtil.calculatePrice(
-        repackFee:  _order!.repackFee!,
-        payOnBehalf:  _order!.payOnBehalf!,
-        intFee:  _order!.intFee!,
-        extFee:  _order!.weight! *  _order!.feeByWeightDealer! +
-             _order!.size! *  _order!.feeBySizeDealer);
+        repackFee: _order!.repackFee!,
+        payOnBehalf: _order!.payOnBehalf!,
+        intFee: _order!.intFee!,
+        extFee: _order!.weight! * _order!.feeByWeightDealer! +
+            _order!.size! * _order!.feeBySizeDealer);
   }
 
   void _updateAgentFee() {
@@ -299,22 +302,22 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
     //_promotion = null; // reset promotion when the price has changed, user need reselect promotion!!!
     _getFormData();
     double price = PriceCalculationUtil.calculateExtFee(
-        address:  _order!.addressDTO,
-        goodsType:  _order!.goodsType,
-        size:  _order!.size!,
-        weight:  _order!.weight!,
-        feeBySize:  _order!.feeBySize!,
-        feeByWeight:  _order!.feeByWeight!);
+        address: _order!.addressDTO,
+        goodsType: _order!.goodsType,
+        size: _order!.size!,
+        weight: _order!.weight!,
+        feeBySize: _order!.feeBySize!,
+        feeByWeight: _order!.feeByWeight!);
 
-    _extFeeController.text = price == null? '0': price!.toString();
+    _extFeeController.text = price == null ? '0' : price!.toString();
 
     Map<String, double> fees = PriceCalculationUtil.getAgentFee(
-        address:  _order!.addressDTO,
-        goodsType:  _order!.goodsType,
-        weight:  _order!.weight!,
-        size:  _order!.size!,
-        feeBySize:  _order!.feeBySize!,
-        feeByWeight:  _order!.feeByWeight!);
+        address: _order!.addressDTO,
+        goodsType: _order!.goodsType,
+        weight: _order!.weight!,
+        size: _order!.size!,
+        feeBySize: _order!.feeBySize!,
+        feeByWeight: _order!.feeByWeight!);
 
     _minAgentWeightFee = fees["weight"]!;
     _minAgentSizeFee = fees["size"]!;
@@ -346,45 +349,45 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
     if (_order == null) {
       _order = Order();
     }
-     _order!.addressDTO = _address;
-     _order!.addressId = _address!.addressId;
-     _order!.customerId = _customer!.username;
-     _order!.customerDTO = _customer;
-     _order!.goodsType = _goodsType;
-     _order!.orderStatus = _status;
-     _order!.goodsDescr = _goodsTypeDescrController.text.trim();
-     _order!.intTrackNo = _intTrackNoController.text.trim();
-     _order!.packCount = _packCountController.text.trim().parseInt();
-     _order!.weight = _weightController.text.trim().parseDouble();
-     _order!.size = _sizeController.text.trim().parseDouble();
-     _order!.needRepack = _boxedWood ? 1 : 0;
-     _order!.repackFee = _repackFeeController.text.trim().parseDouble();
-     _order!.payOnBehalf = _payOnBehalfController.text.trim().parseDouble();
-     _order!.intFee = _intFeeController.text.trim().parseDouble();
-     _order!.extFee = _extFeeController.text.trim().parseDouble();
-     _order!.note = _noteController.text.trim();
+    _order!.addressDTO = _address;
+    _order!.addressId = _address!.addressId;
+    _order!.customerId = _customer!.username;
+    _order!.customerDTO = _customer;
+    _order!.goodsType = _goodsType;
+    _order!.orderStatus = _status;
+    _order!.goodsDescr = _goodsTypeDescrController.text.trim();
+    _order!.intTrackNo = _intTrackNoController.text.trim();
+    _order!.packCount = _packCountController.text.trim().parseInt();
+    _order!.weight = _weightController.text.trim().parseDouble();
+    _order!.size = _sizeController.text.trim().parseDouble();
+    _order!.needRepack = _boxedWood ? 1 : 0;
+    _order!.repackFee = _repackFeeController.text.trim().parseDouble();
+    _order!.payOnBehalf = _payOnBehalfController.text.trim().parseDouble();
+    _order!.intFee = _intFeeController.text.trim().parseDouble();
+    _order!.extFee = _extFeeController.text.trim().parseDouble();
+    _order!.note = _noteController.text.trim();
     if (_removeImages.isNotEmpty) {
-      if ( _order!.tccoFileDTOS == null) {
-         _order!.tccoFileDTOS = [];
+      if (_order!.tccoFileDTOS == null) {
+        _order!.tccoFileDTOS = [];
       }
 
       _removeImages.forEach((e) {
-         _order!.tccoFileDTOS?.removeWhere((f) => e.key == f?.atchFleSeq);
+        _order!.tccoFileDTOS?.removeWhere((f) => e.key == f?.atchFleSeq);
       });
     }
-     _order!.promotionId = _promotion!.promotionId;
-     _order!.promotionDTO = _promotion;
-     _order!.feeBySize =
+    _order!.promotionId = _promotion!.promotionId;
+    _order!.promotionDTO = _promotion;
+    _order!.feeBySize =
         _feeBySizeController?.text?.toString()?.parseDouble() ?? 0;
-     _order!.feeByWeight =
+    _order!.feeByWeight =
         _feeByWeightController?.text?.toString()?.parseDouble() ?? 0;
-     _order!.totalFee = _agentTotalFee;
-     _order!.totalFeeOriginal = _totalFeeOrigin;
-     _order!.feeByWeightDealer =
+    _order!.totalFee = _agentTotalFee;
+    _order!.totalFeeOriginal = _totalFeeOrigin;
+    _order!.feeByWeightDealer =
         _feeByWeightDealerController.text.trim().parseDouble();
-     _order!.feeBySizeDealer =
+    _order!.feeBySizeDealer =
         _feeBySizeDealerController.text.trim().parseDouble();
-     _order!.totalFeeDaiLong = _totalFee;
+    _order!.totalFeeDaiLong = _totalFee;
   }
 
   @override
@@ -426,9 +429,10 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                           child: Column(
                             children: [
                               Visibility(
-                                visible: SessionUtil.instance()?.user?.userType !=
-                                        UserType.customer &&
-                                    !isChineseWarehouseStaff,
+                                visible:
+                                    SessionUtil.instance()?.user?.userType !=
+                                            UserType.customer &&
+                                        !isChineseWarehouseStaff,
                                 child: ListTile(
                                   enabled: isNotCustomer,
                                   onTap: !canEditCustomer
@@ -525,8 +529,8 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                                 _address?.district,
                                                 _address?.province
                                               ]
-                                                  .join(', ')
-                                                  !.replaceAll(' ,', '')),
+                                                  .join(', ')!
+                                                  .replaceAll(' ,', '')),
                                             ],
                                           ),
                                         )
@@ -553,7 +557,8 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                           ),
                                           DropdownButton<PriceType>(
                                             disabledHint: Text(
-                                                Utils.getLocale(context)!.fixed),
+                                                Utils.getLocale(context)!
+                                                    .fixed),
                                             value: _priceType,
                                             items: _dropDownPriceType(),
                                             onChanged: _promotion != null
@@ -705,7 +710,6 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                   if (isChineseWarehouseStaff) return null;
 
                                   if (value == null || value!.isEmpty)
-
                                     return Utils.getLocale(context)!.required;
 
                                   return null;
@@ -745,17 +749,46 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                   GestureDetector(
                                     onTap: !isNotCustomer
                                         ? null
-                                        : () {
-                                            FlutterBarcodeScanner.scanBarcode(
-                                              '#ff6666',
-                                              '${Utils.getLocale(context)!.cancel}',
-                                              true,
-                                              ScanMode.DEFAULT,
-                                            ).then((value) {
-                                              if (value == '-1') value = '';
-                                              _intTrackNoController.text =
-                                                  value;
-                                            });
+                                        : () async {
+                                            QrcodeBarcodeScanner(
+                                              onScannedCallback:
+                                                  (String value) => setState(
+                                                () {
+                                                  setState(() {
+                                                    if (value is String) {
+                                                      if (value == '-1')
+                                                        value = '';
+                                                      _intTrackNoController
+                                                          .text = value;
+                                                    }
+                                                  });
+                                                },
+                                              ),
+                                            );
+                                            // var res = await Navigator.push(
+                                            //     context,
+                                            //     MaterialPageRoute(
+                                            //       builder: (context) =>
+                                            //           const SimpleBarcodeScannerPage(),
+                                            //     ));
+                                            // setState(() {
+                                            //   if (res is String) {
+                                            //     if (res == '-1') res = '';
+                                            //     _intTrackNoController.text =
+                                            //         res;
+                                            //   }
+                                            // });
+
+                                            // FlutterBarcodeScanner.scanBarcode(
+                                            //   '#ff6666',
+                                            //   '${Utils.getLocale(context)!.cancel}',
+                                            //   true,
+                                            //   ScanMode.DEFAULT,
+                                            // ).then((value) {
+                                            //   if (value == '-1') value = '';
+                                            //   _intTrackNoController.text =
+                                            //       value;
+                                            // });
                                           },
                                     child: Image.asset(
                                       'assets/images/scan.png',
@@ -790,7 +823,6 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                 maxLines: 1,
                                 validator: (value) {
                                   if (value == null || value!.isEmpty)
-
                                     return Utils.getLocale(context)!.required;
 
                                   return null;
@@ -913,14 +945,13 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                         maxLines: 1,
                                         validator: (value) {
                                           if (!isAllowEditAgentFee) return null;
-                                          if (value == null || value!.isEmpty)
- {
+                                          if (value == null || value!.isEmpty) {
                                             return Utils.getLocale(context)!
                                                 .required;
                                           } else if (double.parse(value) <
                                               _minAgentWeightFee) {
-                                            return Utils.getLocale(context)
-                                                    !.required! +
+                                            return Utils.getLocale(context)!
+                                                    .required! +
                                                 " >= " +
                                                 _minAgentWeightFee.toString();
                                           }
@@ -953,8 +984,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                         maxLines: 1,
                                         validator: (value) {
                                           if (!isAllowEditAgentFee) return null;
-                                          if (value == null || value!.isEmpty)
- {
+                                          if (value == null || value!.isEmpty) {
                                             return Utils.getLocale(context)!
                                                 .required;
                                           } else if (double.parse(value) <
@@ -983,7 +1013,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                         value: _boxedWood,
                                         onChanged: widget.update! &&
                                                 OrderStatus.chineseWarehoused ==
-                                                     _order!.orderStatus
+                                                    _order!.orderStatus
                                             ? null
                                             : (value) => setState(() {
                                                   _boxedWood = value!;
@@ -1166,7 +1196,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                           _getFormData();
                                           if (_order == null ||
                                               Utils.isNullOrEmpty(
-                                                   _order!.customerId) ||
+                                                  _order!.customerId) ||
                                               _address == null ||
                                               Utils.isNullOrEmpty(
                                                   _address?.province)) {
@@ -1184,7 +1214,8 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
                                                       builder: (context) =>
                                                           SelectPromotionScreen(
                                                             order: _order,
-                                                            current: _promotion!,
+                                                            current:
+                                                                _promotion!,
                                                           ))) ??
                                               _promotion;
 
@@ -1416,7 +1447,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
   }
 
   void _onGoodsTypeChanged(int? value) {
-    setState(() => _goodsType = value == null? 0: value);
+    setState(() => _goodsType = value == null ? 0 : value);
     _updateExtFee();
   }
 
@@ -1478,7 +1509,7 @@ class _OrderFormScreenState extends State<OrderFormScreen> {
   }
 
   void _onOrderStatusChanged(int? value) {
-    setState(() => _status = value == null? 0: value);
+    setState(() => _status = value == null ? 0 : value);
   }
 
   void _onPriceTypeChanged(PriceType? value) {
